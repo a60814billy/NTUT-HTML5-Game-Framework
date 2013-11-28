@@ -9,7 +9,8 @@ var framework = (function (framework) {
         // gameloop is running ?
         this._isRun = false;
         // gameloop fps
-        this._fps = 60;
+        this._updateFPS = 60;
+	    this._drawFPS = 60;
         // show fps's div
         this._fpsContext = null;
         // FPS analysis object
@@ -23,37 +24,29 @@ var framework = (function (framework) {
         this._convas.setAttribute("id", "__game_canvas__");
         this._context = this._convas.getContext("2d");
 
-        this.initialize = function () {
-            framework.log.info("game init non-override");
-        };
-        this.update = function () {
-            //log("game update non-override");
-        };
-        this.draw = function () {
-            //log("game draw non-override");
-        };
+        this.initialize = function () {};
+        this.update = function () {};
+        this.draw = function () {};
 
         this.start = function () {
             this.initialize();
-
-
-            this.run();
-            this._isRun = true;
+	        if(!this._isRun){
+		        this.run();
+	        }
         };
-
 
         this.run = function () {
             // dynamic product runnable function
             this._run = (function (that) {
                 // local variable for game loop use
                 var nextGameTick = (new Date()).getTime();
-                var skipTicks = 1000 / that.getFPS();
+                var skipTicks = 1000 / that._updateFPS;
                 return function () {
-                    while ((new Date().getTime() > nextGameTick)) {
+                    while ((new Date()).getTime() > nextGameTick) {
                         // update FPS counter
                         that._fpsAnalysis.update();
                         // show FPS information
-                        if (that.fpsContext) that.fpsContext.innerHTML = "update FPS:" + that._fpsAnalysis.getFPS() + "<br />draw FPS:" + that._drawfpsAnalysis.getFPS();
+                        if (that.fpsContext) that.fpsContext.innerHTML = "update FPS:" + that._fpsAnalysis.getUpdateFPS() + "<br />draw FPS:" + that._drawfpsAnalysis.getUpdateFPS();
                         // run Game's update
                         that.update();
                         // setup next run update time
@@ -62,25 +55,45 @@ var framework = (function (framework) {
                     // run Game's draw
                     that.draw(that.context);
                     that._drawfpsAnalysis.update();
+	                if (that.fpsContext) that.fpsContext.innerHTML = "update FPS:" + that._fpsAnalysis.getUpdateFPS() + "<br />draw FPS:" + that._drawfpsAnalysis.getUpdateFPS();
                 }
             })(this);
-            //window.requestAnimationFrame(this._run);
-            this._runInstance = setInterval(this._run, 1000 / 60);
-            //this._run();
+            this._runInstance = setInterval(this._run, 1000 / this._drawFPS);
+	        this._isRun = true;
         };
+
+	    this.stop = function(){
+		    if(this._isRun){
+			    clearInterval(this._runInstance);
+			    this._runInstance = null;
+			    this._isRun = false;
+		    }
+	    };
 
         // propetity
-        this.setFPS = function (fps) {
-            this._fps = fps;
-            if (this._isRun) {
-                clearInterval(this._runInstance);
-                this.run();
-            }
+        this.setUpdateFPS = function (fps) {
+            this._updateFPS = fps;
+            this.stop();
+	        this.run();
         };
 
-        this.getFPS = function () {
-            return this._fps;
+        this.getUpdateFPS = function () {
+            return this._updateFPS;
         };
+
+	    this.setDrawFPS = function(fps){
+		    if(fps > 60){
+				framework.DebugInfo.log.warring("FPS must more than 60");
+			    fps = 60;
+		    }
+		    this._drawFPS = fps;
+		    this.stop();
+		    this.run();
+	    };
+
+	    this.getDrawFPS = function(){
+		    return this._drawFPS;
+	    };
 
         this.setContext = function (context) {
             if (context) {
