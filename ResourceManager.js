@@ -25,77 +25,75 @@ framework.ResourceManager = (function(){
 	//Private
 	var ResourceManager, responsedResource = {}, requestCount = 0, responseCount = 0, mainGame = {}, ajaxProcessing = true, intervalID = 0, timeountID = 0;
 
+	var jsonProperty = {id: 'id', compositeGraph: 'compositeGraph', inGraphPositionX: 'inGraphPositionX', inGraphPositionY: 'inGraphPositionY', width: 'width', height: 'height'};
 
+	var encode64 = function(inputStr){var b64="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";var outputStr="";var i=0;while(i<inputStr.length){var byte1=inputStr.charCodeAt(i++)&255;var byte2=inputStr.charCodeAt(i++)&255;var byte3=inputStr.charCodeAt(i++)&255;var enc1=byte1>>2;var enc2=(byte1&3)<<4|byte2>>4;var enc3,enc4;if(isNaN(byte2))enc3=enc4=64;else{enc3=(byte2&15)<<2|byte3>>6;if(isNaN(byte3))enc4=64;else enc4=byte3&63}outputStr+=b64.charAt(enc1)+b64.charAt(enc2)+b64.charAt(enc3)+b64.charAt(enc4)}return outputStr};
 
-	var encode64 = function(inputStr){var b64="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";var outputStr="";var i=0;while(i<inputStr.length){var byte1=inputStr.charCodeAt(i++)&255;var byte2=inputStr.charCodeAt(i++)&255;var byte3=inputStr.charCodeAt(i++)&255;var enc1=byte1>>2;var enc2=(byte1&3)<<4|byte2>>4;var enc3,enc4;if(isNaN(byte2))enc3=enc4=64;else{enc3=(byte2&15)<<2|byte3>>6;if(isNaN(byte3))enc4=64;else enc4=byte3&63}outputStr+=b64.charAt(enc1)+b64.charAt(enc2)+b64.charAt(enc3)+b64.charAt(enc4)}return outputStr},
-	jsonProperty = {id: 'id', compositeGraph: 'compositeGraph', inGraphPositionX: 'inGraphPositionX', inGraphPositionY: 'inGraphPositionY', width: 'width', height: 'height'},
-	setProperty = function(userProperty) {
-
-		setSettingsInfo(jsonProperty, userProperty);	
-		
+	var setProperty = function(userProperty) {
+		setSettingsInfo(jsonProperty, userProperty);		
 	}; 
 
 	var getId = function(json) {
 		return getProperty(json, jsonProperty.id);
 	};
 
-	var getCompositeGraph = function(json) {
-		
-		return getProperty(json, jsonProperty.compositeGraph);
-		
-	}, getInGraphPositionX = function(json) {
-		
-		return getProperty(json, jsonProperty.inGraphPositionX);
-		
-	}, getInGraphPositionY = function(json) {
-		
-		return getProperty(json, jsonProperty.inGraphPositionY);
-		
-	}, getWidth = function(json) {
-		
-		return getProperty(json, jsonProperty.width);
-		
-	}, getHeight = function(json) {
-		
-		return getProperty(json, jsonProperty.height);
-		
-	}, 
-	/** Happy New Year */
-	getProperty = function(json, propertyName) {
-		
-		if (json.hasOwnProperty(jsonProperty[propertyName]))
+	var getCompositeGraph = function(json) {		
+		return getProperty(json, jsonProperty.compositeGraph);		
+	};
+
+	var getInGraphPositionX = function(json) {		
+		return getProperty(json, jsonProperty.inGraphPositionX);		
+	};
+
+	var getInGraphPositionY = function(json) {		
+		return getProperty(json, jsonProperty.inGraphPositionY);		
+	};
+
+	var getWidth = function(json) {		
+		return getProperty(json, jsonProperty.width);		
+	};
+
+	var getHeight = function(json) {		
+		return getProperty(json, jsonProperty.height);		
+	};
+
+	var getProperty = function(json, propertyName) {		
+		if (json.hasOwnProperty(jsonProperty[propertyName])) {
 			return json[jsonProperty[propertyName]];
+		}
 			
-		if (!isUndefined(json[0])) 
+		if (!isUndefined(json[0])) {
 			return getProperty(json[0]);
-			
+		}
 			
 		for (var key in json) { 
-			if(!userSettings.hasOwnProperty(key))
+			if (!userSettings.hasOwnProperty(key)) {
 				userSettings[key] = defaultSettings[key];
+			}
 		}
+	};
 
-	}, setSettingsInfo = function(defaultSettings, userSettings) {
-
+	var setSettingsInfo = function(defaultSettings, userSettings) {
 		for (var key in defaultSettings) { 
-			if(isUndefined(userSettings[key]))
+			if (isUndefined(userSettings[key])){
 				userSettings[key] = defaultSettings[key];
+			}				
 		}
-		
-	}, isUndefined = function(obj) {
+	};
 
-		return (typeof obj === 'undefined');
-		
-	}, ajaxGetJSON = function(requestTarget, data, success) {
+	var isUndefined = function(obj) {
+		return (typeof obj === 'undefined');		
+	};
 
+	var ajaxGetJSON = function(requestTarget, data, success) {
 		minAjaxJSON('GET', requestTarget);
-		
-	}, ajaxPostJSON = function(requestTarget) {
-		
-		minAjaxJSON('POST', requestTarget);
-		
-	}, minAjaxJSON = function(type, requestTarget) {		
+	};
 
+	var ajaxPostJSON = function(requestTarget) {
+		minAjaxJSON('POST', requestTarget);		
+	};
+
+	var minAjaxJSON = function(type, requestTarget) {
 		requestTarget.systemSuccess = function(responseText, textStatus, xmlHttpRequest) { 
 			var responseJSON = eval('(' + responseText.trim() + ')');	//因有可能是不合法的JSON, 故只能用eval了
 			responsedResource[requestTarget.id] = { url: requestTarget.url, response: responseJSON };
@@ -104,26 +102,26 @@ framework.ResourceManager = (function(){
 			}
 		};
 
-		minAjax(type, requestTarget);			
+		minAjax(type, requestTarget);	
+	};
 
-	}, ajaxGet = function(requestTarget) {
-		
-		minAjax('GET', requestTarget);	
-		
-	}, ajaxPost = function(requestTarget) {
-		
-		minAjax('POST', requestTarget);
-		
-	}, ajaxGetImg = function(requestTarget) {
-		
-		minAjaxImg('GET', requestTarget);	
-		
-	}, ajaxPostImg = function(requestTarget) {
-		
-		minAjaxImg('POST', requestTarget);
-		
-	}, minAjaxImg = function(type, requestTarget) {		
+	var ajaxGet = function(requestTarget) {		
+		minAjax('GET', requestTarget);			
+	};
 
+	var ajaxPost = function(requestTarget) {		
+		minAjax('POST', requestTarget);		
+	};
+
+	var ajaxGetImg = function(requestTarget) {		
+		minAjaxImg('GET', requestTarget);			
+	};
+
+	var ajaxPostImg = function(requestTarget) {		
+		minAjaxImg('POST', requestTarget);		
+	};
+
+	var minAjaxImg = function(type, requestTarget) {
 		var id = requestTarget.id;
 		requestTarget.systemSuccess = function(responseText, textStatus, xmlHttpRequest) { 
 			var encodedResponseText = encode64(responseText);			
@@ -133,12 +131,11 @@ framework.ResourceManager = (function(){
 			}
 		};
 
-		minAjax(type, requestTarget);			
+		minAjax(type, requestTarget);
+	};
 
-	}, minAjax = function(type, requestTarget) {
-
+	var minAjax = function(type, requestTarget) {
 		var userSettings = userSettings || {};
-
 		userSettings.type = type || 'POST';
 
 		if (!isUndefined(requestTarget.data)) {
@@ -150,9 +147,9 @@ framework.ResourceManager = (function(){
 		}	
 
 		ajax(requestTarget, userSettings);
+	};
 
-	}, ajax = function(requestTarget, userSettings) {
-
+	var ajax = function(requestTarget, userSettings) {
 		requestCount += 1;
 
 		var defaultSettings = {
@@ -211,38 +208,40 @@ framework.ResourceManager = (function(){
 			
 			httpRequest.setRequestHeader('Content-Type', userSettings.contentType);	
 			httpRequest.send(userSettings.data);
-		}
-		
-	}, setSettingsInfo = function(defaultSettings, userSettings) {
+		}		
+	};
 
+	var setSettingsInfo = function(defaultSettings, userSettings) {
 		for (var key in defaultSettings) { 
 			if (isUndefined(userSettings[key]))
 				userSettings[key] = defaultSettings[key];
-		}
-		
-	}, getResource = function(id) {	
+		}		
+	};
 
+	var getResource = function(id) {
 		return responsedResource[id].response;
+	};
 
-	}, destroyResource = function(id) {
-
+	var destroyResource = function(id) {
 		responsedResource[id].response = null;
 		responsedResource[id].url = null;
 		delete responsedResource[id];
+	};
 
-	}, setGame = function(game) {
-
+	var setGame = function(game) {
 		mainGame = game;
+	};
 
-	}, detectAjax = function() {
+	var detectAjax = function() {
 		//Constuctor即開始偵測		
 		ajaxProcessing = (requestCount != responseCount);
+	};
 
-	}, stopDetectingAjax = function() {		
-		
+	var stopDetectingAjax = function() {
 		clearInterval(intervalID);
+	};
 
-	}, gameStart = function() {
+	var gameStart = function() {
 		//由game來控制遊戲開始的時機, 需要是在發出所有request後, 再call這個funciton
 		if(!ajaxProcessing) {
 			stopDetectingAjax();
@@ -253,7 +252,6 @@ framework.ResourceManager = (function(){
 				clearTimeout(timeountID);
 			}, 500);
 		}
-
 	};
 
 	//Constuctor
@@ -262,7 +260,6 @@ framework.ResourceManager = (function(){
 	 * @param {Game} game funny
 	 */
 	ResourceManager = function(game) {
-
 		requestCount = 0;
 		responseCount = 0;
 
@@ -271,7 +268,6 @@ framework.ResourceManager = (function(){
 		}
 
 		intervalID = setInterval(detectAjax, 50);
-
 	};
 
 	//Public
