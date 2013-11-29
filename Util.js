@@ -1,38 +1,38 @@
-var framework = (function (framework) {
+var Framework = (function (Framework) {
 
-	framework.Util = {};
+	Framework.Util = {};
 
-	framework.Util.isUndefined = function (obj) {
+	Framework.Util.isUndefined = function (obj) {
 		return (typeof obj === 'undefined');
 	};
 
-	framework.Util.isFunction = function (obj) {
+	Framework.Util.isFunction = function (obj) {
 		return (typeof  obj === 'function');
 	};
 
-	framework.Util.isNumber = function (obj) {
+	Framework.Util.isNumber = function (obj) {
 		return (typeof  obj === 'number');
 	};
 
-	framework.Util.isObject = function (obj) {
+	Framework.Util.isObject = function (obj) {
 		return (typeof  obj === 'object');
 	};
 
-	framework.Util.isBoolean = function (obj) {
-		framework.DebugInfo.log.info(typeof obj);
+	Framework.Util.isBoolean = function (obj) {
+		Framework.DebugInfo.Log.info(typeof obj);
 		return (typeof  obj === 'boolean');
 	};
 
-	framework.Util.isString = function (obj) {
-		framework.DebugInfo.log.info(typeof obj);
+	Framework.Util.isString = function (obj) {
+		Framework.DebugInfo.Log.info(typeof obj);
 		return (typeof  obj === 'string');
 	};
 
-	framework.Util.namespace = function (ns_string) {
+	Framework.Util.namespace = function (ns_string) {
 		var parts = ns_string.split("."),
-			parent = framework,
+			parent = Framework,
 			i;
-		if (parts[0] === "framework") {
+		if (parts[0] === "Framework") {
 			parts = parts.slice(1);
 		}
 		for (i = 0; i < parts.length; i += 1) {
@@ -44,7 +44,7 @@ var framework = (function (framework) {
 		return parts;
 	};
 
-	framework.overrideProperty = function (defaultSettings, userSettings) {
+	Framework.Util.overrideProperty = function (defaultSettings, userSettings) {
 		for (var key in defaultSettings) {
 			if (isUndefined(userSettings[key])) {
 				userSettings[key] = defaultSettings[key];
@@ -52,5 +52,5 @@ var framework = (function (framework) {
 		}
 	};
 
-	return framework;
-})(framework || {});
+	return Framework;
+})(Framework || {});

@@ -1,8 +1,7 @@
-var framework = (function (framework) {
-	framework.DebugInfo = (function () {
-
-		var _showDebugInfo = false;
-
+var Framework = (function (Framework) {
+	Framework.DebugInfo = (function () {
+		var _showDebugInfo = false,
+            that = {};
 		var _debugInfo = document.createElement("div");
 		_debugInfo.style.width = '500px';
 		_debugInfo.style.height = '200px';
@@ -25,31 +24,31 @@ var framework = (function (framework) {
 			return newLog;
 		};
 
-		this.log = {};
+		that.Log = {};
 
-		this.log.info = function (str) {
+		that.Log.info = function (str) {
 			_prepareLog("Info", str).style.backgroundColor = "#80ffff";
 		};
 
-		this.log.error = function (str) {
+		that.Log.error = function (str) {
 			_prepareLog("Error", str).style.backgroundColor = "#ff8080";
 		};
 
-		this.log.warring = function (str) {
+		that.Log.warring = function (str) {
 			_prepareLog("Warring", str).style.backgroundColor = "#ffff80";
 		};
 
-		this.log.console = function (str) {
+		that.Log.console = function (str) {
 			if (_showDebugInfo) {
-				console.log(str);
+				console.Log(str);
 			}
 		};
 
-		this.showDebugInfo = function (isShowDebug) {
+		that.showDebugInfo = function (isShowDebug) {
 			_showDebugInfo = isShowDebug;
 		};
 
-		this.show = function (dom) {
+		that.show = function (dom) {
 			if (_showDebugInfo) {
 				if (dom) {
 					dom.appendChild(_debugInfo);
@@ -58,8 +57,8 @@ var framework = (function (framework) {
 				}
 			}
 		};
-		return this;
+		return that;
 	})();
 
-	return framework;
-})(framework || {});
+	return Framework;
+})(Framework || {});

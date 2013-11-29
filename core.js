@@ -20,51 +20,46 @@
         };
 })();
 
-var framework = (function (framework) {
-    // log
-    framework.log = {};
-    framework.log.info = function (str) {
-        var newLog = document.createElement("p");
-        var log = document.createTextNode("System log : " + str);
-        newLog.appendChild(log);
-        document.getElementById("log").appendChild(newLog);
+var Framework = (function (Framework) {
+    // Extend Date's function , add format method
+    Date.prototype.format = function (format) {
+        var o = {
+            "M+": this.getMonth() + 1, //month
+            "d+": this.getDate(),    //day
+            "h+": this.getHours(),   //hour
+            "m+": this.getMinutes(), //minute
+            "s+": this.getSeconds(), //second
+            "q+": Math.floor((this.getMonth() + 3) / 3),  //quarter
+            "S": this.getMilliseconds() //millisecond
+        };
+
+        if (/(y+)/.test(format)) format = format.replace(RegExp.$1,
+            (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)if (new RegExp("(" + k + ")").test(format))
+            format = format.replace(RegExp.$1,
+                RegExp.$1.length == 1 ? o[k] :
+                    ("00" + o[k]).substr(("" + o[k]).length));
+        return format;
     };
-    // create namespace from javascript patterns namespace pattern
-    framework.namespace = function (ns_string) {
-        var parts = ns_string.split("."),
-            parent = framework,
-            i;
-        if (parts[0] === "framework") {
-            parts = parts.slice(1);
-        }
-        for (i = 0; i < parts.length; i += 1) {
-            if (typeof parent[parts[i]] === "undefined") {
-                parent[parts[i]] = {};
+
+    // Framework.class.create (simulator Inheritance class)
+    Framework.inheritance = function (createObj, options) {
+        var emptyObj = function () {};
+        var newObj = new createObj();
+        emptyObj.prototype = createObj.prototype;
+        newObj.prototype = new emptyObj;
+        newObj.uber = createObj.prototype;
+        //讀出所有的屬性，如果不是內建的就加給obj
+        for (var option in options) {
+            if (options.hasOwnProperty(option)) {
+                newObj[option] = options[option];
             }
-            parent = parent[parts[i]];
         }
-        return parts;
+        return newObj;
     };
-    // framework.class.create (simulator Inheritance class)
-    framework.class = {
-        create: function (createObj, options) {
-            var emptyObj = function () {
-            };
-            var newObj = new createObj();
-            emptyObj.prototype = createObj.prototype;
-            newObj.prototype = new emptyObj;
-            newObj.uber = createObj.prototype;
-            //讀出所有的屬性，如果不是內建的就加給obj
-            for (var option in options) {
-                if (options.hasOwnProperty(option)) {
-                    newObj[option] = options[option];
-                }
-            }
-            return newObj;
-        }
-    };
-    return framework;
-})(framework || {});
+
+    return Framework;
+})(Framework || {});
 
 
 

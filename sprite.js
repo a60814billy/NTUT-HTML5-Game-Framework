@@ -1,21 +1,20 @@
 // By Raccoon
 // include namespace
 
-var framework = (function (framework) {
-    framework.Sprite = function (options) {
-        console.log(typeof  options);
-        var texture = null;
-        var type = null;
-        if ((typeof options) === "string") {
+var Framework = (function (Framework) {
+    Framework.Sprite = function (options) {
+        var texture = null,
+            type = null;
+
+        if (Framework.Util.isString(options)) {
             var image = document.createElement("img");
             image.src = options;
             texture = image;
             type = "image";
+        } else {
+            Framework.DebugInfo.Log.error("Sprite 不支援的參數 " + options);
         }
-        if ((typeof  options) === "canvas") {
-            texture = options;
-            type = "canvas";
-        }
+
         return {
             index: 0,
             type: type,
@@ -23,11 +22,10 @@ var framework = (function (framework) {
                 x: 0,
                 y: 0
             },
-            rotation: 0.3,
-            scale: 0.1,
+            rotation: 0,
+            scale: 1,
             texture: texture,
             update: function () {
-
             },
             draw: function (context) {
                 var tmp = document.createElement("canvas");
@@ -36,11 +34,10 @@ var framework = (function (framework) {
                 var tmpContext = tmp.getContext("2d");
                 tmpContext.scale(this.scale, this.scale);
                 tmpContext.rotate(this.rotation);
-                tmpContext.drawImage(this.texture, 300, -300);
-
+                tmpContext.drawImage(this.texture, 0, 0);
                 context.drawImage(tmpContext.canvas, this.position.x, this.position.y);
             }
         };
     };
-    return framework;
-})(framework || {});
+    return Framework;
+})(Framework || {});
