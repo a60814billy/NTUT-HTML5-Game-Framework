@@ -30,7 +30,36 @@ var Framework = (function (Framework) {
         this.touchend = function(e){};
         this.touchmove = function(e){};
 
-
+        var eventHandler = (function(that){
+            return function(e){
+                switch (e.type){
+                    case "click":
+                        that.click(e);
+                        break;
+                    case "mousedown":
+                        that.mousedown(e);
+                        break;
+                    case "mouseup":
+                        that.mouseup(e);
+                        break;
+                    case "mousemove":
+                        that.mousemove(e);
+                        break;
+                    case "touchstart":
+                        e.preventDefault();
+                        that.touchstart(e);
+                        break;
+                    case "touchend":
+                        e.preventDefault();
+                        that.touchend(e);
+                        break;
+                    case "touchmove":
+                        e.preventDefault();
+                        that.touchmove(e);
+                        break;
+                }
+            }
+        })(this);
 
 		// defined default Game screen (canvas object)
 		this._convas = document.createElement("canvas");
@@ -46,13 +75,13 @@ var Framework = (function (Framework) {
 
 		this.start = function () {
 			this.initialize();
-            this._canvas.addEventListener("click" , this.click);
-            this._canvas.addEventListener("mousedown" , this.mousedown);
-            this._canvas.addEventListener("mouseup" , this.mouseup);
-            this._canvas.addEventListener("mousemove" , this.mousemove);
-            this._canvas.addEventListener("touchstart" , this.touchstart);
-            this._canvas.addEventListener("touchend" , this.touchend);
-            this._canvas.addEventListener("touchmove" , this.touchmove);
+            this._canvas.addEventListener("click" , eventHandler);
+            this._canvas.addEventListener("mousedown" , eventHandler);
+            this._canvas.addEventListener("mouseup" , eventHandler);
+            this._canvas.addEventListener("mousemove" , eventHandler);
+            this._canvas.addEventListener("touchstart" , eventHandler);
+            this._canvas.addEventListener("touchend" , eventHandler);
+            this._canvas.addEventListener("touchmove" , eventHandler);
 			if (!this._isRun) {
 				this.run();
 			}

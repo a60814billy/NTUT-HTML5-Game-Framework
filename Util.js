@@ -19,12 +19,10 @@ var Framework = (function (Framework) {
 	};
 
 	Framework.Util.isBoolean = function (obj) {
-		Framework.DebugInfo.Log.info(typeof obj);
 		return (typeof  obj === 'boolean');
 	};
 
 	Framework.Util.isString = function (obj) {
-		Framework.DebugInfo.Log.info(typeof obj);
 		return (typeof  obj === 'string');
 	};
 

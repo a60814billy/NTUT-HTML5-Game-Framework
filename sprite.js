@@ -11,7 +11,9 @@ var Framework = (function (Framework) {
             image.src = options;
             texture = image;
             type = "image";
-        } else {
+        } else if(Framework.Util.isUndefined(options)) {
+            // = sense
+        }else{
             Framework.DebugInfo.Log.error("Sprite 不支援的參數 " + options);
         }
 
@@ -28,14 +30,18 @@ var Framework = (function (Framework) {
             update: function () {
             },
             draw: function (context) {
-                var tmp = document.createElement("canvas");
-                tmp.width = this.texture.width;
-                tmp.height = this.texture.height;
-                var tmpContext = tmp.getContext("2d");
-                tmpContext.scale(this.scale, this.scale);
-                tmpContext.rotate(this.rotation);
-                tmpContext.drawImage(this.texture, 0, 0);
-                context.drawImage(tmpContext.canvas, this.position.x, this.position.y);
+                if(this.type == "image"){
+                    var tmp = document.createElement("canvas");
+                    tmp.width = this.texture.width;
+                    tmp.height = this.texture.height;
+                    var tmpContext = tmp.getContext("2d");
+                    tmpContext.scale(this.scale, this.scale);
+                    tmpContext.rotate(this.rotation);
+                    tmpContext.drawImage(this.texture, 0, 0);
+                    context.drawImage(tmpContext.canvas, this.position.x, this.position.y);
+                }else if(this.type=="canvas"){
+                    context.drawImage(this.texture, this.position.x, this.position.y);
+                }
             }
         };
     };
