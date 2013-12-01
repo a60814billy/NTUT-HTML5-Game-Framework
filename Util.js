@@ -44,10 +44,11 @@ var Framework = (function (Framework) {
 
 	Framework.Util.overrideProperty = function (defaultSettings, userSettings) {
 		for (var key in defaultSettings) {
-			if (isUndefined(userSettings[key])) {
+			if (Framework.Util.isUndefined(userSettings[key])) {
 				userSettings[key] = defaultSettings[key];
 			}
 		}
+		return userSettings;
 	};
 
 	return Framework;
