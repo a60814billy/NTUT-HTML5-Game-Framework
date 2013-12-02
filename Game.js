@@ -19,52 +19,62 @@ var Framework = (function (Framework) {
 		// for gameloop -
 		this._runInstance = null;
 
-        //Event Handler
-        // mouse event
-        this.click = function(e){};
-        this.mousedown = function(e){};
-        this.mouseup = function(e){};
-        this.mousemove = function(e){};
-        // touch event
-        this.touchstart = function(e){};
-        this.touchend = function(e){};
-        this.touchmove = function(e){};
+		this._context = null;
+		this._context = null;
 
-        var eventHandler = (function(that){
-            return function(e){
-                switch (e.type){
-                    case "click":
-                        that.click(e);
-                        break;
-                    case "mousedown":
-                        that.mousedown(e);
-                        break;
-                    case "mouseup":
-                        that.mouseup(e);
-                        break;
-                    case "mousemove":
-                        that.mousemove(e);
-                        break;
-                    case "touchstart":
-                        e.preventDefault();
-                        that.touchstart(e);
-                        break;
-                    case "touchend":
-                        e.preventDefault();
-                        that.touchend(e);
-                        break;
-                    case "touchmove":
-                        e.preventDefault();
-                        that.touchmove(e);
-                        break;
-                }
-            }
-        })(this);
+		//Event Handler
+		// mouse event
+		this.click = function (e) {
+		};
+		this.mousedown = function (e) {
+		};
+		this.mouseup = function (e) {
+		};
+		this.mousemove = function (e) {
+		};
+		// touch event
+		this.touchstart = function (e) {
+		};
+		this.touchend = function (e) {
+		};
+		this.touchmove = function (e) {
+		};
+
+		this.eventHandler = function (e) {
+			switch (e.type) {
+				case "contextmenu":
+				case "click":
+					this.click(e);
+					return false;
+					break;
+				case "mousedown":
+					this.mousedown(e);
+					break;
+				case "mouseup":
+					this.mouseup(e);
+					break;
+				case "mousemove":
+					this.mousemove(e);
+					break;
+				case "touchstart":
+					e.preventDefault();
+					this.touchstart(e);
+					break;
+				case "touchend":
+					e.preventDefault();
+					this.touchend(e);
+					break;
+				case "touchmove":
+					e.preventDefault();
+					this.touchmove(e);
+					break;
+			}
+		};
 
 		// defined default Game screen (canvas object)
-		this._convas = document.createElement("canvas");
-		this._convas.setAttribute("id", "__game_canvas__");
-		this._context = this._convas.getContext("2d");
+		//this._convas = document.createElement("canvas");
+		//this._convas.setAttribute("id", "__game_canvas__");
+		//this._context = this._convas.getContext("2d");
 
 		this.initialize = function () {
 		};
@@ -75,13 +85,31 @@ var Framework = (function (Framework) {
 
 		this.start = function () {
 			this.initialize();
-            this._canvas.addEventListener("click" , eventHandler);
-            this._canvas.addEventListener("mousedown" , eventHandler);
-            this._canvas.addEventListener("mouseup" , eventHandler);
-            this._canvas.addEventListener("mousemove" , eventHandler);
-            this._canvas.addEventListener("touchstart" , eventHandler);
-            this._canvas.addEventListener("touchend" , eventHandler);
-            this._canvas.addEventListener("touchmove" , eventHandler);
+			var self = this;
+			this._canvas.addEventListener("click", function (e) {
+				self.eventHandler(e);
+			});
+			this._canvas.addEventListener("mousedown", function (e) {
+				self.eventHandler(e);
+			});
+			this._canvas.addEventListener("mouseup", function (e) {
+				self.eventHandler(e);
+			});
+			this._canvas.addEventListener("mousemove", function (e) {
+				self.eventHandler(e);
+			});
+			this._canvas.addEventListener("touchstart", function (e) {
+				self.eventHandler(e);
+			});
+			this._canvas.addEventListener("touchend", function (e) {
+				self.eventHandler(e);
+			});
+			this._canvas.addEventListener("touchmove", function (e) {
+				self.eventHandler(e);
+			});
+			this._canvas.addEventListener("contextmenu", function (e) {
+				self.eventHandler(e);
+			});
 			if (!this._isRun) {
 				this.run();
 			}
@@ -105,6 +133,7 @@ var Framework = (function (Framework) {
 						nextGameTick += skipTicks;
 					}
 					// run Game's draw
+					that._context.clearRect(0,0,that._canvas.width , that._canvas.height);
 					that.draw(that._context);
 					that._drawfpsAnalysis.update();
 					if (that.fpsContext) that.fpsContext.innerHTML = "update FPS:" + that._fpsAnalysis.getUpdateFPS() + "<br />draw FPS:" + that._drawfpsAnalysis.getUpdateFPS();
@@ -147,14 +176,14 @@ var Framework = (function (Framework) {
 			return this._drawFPS;
 		};
 
-        this.setCanvas = function(canvas){
-            if(canvas){
-                this._canvas = null;
-                this._context = null;
-                this._canvas = canvas;
-                this._context = this._canvas.getContext("2d");
-            }
-        }
+		this.setCanvas = function (canvas) {
+			if (canvas) {
+				this._canvas = null;
+				this._context = null;
+				this._canvas = canvas;
+				this._context = this._canvas.getContext("2d");
+			}
+		};
 
 		this.setContext = function (context) {
 			if (context) {
