@@ -16,6 +16,7 @@ var Framework = (function (Framework) {
 		var _prepareLog = function (state, str) {
 			var newLog = document.createElement("p");
 			newLog.style.margin = "0";
+			newLog.style.minWidth = "600px";	//In order to fill the background color
 			newLog.style.padding = "2px 0 2px 5px";
 			var logTxt = document.createTextNode("[" + (new Date()).format("hh:mm:ss") + "] " + "[" + state + "] " + str);
 			newLog.appendChild(logTxt);

@@ -40,6 +40,17 @@ var Framework = (function (Framework) {
 		this.touchmove = function (e) {
 		};
 
+		//
+		this.keydown = function (e) {
+			console.log(e.keyCode);
+		};
+		this.keyup = function (e) {
+			console.log(e.keyCode);
+		};
+		this.keypress = function (e) {
+			console.log(e.keyCode);
+		};
+
 		this.eventHandler = function (e) {
 			switch (e.type) {
 				case "contextmenu":
@@ -68,6 +79,14 @@ var Framework = (function (Framework) {
 					e.preventDefault();
 					this.touchmove(e);
 					break;
+				/*case "keydown":
+					e.preventDefault();
+					this.keydown(e);
+					break;
+				case "keypress":
+					e.preventDefault();
+					this.keypress(e);
+					break;*/
 			}
 		};
 
@@ -110,6 +129,9 @@ var Framework = (function (Framework) {
 			this._canvas.addEventListener("contextmenu", function (e) {
 				self.eventHandler(e);
 			});
+
+			Framework.KeyBoardManager.setKeyupEvent(self.keyup);
+			Framework.KeyBoardManager.setKeydownEvent(self.keydown);
 			if (!this._isRun) {
 				this.run();
 			}
