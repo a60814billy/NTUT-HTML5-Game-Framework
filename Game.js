@@ -186,7 +186,7 @@ var Framework = (function (Framework) {
 
 		this.setDrawFPS = function (fps) {
 			if (fps > 60) {
-				Framework.DebugInfo.Log.warring("FPS must smaller than 60");
+				Framework.DebugInfo.Log.warring("FPS must be smaller than 60");
 				fps = 60;
 			}
 			this._drawFPS = fps;
