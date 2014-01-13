@@ -1,28 +1,30 @@
 var Framework = (function (Framework) {
 	//Framework.Util.namespace("Framework.ResourceManager");
 	Framework.ResourceManager = (function(){
-		var requestCount = 0,
-			responseCount = 0, 
-			timeountID = 0, 
-			intervalID = 0, 
-			responsedResource = {}, 
-			mainGameContorller = {};
+		var _requestCount = 0,
+			_responseCount = 0, 
+			_timeountID = 0, 
+			_intervalID = 0, 
+			_responsedResource = {}, 
+			_subjectFunction = function() {},
+			ResourceManagerClass = function() {},
+			ResourceManagerIntance = function() {};
 
 		var loadImage = function(requestOption) {
 			var imageObj = new Image();
 			imageObj.src = requestOption['url'];
-			requestCount++;
+			_requestCount++;
 			imageObj.onload = function() {
-		      responseCount++;
-		      responsedResource[requestOption.id] = { url: requestOption.url, response: imageObj };
+		      _responseCount++;
+		      _responsedResource[requestOption.id] = { url: requestOption.url, response: imageObj };
 		    };
 		};
 
 		var minAjaxJSON = function(requestOption) {
 			requestOption.systemSuccess = function(responseText, textStatus, xmlHttpRequest) { 
 				var responseJSON = eval('(' + responseText.trim() + ')');	//因有可能是不合法的JSON, 故只能用eval了
-				responsedResource[requestOption.id] = { url: requestOption.url, response: responseJSON };	
-				responseCount++;		
+				_responsedResource[requestOption.id] = { url: requestOption.url, response: responseJSON };	
+				_responseCount++;		
 			};
 
 			minAjax(requestOption.type, requestOption);	
@@ -44,7 +46,7 @@ var Framework = (function (Framework) {
 		};
 
 		var ajax = function(requestOption, userSettings) {
-			requestCount++;
+			_requestCount++;
 			var defaultSettings = {
 				type:'POST',
 				cache:false,
@@ -69,7 +71,7 @@ var Framework = (function (Framework) {
 				xhr.onload = (function() {
 					if (xhr.readyState === 4) {
 	    				if (xhr.status === 200) {
-	    					responsedResource[requestOption.id] = { url: requestOption.url, response: xhr.responseText }; 
+	    					_responsedResource[requestOption.id] = { url: requestOption.url, response: xhr.responseText }; 
 							userSettings.success(xhr.responseText, xhr.statusText, xhr);
 	    				} else {
 	    					userSettings.error(xhr, xhr.statusText);
@@ -97,30 +99,30 @@ var Framework = (function (Framework) {
 
 
 		var getResource = function(id) {
-			if(Framework.Util.isUndefined(responsedResource[id])) {
+			if(Framework.Util.isUndefined(_responsedResource[id])) {
 				throw ('"' + id + '" is undefined Resource.');
 			}		
-			return responsedResource[id].response;
+			return _responsedResource[id].response;
 		};
 
 		var destroyResource = function(id) {
-			responsedResource[id].response = null;
-			responsedResource[id].url = null;
-			delete responsedResource[id];
+			_responsedResource[id].response = null;
+			_responsedResource[id].url = null;
+			delete _responsedResource[id];
 		};
 
-		var setGame = function(game) {
-			mainGame = game;
+		var setSubjectFunction = function(subjectFunction) {
+			_subjectFunction = subjectFunction;
 		};
 
 		var detectAjax = function() {
 			//Constuctor即開始偵測	
-			//要有(requestCount == 0)是為了避免一開始就去執行gameController.start
-			ajaxProcessing = (requestCount != responseCount) || (requestCount == 0);		
+			//要有(_requestCount == 0)是為了避免一開始就去執行gameController.start
+			ajaxProcessing = (_requestCount != _responseCount) || (_requestCount == 0);		
 		};
 
 		var stopDetectingAjax = function() {
-			clearInterval(intervalID);
+			clearInterval(_intervalID);
 		};
 
 		var finishLoading = function() {
@@ -128,11 +130,11 @@ var Framework = (function (Framework) {
 			detectAjax();
 			if(!ajaxProcessing) {
 				stopDetectingAjax();
-				mainGameContorller.start();
+				_subjectFunction();
 			} else {
-				timeountID = setTimeout(function() {  
+				_timeountID = setTimeout(function() {  
 					finishLoading();
-					clearTimeout(timeountID);
+					clearTimeout(_timeountID);
 				}, 500);
 			}
 		};
@@ -142,22 +144,22 @@ var Framework = (function (Framework) {
 		 * @constructor
 		 * @param {Game} game funny
 		 */
-		ResourceManager = function(gameContorller) {
-			requestCount = 0;
-			responseCount = 0;
-			responsedResource = {};
+		ResourceManagerClass = function(subjectFunction) {
+			_requestCount = 0;
+			_responseCount = 0;
+			_responsedResource = {};
 
-			if(!Framework.Util.isUndefined(gameContorller)) {
-				mainGameContorller = gameContorller;
+			if(!Framework.Util.isUndefined(subjectFunction)) {
+				_subjectFunction = subjectFunction;
 			}
 
-			intervalID = setInterval(detectAjax, 50);
+			_intervalID = setInterval(detectAjax, 50);
 			finishLoading();
 		};
 
 		//Public
 		/** request anything */
-		ResourceManager.prototype = {
+		ResourceManagerClass.prototype = {
 			/** Load image */
 			loadImage: loadImage,
 			/** Load JSON by AJAX */
@@ -165,10 +167,12 @@ var Framework = (function (Framework) {
 			/** Delete Resource */
 			destroyResource: destroyResource,
 			/** Get Resource */
-			getResource: getResource,		
+			getResource: getResource,	
+			setSubjectFunction: setSubjectFunction,	
 		};
 
-		return ResourceManager;	
+		ResourceManagerIntance = new ResourceManagerClass();
+		return ResourceManagerIntance;	
 	})();
 	return Framework;
 })(Framework || {});

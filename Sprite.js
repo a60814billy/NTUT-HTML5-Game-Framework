@@ -4,13 +4,19 @@
 var Framework = (function (Framework) {
     Framework.Sprite = function (options) {
         var texture = null,
-            type = null;
+            type = null,
+            id,
+            url;
 
         if (Framework.Util.isString(options)) {
-            var image = document.createElement("img");
+            id = options;
+            url = options;
+            Framework.ResourceManager.loadImage({id:options, url:options});
+            type = 'image';
+           /* var image = document.createElement("img");
             image.src = options;
             texture = image;
-            type = "image";
+            type = "image";*/
         } else if(Framework.Util.isUndefined(options)) {
             // = sense
         }else{
@@ -30,6 +36,7 @@ var Framework = (function (Framework) {
             update: function () {
             },
             draw: function (context) {
+                this.texture = Framework.ResourceManager.getResource(id);
                 if(this.type == "image"){
                     var tmp = document.createElement("canvas");
                     tmp.width = this.texture.width;

@@ -130,11 +130,14 @@ var Framework = (function (Framework) {
 				self.eventHandler(e);
 			});
 
+			Framework.ResourceManager.setSubjectFunction(function() {
+				if (!self._isRun) {
+					self.run();
+				}
+			});
 			Framework.KeyBoardManager.setKeyupEvent(self.keyup);
 			Framework.KeyBoardManager.setKeydownEvent(self.keydown);
-			if (!this._isRun) {
-				this.run();
-			}
+			
 		};
 
 		this.run = function () {
