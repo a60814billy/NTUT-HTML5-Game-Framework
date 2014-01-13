@@ -88,9 +88,11 @@ var Framework = (function (Framework) {
 		};
 
 		// defined default Game screen (canvas object)
-		//this._convas = document.createElement("canvas");
-		//this._convas.setAttribute("id", "__game_canvas__");
-		//this._context = this._convas.getContext("2d");
+		this._canvas = document.createElement("canvas");
+		this._canvas.setAttribute("id", "__game_canvas__");
+		this._canvas.width = innerWidth;
+		this._canvas.height = innerHeight;
+		this._context = this._canvas.getContext("2d");
 
 		this.initialize = function () {
 		};
@@ -100,6 +102,7 @@ var Framework = (function (Framework) {
 		};
 
 		this.start = function () {
+			document.body.appendChild(this._canvas);
 			this.initialize();
 			var self = this;
 			this._canvas.addEventListener("click", function (e) {

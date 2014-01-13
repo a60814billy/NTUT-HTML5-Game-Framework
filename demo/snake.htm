@@ -23,31 +23,11 @@
                     $.DebugInfo.showDebugInfo(true);
                     $.DebugInfo.show();
 
-                    this.drawSnake = new $.Sprite("snake_files/body.png");
-                   // this.drawSnake.type = "image";
-                    /*
-                    var canvas = document.createElement('canvas');
-                    var context = canvas.getContext('2d');
-                    context.rect(0, 0, 10, 10);
-                    context.stroke();
-                    this.drawSnake.type = "canvas";
-                    this.drawSnake.texture = canvas;
-                    */
-
+                    this.drawSnake = new $.Sprite("snake_files/body.png");                   
                     this.drawFood = new $.Sprite("snake_files/food.jpg");
-                   // this.drawFood.type = "image";
-                    /*
-                    var Foodcanvas = document.createElement('canvas');
-                    var Foodcontext = Foodcanvas.getContext('2d');
-                    Foodcontext.fillStyle = "red";
-                    Foodcontext.fillRect(0, 0, 10, 10);
-                    Foodcontext.stroke();
-                    this.drawFood.type = "canvas";
-                    this.drawFood.texture = Foodcanvas;
-                    */
-
+                  
                     this.size = 48;
-                    this.setCanvas(document.getElementById("viewport"));
+                    //this.setCanvas(document.getElementById("viewport"));
                     this.snakeArray = new Array(this.size);
                     for (var i = 0; i < this.size; i++) {
                         this.snakeArray[i] = new Array(this.size);
@@ -72,7 +52,6 @@
                     var length = this.snakeBody.length - 1;
                     var oldX, oldY;
                     if (this.speedCounter === this.speed) {
-                        //$.DebugInfo.Log.info(this.clickx);
                         switch (this.dir) {
                             case 6:
                                 if (this.snakeBody[length].x === this.size - 1) {
@@ -286,7 +265,7 @@
     </style>
 </head>
 <body>
-    <canvas id="viewport" width="480" height="480" style="border: 1px solid #000;" oncontextmenu="return false;"></canvas>
+ <!--   <canvas id="viewport" width="480" height="480" style="border: 1px solid #000;" oncontextmenu="return false;"></canvas>-->
 
     <div style="width: 500px; height: 200px; background-color: rgb(240, 240, 240); position: absolute; top: 10px; border: 1px solid rgb(0, 0, 0); right: 10px; z-index: 99999; overflow-y: scroll;"></div>
 
