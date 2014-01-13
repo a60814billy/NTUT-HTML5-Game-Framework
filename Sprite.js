@@ -3,16 +3,16 @@
 
 var Framework = (function (Framework) {
     Framework.Sprite = function (options) {
-        var texture = null,
-            type = null,
-            id,
-            url;
+        var _texture = null,
+            _type = null,
+            _id,
+            _url;
 
         if (Framework.Util.isString(options)) {
-            id = options;
-            url = options;
+            _id = options;
+            _url = options;
             Framework.ResourceManager.loadImage({id:options, url:options});
-            type = 'image';
+            _type = 'image';
            /* var image = document.createElement("img");
             image.src = options;
             texture = image;
@@ -25,18 +25,18 @@ var Framework = (function (Framework) {
 
         return {
             index: 0,
-            type: type,
+            type: _type,
             position: {
                 x: 0,
                 y: 0
             },
             rotation: 0,
             scale: 1,
-            texture: texture,
+            texture: _texture,
             update: function () {
             },
             draw: function (context) {
-                this.texture = Framework.ResourceManager.getResource(id);
+                this.texture = Framework.ResourceManager.getResource(_id);
                 if(this.type == "image"){
                     var tmp = document.createElement("canvas");
                     tmp.width = this.texture.width;
