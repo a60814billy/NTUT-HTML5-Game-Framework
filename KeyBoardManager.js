@@ -9,18 +9,24 @@ var Framework = (function (Framework) {
 			KeyBoardManagerClass = {},
 			KeyBoardManagerInstance = {},
 			userKeydownEvent = function() {},
-			userKeyupEvent = function() {};
+			userKeyupEvent = function() {}
+			_subjectArr = [],
+			_subjectLenth = 0;
 
 		var keydownEvent = function(e) {
 			e.preventDefault();
-			var keyCode = _keyCodeToChar[e.which || e.keyCode];
+			var keyCode = _keyCodeToChar[e.which || e.keyCode], i;
 			if(!Framework.Util.isUndefined(_keydownList[keyCode])) {
 				var ele = _keydownList[keyCode];
 				ele.lastTimeDiff = e.timeStamp - ele.firstTimeStamp;
 			} else {
 				_keydownList[keyCode] = { key:keyCode, firstTimeStamp: e.timeStamp, ctrlKey: e.ctrlKey,  shiftKey: e.shiftKey, altKey: e.altKey, lastTimeDiff: 0 };
 			}
-			userKeydownEvent.call(this, _keydownList[keyCode], _keydownList, e);
+
+			
+			for(i = 0; i < _subjectLenth; i++) {
+				userKeydownEvent.call(_subjectArr[i], _keydownList[keyCode], _keydownList, e);
+			}
 		};
 
 		var keyupEvent = function(e) {
@@ -35,7 +41,10 @@ var Framework = (function (Framework) {
 				}
 				_keydownList[temp][keyCode] = false;
 			}
-			userKeyupEvent.call(this, e);
+
+			for(i = 0; i < _subjectLenth; i++) {
+				userKeyupEvent.call(_subjectArr[i], e);
+			}
 		};
 
 		var setKeydownEvent = function(userFunction) {
@@ -60,6 +69,21 @@ var Framework = (function (Framework) {
 			_timeountID = setTimeout(clearHistory, _clearHistoryTime);
 		};
 
+		var addSubject = function(subject) {
+			_subjectArr.push(subject);
+			_subjectLenth++;
+		};
+
+		var removeSubject = function(subject) {
+			var i, len = _subjectArr.length;
+			for(i = 0; i < len; i++) {
+				if(_subjectArr[i] === subject)
+					break;
+			}
+			_subjectArr.splice(i, 1);
+			_subjectLenth--;
+		};
+
 		KeyBoardManagerClass = function() {
 			window.addEventListener("keydown", keydownEvent, false);
 			window.addEventListener("keyup", keyupEvent, false);
@@ -68,6 +92,8 @@ var Framework = (function (Framework) {
 
 
 		KeyBoardManagerClass.prototype = {
+			addSubject: addSubject,
+			removeSubject: removeSubject,
 			setClearHistoryTime: setClearHistoryTime,
 			setKeydownEvent: setKeydownEvent,
 			setKeyupEvent: setKeyupEvent,

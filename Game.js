@@ -42,13 +42,10 @@ var Framework = (function (Framework) {
 
 		//
 		this.keydown = function (e) {
-			console.log(e.keyCode);
 		};
 		this.keyup = function (e) {
-			console.log(e.keyCode);
 		};
 		this.keypress = function (e) {
-			console.log(e.keyCode);
 		};
 
 		this.eventHandler = function (e) {
@@ -135,6 +132,8 @@ var Framework = (function (Framework) {
 					self.run();
 				}
 			});
+
+			Framework.KeyBoardManager.addSubject(self);
 			Framework.KeyBoardManager.setKeyupEvent(self.keyup);
 			Framework.KeyBoardManager.setKeydownEvent(self.keydown);
 			
