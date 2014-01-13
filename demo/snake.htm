@@ -16,13 +16,10 @@
     <script type="text/javascript">        
         window.onload = function () {
             var $ = Framework;
-            $.DebugInfo.showDebugInfo(true);
-
+        
             var mineGame = $.inheritance($.Game, {
                 initialize: function () {
-                    $.DebugInfo.showDebugInfo(true);
-                    $.DebugInfo.show();
-
+                   
                     this.drawSnake = new $.Sprite("snake_files/body.png");                   
                     this.drawFood = new $.Sprite("snake_files/food.jpg");
                   
@@ -266,8 +263,4 @@
 </head>
 <body>
  <!--   <canvas id="viewport" width="480" height="480" style="border: 1px solid #000;" oncontextmenu="return false;"></canvas>-->
-
-    <div style="width: 500px; height: 200px; background-color: rgb(240, 240, 240); position: absolute; top: 10px; border: 1px solid rgb(0, 0, 0); right: 10px; z-index: 99999; overflow-y: scroll;"></div>
-
-
-<div style="width: 500px; height: 200px; background-color: rgb(240, 240, 240); position: absolute; top: 10px; border: 1px solid rgb(0, 0, 0); right: 10px; z-index: 99999; overflow-y: scroll;"></div></body></html>
+</body></html>

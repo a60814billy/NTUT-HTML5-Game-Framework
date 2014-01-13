@@ -1,6 +1,7 @@
 var Framework = (function (Framework) {
 	Framework.DebugInfo = (function () {
 		var _showDebugInfo = false,
+			_containerAppended = false,
             that = {};
 		var _debugInfo = document.createElement("div");
 		_debugInfo.style.width = '500px';
@@ -45,19 +46,32 @@ var Framework = (function (Framework) {
 			}
 		};
 
-		that.showDebugInfo = function (isShowDebug) {
+		/*that.showDebugInfo = function (isShowDebug) {
 			_showDebugInfo = isShowDebug;
-		};
+		};*/
 
-		that.show = function (dom) {
-			if (_showDebugInfo) {
-				if (dom) {
-					dom.appendChild(_debugInfo);
-				} else {
-					document.body.appendChild(_debugInfo);
-				}
+		that.show = function (dom) {				
+			
+			_debugInfo.style.visibility = 'visible';
+			_debugInfo.style.width = '500px';
+			_debugInfo.style.height = '200px';
+			_debugInfo.style.border = "1px solid #000";
+			
+			if(!_containerAppended) {
+				var container = dom || document.body;
+				container.appendChild(_debugInfo)
 			}
 		};
+
+		that.hide = function (dom) {
+			var zeroPxStr = '0px';
+			_debugInfo.style.visibility = 'hidden';
+			_debugInfo.style.border = zeroPxStr;
+			_debugInfo.style.width = zeroPxStr;
+			_debugInfo.style.height = zeroPxStr;
+		};
+
+
 		return that;
 	})();
 
