@@ -1,45 +1,43 @@
 // By Raccoon , undyingmoon
-// include namespace
-
-// control screen refresh to 60 FPS (Because screen update is 50Hz ~ 60Hz)
-(function () {
-    window.requestAnimationFrame = window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        function (callback, element) {
-            callback.requestAnimationFrame = window.setInterval(callback, 16.666);
-        };
-    window.cancelRequestAnimationFrame = window.cancelRequestAnimationFrame ||
-        window.webkitCancelRequestAnimationFrame ||
-        window.mozCancelRequestAnimationFrame ||
-        function (callback, element) {
-            window.clearInterval(callback.requestAnimationFrame);
-            callback.requestAnimationFrame = null;
-            delete callback.requestAnimationFrame;
-        };
-})();
 
 var Framework = (function (Framework) {
-    // Extend Date's function , add format method
-    Date.prototype.format = function (format) {
-        var o = {
-            "M+": this.getMonth() + 1, //month
-            "d+": this.getDate(),    //day
-            "h+": this.getHours(),   //hour
-            "m+": this.getMinutes(), //minute
-            "s+": this.getSeconds(), //second
-            "q+": Math.floor((this.getMonth() + 3) / 3),  //quarter
-            "S": this.getMilliseconds() //millisecond
+
+    Framework.Class = function(){
+        "use strict";
+        var parent, props , child , f , i;
+        if(arguments.length === 1){
+            props = arguments[0];
+        }else if(arguments.length === 2){
+            parent = arguments[0];
+            props = arguments[1];
+        }
+
+        // 1. new constructor
+        child = function(){
+            // 這邊應該是要執行uber的constructor，但是會因為參數的順序產生問題..
+            if(child.uber && child.uber.hasOwnProperty("__construct")){
+                child.uber.__construct.apply(this , arguments);
+            }
+            if(child.prototype.hasOwnProperty("__construct")){
+                child.prototype.__construct.apply(this, arguments);
+            }
         };
 
-        if (/(y+)/.test(format)) format = format.replace(RegExp.$1,
-            (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-        for (var k in o)if (new RegExp("(" + k + ")").test(format))
-            format = format.replace(RegExp.$1,
-                RegExp.$1.length == 1 ? o[k] :
-                    ("00" + o[k]).substr(("" + o[k]).length));
-        return format;
+        // 2. inherit
+        parent = parent || Object;
+        f = function(){};
+        f.prototype = parent.prototype;
+        child.prototype = new f();
+        child.uber = parent.prototype;
+        child.prototype.constructor = child;
+
+        // 3. add implementation methods
+        for(i in props){
+            if(props.hasOwnProperty(i)){
+                child.prototype[i] = props[i];
+            }
+        }
+        return child;
     };
 
     // Framework.class.create (simulator Inheritance class)
@@ -60,7 +58,3 @@ var Framework = (function (Framework) {
 
     return Framework;
 })(Framework || {});
-
-
-
-

@@ -13,7 +13,7 @@ var Framework = (function (Framework) {
 
 		var setErrorEvent = function(eventFunction) {
 			_errorEvent = eventFunction;
-		}
+		};
 
 		var addSongs = function(playlist) {
 			_mainPlaylist =  $.Util.overrideProperty(playlist, _mainPlaylist);
@@ -22,7 +22,7 @@ var Framework = (function (Framework) {
 		var removeSong = function(song) {
 			_mainPlaylist[_mainPlaylist] = null;
 			delete _mainPlaylist[_mainPlaylist];
-		}
+		};
 
 		//只接受String或Array
 		var removeSongs = function(songs) {
@@ -139,17 +139,17 @@ var Framework = (function (Framework) {
 		var manageMute = function(name, muted) {
 			var audio = _audioInstanceObj[name];
 			audio.muted = muted;
-		}
+		};
 
 		var openVolume = function(name) {
 			manageMute(name, false);
-		}
+		};
 
 		var openVolumeAll = function() {
 			for(tempName in _audioInstanceObj) {
 				openVolume(tempName);
 			}
-		}
+		};
 
 		var mute = function(name) {
 			manageMute(name, true);
@@ -217,7 +217,7 @@ var Framework = (function (Framework) {
 			off: off,
 			allOn: allOn,
 			allOff: allOff,*/
-		}
+		};
 
 		return _audioClass;
 	})();

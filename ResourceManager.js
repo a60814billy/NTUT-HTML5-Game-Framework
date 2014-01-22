@@ -78,7 +78,7 @@ var Framework = (function (Framework) {
 	    				}
 	    			}
 				});
-			};	
+			}
 			
 			if (!userSettings.cache && Framework.Util.isUndefined(userSettings.data) && userSettings.type === 'GET') {	
 				requestOption.url = requestOption.url + '?' + Math.random();	
