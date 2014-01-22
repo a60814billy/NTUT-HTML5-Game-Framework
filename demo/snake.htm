@@ -19,9 +19,24 @@
             var $ = Framework;
         
             var mineGame = $.inheritance($.Game, {
+                initializeProgressResource: function() {
+                    
+                },
+                loadingProgress: function(ctx) {
+                    //console.log($.ResourceManager.getFinishedRequestPercent())
+                    ctx.font="90px Arial";
+                    ctx.fillText($.ResourceManager.getFinishedRequestPercent() + "%",10,50);
+                },
                 initialize: function () {
-                   
-                    this.drawSnake = new $.Sprite("snake_files/body.png");                   
+                   //console.log('initialize')
+                    
+                    this.f = new $.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?lll=55555');
+                    this.g = new $.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?yyy=55555');
+                    this.e = new $.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?ccc=55555');
+                    this.d = new $.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?nnn=55555');
+                    this.c = new $.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?mmm=55555');
+                    this.b = new $.Sprite("https://dl.dropboxusercontent.com/s/ibzeksz1x7ew82x/doorAnimate.png?dl=1&token_hash=AAFaUoR0A3_b1ckwGJIUAei8brkTNEmOdaOaVNh3rbVO5Q");
+                    this.drawSnake = new $.Sprite("snake_files/body.png"); 
                     this.drawFood = new $.Sprite("snake_files/food.jpg");
                   
                     this.size = 48;
@@ -47,6 +62,7 @@
                     this.createFood();
                 },
                 update: function () {
+                    //console.log('update')
                     var length = this.snakeBody.length - 1;
                     var oldX, oldY;
                     if (this.speedCounter === this.speed) {
@@ -177,7 +193,7 @@
                     }
                 },
                 draw: function (ctx) {
-
+                   // console.log('draw')
                     for (var i = 0; i < this.size; i++) {
                         for (var j = 0; j < this.size; j++) {
                             if (this.snakeArray[i][j] === 1) {
@@ -196,6 +212,7 @@
                 click: function (e) {
                 },
                 keydown: function (key, list, e) {
+                    console.log(key);
                     if (list.Right && (this.dir === 8 || this.dir === 2)) {
                         this.dir = 6;
                     }

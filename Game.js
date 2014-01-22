@@ -6,6 +6,8 @@ var Framework = (function (Framework) {
 		// as work as use new keyword.
 		if (!(this instanceof arguments.callee)) return new arguments.callee();
 
+
+		this._isInit = false;
 		// gameloop is running ?
 		this._isRun = false;
 		// gameloop fps
@@ -20,7 +22,10 @@ var Framework = (function (Framework) {
 		this._runInstance = null;
 
 		this._context = null;
-		this._context = null;
+
+		this._tempUpdate = function() {};
+		this._tempDraw = function(context) {};
+
 
 		//Event Handler
 		// mouse event
@@ -94,6 +99,10 @@ var Framework = (function (Framework) {
 		this._canvas.height = innerHeight;
 		this._context = this._canvas.getContext("2d");
 
+		this.initializeProgressResource = function() {
+		};
+		this.loadingProgress = function(context) {
+		};
 		this.initialize = function () {
 		};
 		this.update = function () {
@@ -102,9 +111,11 @@ var Framework = (function (Framework) {
 		};
 
 		this.start = function () {
-			document.body.appendChild(this._canvas);
-			this.initialize();
+			document.body.appendChild(this._canvas);			
 			var self = this;
+			this._tempDraw = self.draw;
+			this._tempUpdate = self.update;	
+			this.initializeProgressResource();
 			this._canvas.addEventListener("click", function (e) {
 				self.eventHandler(e);
 			});
@@ -130,11 +141,41 @@ var Framework = (function (Framework) {
 				self.eventHandler(e);
 			});
 
-			Framework.ResourceManager.setSubjectFunction(function() {
+			var runFunction = function() {
+				self._isRun = true;
+				self.stop();
+				self.draw = self._tempDraw;
+				self.update = self._tempUpdate;
+				self.run();
+			};
+
+			var	initFunction = function() {
+				self._isInit = true;					
+				self.draw = self.loadingProgress;
+				self.update = function() {};
+				self.run();
+				self._isRun = false;
+				self.initialize();
+				if(Framework.ResourceManager.getRequestCount() ===  Framework.ResourceManager.getResponseCount()) {
+					runFunction();
+				}
+			};
+
+			Framework.ResourceManager.setSubjectFunction(function() {				
+				if(!self._isInit) {
+					initFunction();
+					return;
+				}
+
 				if (!self._isRun) {
-					self.run();
+					runFunction();
 				}
 			});
+
+			
+			if(Framework.ResourceManager.getRequestCount() === 0) {
+				initFunction();
+			}
 
 			Framework.KeyBoardManager.addSubject(self);
 			Framework.KeyBoardManager.setKeyupEvent(self.keyup);

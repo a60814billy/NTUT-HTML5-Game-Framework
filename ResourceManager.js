@@ -1,8 +1,13 @@
+/** 
+	* @constructor
+	* @param {Game} game funny
+*/
 var Framework = (function (Framework) {
-	//Framework.Util.namespace("Framework.ResourceManager");
+	//Framework.Util.namespace("Framework.ResourceManager");	
 	Framework.ResourceManager = (function(){
 		var _requestCount = 0,
 			_responseCount = 0, 
+			_timeountIDPrevious = 0,
 			_timeountID = 0, 
 			_intervalID = 0, 
 			_responsedResource = {}, 
@@ -10,7 +15,25 @@ var Framework = (function (Framework) {
 			ResourceManagerClass = function() {},
 			ResourceManagerIntance = function() {};
 
+		
+		var getFinishedRequestPercent = function() {
+			return _responseCount / _requestCount * 100;
+		};
+
+		var getRequestCount = function() {
+			return _requestCount;
+		};
+
+		var getResponseCount = function() {
+			return _responseCount;
+		};
+
 		var loadImage = function(requestOption) {
+			if(_intervalID === null) {
+				_intervalID = setInterval(detectAjax, 50);
+				finishLoading();
+			}
+
 			var imageObj = new Image();
 			imageObj.src = requestOption['url'];
 			_requestCount++;
@@ -118,11 +141,12 @@ var Framework = (function (Framework) {
 		var detectAjax = function() {
 			//Constuctor即開始偵測	
 			//要有(_requestCount == 0)是為了避免一開始就去執行gameController.start
-			ajaxProcessing = (_requestCount != _responseCount) || (_requestCount == 0);		
+			ajaxProcessing = (_requestCount !== _responseCount) || (_requestCount === 0);		
 		};
 
 		var stopDetectingAjax = function() {
 			clearInterval(_intervalID);
+			_intervalID = null;
 		};
 
 		var finishLoading = function() {
@@ -132,18 +156,14 @@ var Framework = (function (Framework) {
 				stopDetectingAjax();
 				_subjectFunction();
 			} else {
+				_timeountIDPrevious = _timeountID;
 				_timeountID = setTimeout(function() {  
 					finishLoading();
-					clearTimeout(_timeountID);
+					clearTimeout(_timeountIDPrevious);
 				}, 500);
 			}
 		};
-
-		//Constuctor
-		/** 
-		 * @constructor
-		 * @param {Game} game funny
-		 */
+		
 		ResourceManagerClass = function(subjectFunction) {
 			_requestCount = 0;
 			_responseCount = 0;
@@ -153,7 +173,7 @@ var Framework = (function (Framework) {
 				_subjectFunction = subjectFunction;
 			}
 
-			_intervalID = setInterval(detectAjax, 50);
+			//_intervalID = setInterval(detectAjax, 50);
 			finishLoading();
 		};
 
@@ -169,6 +189,9 @@ var Framework = (function (Framework) {
 			/** Get Resource */
 			getResource: getResource,	
 			setSubjectFunction: setSubjectFunction,	
+			getFinishedRequestPercent: getFinishedRequestPercent,
+			getRequestCount: getRequestCount,
+			getResponseCount: getResponseCount,
 		};
 
 		ResourceManagerIntance = new ResourceManagerClass();
