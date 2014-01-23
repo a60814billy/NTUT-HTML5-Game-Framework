@@ -4,8 +4,10 @@ var Framework = (function (Framework) {
 	Framework.Game = function () {
 		// ensure forget use new keyword to call this function
 		// as work as use new keyword.
-		if (!(this instanceof arguments.callee)) return new arguments.callee();
-
+		if (!(this instanceof Framework.Game)){
+            Framework.DebugInfo.Log.error("Game error : 必須要使用new關鍵字");
+            throw new SyntaxError("must be use new keyword on Game");
+        }
 
 		this._isInit = false;
 		// gameloop is running ?
@@ -266,7 +268,6 @@ var Framework = (function (Framework) {
 		this.getContext = function () {
 			return this.context;
 		};
-
 		return this;
 	};
 	return Framework;

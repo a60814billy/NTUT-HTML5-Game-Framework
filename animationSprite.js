@@ -7,15 +7,16 @@ var Framework = (function (Framework) {
             // private
             this._id = undefined;
             this._type = undefined;
-            this._fpsCounter = 0;
             this._isLoadSprite = false;
             this._sprites = [];
+            this._previousTime = (new Date()).getTime();
+            this._start = false;
             // public
             this.col = 1;
             this.row = 1;
             this.from = 0;
-            this.to = 0;
-            this.currentIndex = 0;
+            this.to = -1;
+            this.index = 0;
             this.speed = 10;
             this.loop = true;
             this.maxIndex = 0;
@@ -23,7 +24,7 @@ var Framework = (function (Framework) {
             // 建構子參數判斷
             if(!Framework.Util.isUndefined(options.url)){
                 if(Framework.Util.isString(options.url)){
-                    this.id = options.url;
+                    this._id = options.url;
                     if(Framework.Util.isUndefined(options.col) || Framework.Util.isUndefined(options.row)){
                         Framework.DebugInfo.Log.error("AnimationSprite Error : 建構子參數錯誤，需指定col、row");
                         throw new SyntaxError("AnimationSprite constructor arguments error");
@@ -44,17 +45,17 @@ var Framework = (function (Framework) {
                 throw new SyntaxError("AnimationSprite constructor arguments error");
             }
             this.speed = options.speed || 24 ;
-            this.loop = options.loop || true;
+            this.loop = (Framework.Util.isUndefined(options.loop) ? true : options.loop);
 
 
             if(Framework.Util.isString(options.url)){
                 //單張圖片切割
-                Framework.ResourceManager.loadImage({id:this.id, url:this.id});
-                this.type = 'one';
+                Framework.ResourceManager.loadImage({id:this._id, url:this._id});
+                this._type = 'one';
             }else if(Array.isArray(options.url)){
                 //一堆圖片串成動畫
-                this.id = [];
-                this.type = 'more';
+                this._id = [];
+                this._type = 'more';
                 options.url.forEach(function(src){
                     this._sprites.push(new Framework.Sprite(src));
                 } , this);
@@ -63,22 +64,53 @@ var Framework = (function (Framework) {
                 Framework.DebugInfo.Log.error("AnimationSprite 不支援的參數 " + options);
             }
         },
+        _nextFrame: function(){
+            if(this._start){
+                this.index ++;
+                if(this.to === -1){
+                    if(this.index >= this.maxIndex){
+                        this._start = this.loop;
+                        if(this._start){
+                            this.index = this.from;
+                        }else{
+                            this.index = this.maxIndex-1;
+                        }
+                    }
+                }else{
+                    if(this.index > this.to){
+                        this._start = this.loop;
+                        this.index = this.to;
+                    }
+                }
+            }
+        },
+        start:function(from , to , speed , loop){
+            this.from = (Framework.Util.isUndefined(from) ? this.from : from);
+            this.to = (Framework.Util.isUndefined(to) ? this.to : to);
+            this.speed = (Framework.Util.isUndefined(speed) ? this.speed : speed);
+            this.loop = (Framework.Util.isUndefined(loop) ? this.loop : loop);
+            this.index = this.from;
+            this._start = true;
+            this._previousTime = (new Date()).getTime();
+        },
         update:function(){
-            if((++this._fpsCounter>this.speed)){
-                this._fpsCounter = 0;
-                this.currentIndex = (this.currentIndex+1) % (this.col * this.row);
-                if(this.currentIndex >= this.maxIndex) this.currentIndex = 0 ;
+            var now = (new Date()).getTime();
+            if( (now - this._previousTime) > (1000 / this.speed) ){
+                for(var i= 1,l=Math.floor((now - this._previousTime)/(1000 / this.speed));i<=l;i++){
+                    this._nextFrame();
+                }
+                this._previousTime = now;
             }
             if(this._isLoadSprite){
-                this._sprites[this.currentIndex].position = this.position;
-                this._sprites[this.currentIndex].rotation = this.rotation;
-                this._sprites[this.currentIndex].scale = this.scale;
+                this._sprites[this.index].position = this.position;
+                this._sprites[this.index].rotation = this.rotation;
+                this._sprites[this.index].scale = this.scale;
             }else{
-                if(this.type === 'one'){
+                if(this._type === 'one'){
                     // 故意用 closures 隔離變數的scope
                     (function(){
                         for(var i=0;i<this.col*this.row;i++){
-                            var texture = Framework.ResourceManager.getResource(this.id);
+                            var texture = Framework.ResourceManager.getResource(this._id);
                             var tmp = document.createElement("canvas");
                             var realWidth = texture.width * this.scale;
                             var realHeight = texture.height * this.scale;
@@ -99,7 +131,7 @@ var Framework = (function (Framework) {
         },
         draw:function(context){
             if(this._isLoadSprite){
-                this._sprites[this.currentIndex].draw(context);
+                this._sprites[this.index].draw(context);
             }
         },
         toString:function(){
