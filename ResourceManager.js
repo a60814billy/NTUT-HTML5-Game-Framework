@@ -29,14 +29,14 @@ var Framework = (function (Framework) {
 		};
 
 		var loadImage = function(requestOption) {
-			if(_intervalID === null) {
-				_intervalID = setInterval(detectAjax, 50);
-				finishLoading();
-			}
 
 			var imageObj = new Image();
 			imageObj.src = requestOption['url'];
 			_requestCount++;
+            if(_intervalID === null) {
+                _intervalID = setInterval(detectAjax, 50);
+                finishLoading();
+            }
 			imageObj.onload = function() {
 		      _responseCount++;
 		      _responsedResource[requestOption.id] = { url: requestOption.url, response: imageObj };
@@ -131,6 +131,7 @@ var Framework = (function (Framework) {
 		var destroyResource = function(id) {
 			_responsedResource[id].response = null;
 			_responsedResource[id].url = null;
+            _responsedResource[id] = null;
 			delete _responsedResource[id];
 		};
 

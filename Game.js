@@ -1,87 +1,95 @@
 // By Raccoon
 // include namespace
 var Framework = (function (Framework) {
-	Framework.Game = function () {
-		// ensure forget use new keyword to call this function
-		// as work as use new keyword.
-		if (!(this instanceof Framework.Game)){
-            Framework.DebugInfo.Log.error("Game error : 必須要使用new關鍵字");
-            throw new SyntaxError("must be use new keyword on Game");
-        }
-
-		this._isInit = false;
+	Framework.Game = (function () {
+        var that = {};
+		that._isInit = false;
 		// gameloop is running ?
-		this._isRun = false;
+		that._isRun = false;
 		// gameloop fps
-		this._updateFPS = 60;
-		this._drawFPS = 60;
+		that._updateFPS = 60;
+		that._drawFPS = 60;
 		// show fps's div
-		this._fpsContext = null;
+		that._fpsContext = null;
 		// FPS analysis object
-		this._fpsAnalysis = new Framework.FpsAnalysis();
-		this._drawfpsAnalysis = new Framework.FpsAnalysis();
+		that._fpsAnalysis = new Framework.FpsAnalysis();
+		that._drawfpsAnalysis = new Framework.FpsAnalysis();
 		// for gameloop -
-		this._runInstance = null;
+		that._runInstance = null;
+        // game state
+        that._levels = [];
+        // current level
+        that._currentLevel = undefined;
 
-		this._context = null;
+		that._context = null;
 
-		this._tempUpdate = function() {};
-		this._tempDraw = function(context) {};
+		that._tempUpdate = function() {};
+		that._tempDraw = function(context) {};
 
 
 		//Event Handler
 		// mouse event
-		this.click = function (e) {
+		that.click = function (e) {
+            that._currentLevel.click(e);
 		};
-		this.mousedown = function (e) {
+		that.mousedown = function (e) {
+            that._currentLevel.mousedown(e);
 		};
-		this.mouseup = function (e) {
+		that.mouseup = function (e) {
+            that._currentLevel.mouseup(e);
 		};
-		this.mousemove = function (e) {
+		that.mousemove = function (e) {
+            that._currentLevel.mousemove(e);
 		};
 		// touch event
-		this.touchstart = function (e) {
+		that.touchstart = function (e) {
+            that._currentLevel.touchstart(e);
 		};
-		this.touchend = function (e) {
+		that.touchend = function (e) {
+            that._currentLevel.touchend(e);
 		};
-		this.touchmove = function (e) {
-		};
-
-		//
-		this.keydown = function (e) {
-		};
-		this.keyup = function (e) {
-		};
-		this.keypress = function (e) {
+		that.touchmove = function (e) {
+            that._currentLevel.touchmove(e);
 		};
 
-		this.eventHandler = function (e) {
+		//keyboard Event
+		that.keydown = function (e) {
+            that._currentLevel.keydown(e);
+		};
+		that.keyup = function (e) {
+            that._currentLevel.keyup(e);
+		};
+		that.keypress = function (e) {
+            that._currentLevel.keypress(e);
+		};
+
+		that.eventHandler = function (e) {
 			switch (e.type) {
 				case "contextmenu":
 				case "click":
-					this.click(e);
+					that.click(e);
 					return false;
 					break;
 				case "mousedown":
-					this.mousedown(e);
+					that.mousedown(e);
 					break;
 				case "mouseup":
-					this.mouseup(e);
+					that.mouseup(e);
 					break;
 				case "mousemove":
-					this.mousemove(e);
+					that.mousemove(e);
 					break;
 				case "touchstart":
 					e.preventDefault();
-					this.touchstart(e);
+					that.touchstart(e);
 					break;
 				case "touchend":
 					e.preventDefault();
-					this.touchend(e);
+					that.touchend(e);
 					break;
 				case "touchmove":
 					e.preventDefault();
-					this.touchmove(e);
+					that.touchmove(e);
 					break;
 				/*case "keydown":
 					e.preventDefault();
@@ -95,59 +103,152 @@ var Framework = (function (Framework) {
 		};
 
 		// defined default Game screen (canvas object)
-		this._canvas = document.createElement("canvas");
-		this._canvas.setAttribute("id", "__game_canvas__");
-		this._canvas.width = innerWidth;
-		this._canvas.height = innerHeight;
-		this._context = this._canvas.getContext("2d");
+		that._canvas = document.createElement("canvas");
+		that._canvas.setAttribute("id", "__game_canvas__");
+		that._canvas.width = innerWidth;
+		that._canvas.height = innerHeight;
+		that._context = that._canvas.getContext("2d");
 
-		this.initializeProgressResource = function() {
+		that.initializeProgressResource = function() {
+            that._currentLevel.initializeProgressResource();
 		};
-		this.loadingProgress = function(context) {
+		that.loadingProgress = function(context) {
+            that._currentLevel.loadingProgress(context);
 		};
-		this.initialize = function () {
+		that.initialize = function () {
+            that._currentLevel.initialize();
 		};
-		this.update = function () {
+		that.update = function () {
+            that._currentLevel.update();
 		};
-		this.draw = function () {
+		that.draw = function () {
+            that._currentLevel.draw();
 		};
 
-		this.start = function () {
-			document.body.appendChild(this._canvas);			
-			var self = this;
-			this._tempDraw = self.draw;
-			this._tempUpdate = self.update;	
-			this.initializeProgressResource();
-			this._canvas.addEventListener("click", function (e) {
-				self.eventHandler(e);
-			});
-			this._canvas.addEventListener("mousedown", function (e) {
-				self.eventHandler(e);
-			});
-			this._canvas.addEventListener("mouseup", function (e) {
-				self.eventHandler(e);
-			});
-			this._canvas.addEventListener("mousemove", function (e) {
-				self.eventHandler(e);
-			});
-			this._canvas.addEventListener("touchstart", function (e) {
-				self.eventHandler(e);
-			});
-			this._canvas.addEventListener("touchend", function (e) {
-				self.eventHandler(e);
-			});
-			this._canvas.addEventListener("touchmove", function (e) {
-				self.eventHandler(e);
-			});
-			this._canvas.addEventListener("contextmenu", function (e) {
-				self.eventHandler(e);
-			});
+        that._teardown = function(){
+            Framework.KeyBoardManager.removeSubject(that._currentLevel);
+            if(this._currentLevel.autoDelete){
+                this._currentLevel.autodelete();
+            }
+        };
+
+        that._findLevel = function(name){
+            for(var i= 0,l=that._levels.length;i<l;i++){
+                if(that._levels[i].name === name ){
+                    return that._levels[i].level;
+                }
+            }
+            return null;
+        };
+
+        // Level
+        that.addNewLevel = function(leveldata){
+            console.dir(leveldata);
+            for(var i in leveldata){
+                if(leveldata.hasOwnProperty(i)){
+                    if(Framework.Util.isNull(that._findLevel(i))){
+                        that._levels.push({name : i , level : leveldata[i]});
+                    }else{
+                        Framework.DebugInfo.Log.error("Game : 關卡名稱不能重複");
+                        throw new Error("Game: already has same level name");
+                    }
+                }
+            }
+        };
+
+        that.goToLevel = function(levelName){
+            that.stop();
+            that._teardown();
+            that._currentLevel = that._findLevel(levelName);
+            if(Framework.Util.isUndefined(that._currentLevel)){
+                Framework.DebugInfo.Log.error("Game : 找不到關卡");
+                throw new Error("Game : levelname not found.");
+            }
+            that.start();
+        };
+
+        that.goToNextLevel = function(){
+            that.stop();
+            that._teardown();
+            var flag = false;
+            for(var i in that._levels){
+                if(flag){
+                    that._currentLevel = that._levels[i].level;
+                    that.start();
+                    return;
+                }
+                if(that._levels[i].level === that._currentLevel){
+                    flag = true;
+                }
+            }
+            Framework.DebugInfo.Log.error("Game : 無下一關");
+            throw new Error("Game : can't goto next level.");
+        };
+
+        that.goToPreviousLevel = function(){
+            that.stop();
+            that._teardown();
+            var flag = false;
+            var prev = undefined;
+            for(var i in that._levels){
+                if(that._levels[i].level === that._currentLevel){
+                    if(!Framework.Util.isUndefined(prev)){
+                        that._currentLevel = prev;
+                        that.start();
+                        return;
+                    }
+                    break;
+                }
+                prev = that._levels[i].level;
+            }
+            Framework.DebugInfo.Log.error("Game : 無前一關");
+            throw new Error("Game : can't goto previous level.");
+        };
+
+		that.start = function () {
+            if(Framework.Util.isUndefined(that._currentLevel)){
+                that._currentLevel = that._levels[0].level;
+            }
+            var self = that;
+
+            if(!that._isInit){
+                document.body.appendChild(that._canvas);
+                that._canvas.addEventListener("click", function (e) {
+                    self.eventHandler(e);
+                });
+                that._canvas.addEventListener("mousedown", function (e) {
+                    self.eventHandler(e);
+                });
+                that._canvas.addEventListener("mouseup", function (e) {
+                    self.eventHandler(e);
+                });
+                that._canvas.addEventListener("mousemove", function (e) {
+                    self.eventHandler(e);
+                });
+                that._canvas.addEventListener("touchstart", function (e) {
+                    self.eventHandler(e);
+                });
+                that._canvas.addEventListener("touchend", function (e) {
+                    self.eventHandler(e);
+                });
+                that._canvas.addEventListener("touchmove", function (e) {
+                    self.eventHandler(e);
+                });
+                that._canvas.addEventListener("contextmenu", function (e) {
+                    self.eventHandler(e);
+                });
+            }
+
+			that._tempDraw = self._currentLevel.draw;
+			that._tempUpdate = self._currentLevel.update;
+			that.initializeProgressResource();
+
 
 			var runFunction = function() {
 				self._isRun = true;
 				self.stop();
-				self.draw = self._tempDraw;
-				self.update = self._tempUpdate;
+				self.draw = self._tempDraw.bind(self._currentLevel);
+				self.update = self._tempUpdate.bind(self._currentLevel);
 				self.run();
 			};
 
@@ -175,19 +276,19 @@ var Framework = (function (Framework) {
 			});
 
 			
-			if(Framework.ResourceManager.getRequestCount() === 0) {
+			//if(Framework.ResourceManager.getRequestCount() === 0) {
 				initFunction();
-			}
+			//}
 
-			Framework.KeyBoardManager.addSubject(self);
-			Framework.KeyBoardManager.setKeyupEvent(self.keyup);
-			Framework.KeyBoardManager.setKeydownEvent(self.keydown);
+			Framework.KeyBoardManager.addSubject(self._currentLevel);
+			Framework.KeyBoardManager.setKeyupEvent(self._currentLevel.keyup);
+			Framework.KeyBoardManager.setKeydownEvent(self._currentLevel.keydown);
 			
 		};
 
-		this.run = function () {
+		that.run = function () {
 			// dynamic product runnable function
-			this._run = (function (that) {
+			that._run = (function (that) {
 				// local variable for Game loop use
 				var nextGameTick = (new Date()).getTime();
 				var skipTicks = 1000 / that._updateFPS;
@@ -208,67 +309,67 @@ var Framework = (function (Framework) {
 					that._drawfpsAnalysis.update();
 					if (that.fpsContext) that.fpsContext.innerHTML = "update FPS:" + that._fpsAnalysis.getUpdateFPS() + "<br />draw FPS:" + that._drawfpsAnalysis.getUpdateFPS();
 				}
-			})(this);
-			this._runInstance = setInterval(this._run, 1000 / this._drawFPS);
-			this._isRun = true;
+			})(that);
+			that._runInstance = setInterval(that._run, 1000 / that._drawFPS);
+			that._isRun = true;
 		};
 
-		this.stop = function () {
-			if (this._isRun) {
-				clearInterval(this._runInstance);
-				this._runInstance = null;
-				this._isRun = false;
+		that.stop = function () {
+			if (that._isRun) {
+				clearInterval(that._runInstance);
+				that._runInstance = null;
+				that._isRun = false;
 			}
 		};
 
 		// propetity
-		this.setUpdateFPS = function (fps) {
-			this._updateFPS = fps;
-			this.stop();
-			this.run();
+		that.setUpdateFPS = function (fps) {
+			that._updateFPS = fps;
+			that.stop();
+			that.run();
 		};
 
-		this.getUpdateFPS = function () {
-			return this._updateFPS;
+		that.getUpdateFPS = function () {
+			return that._updateFPS;
 		};
 
-		this.setDrawFPS = function (fps) {
+		that.setDrawFPS = function (fps) {
 			if (fps > 60) {
 				Framework.DebugInfo.Log.warring("FPS must be smaller than 60");
 				fps = 60;
 			}
-			this._drawFPS = fps;
-			this.stop();
-			this.run();
+			that._drawFPS = fps;
+			that.stop();
+			that.run();
 		};
 
-		this.getDrawFPS = function () {
-			return this._drawFPS;
+		that.getDrawFPS = function () {
+			return that._drawFPS;
 		};
 
-		this.setCanvas = function (canvas) {
+		that.setCanvas = function (canvas) {
 			if (canvas) {
-				this._canvas = null;
-				this._context = null;
-				this._canvas = canvas;
-				this._context = this._canvas.getContext("2d");
+				that._canvas = null;
+				that._context = null;
+				that._canvas = canvas;
+				that._context = that._canvas.getContext("2d");
 			}
 		};
 
-		this.setContext = function (context) {
+		that.setContext = function (context) {
 			if (context) {
-				this.context = null;
-				this._canvas = null;
-				this.context = context;
+				that.context = null;
+				that._canvas = null;
+				that.context = context;
 			} else {
 				Framework.DebugInfo.Log.error("Game SetContext Error")
 			}
 		};
 
-		this.getContext = function () {
-			return this.context;
+		that.getContext = function () {
+			return that.context;
 		};
-		return this;
-	};
+		return that;
+	})();
 	return Framework;
 })(Framework || {});

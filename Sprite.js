@@ -47,6 +47,11 @@ var Framework = (function (Framework) {
         },
         toString:function(){
             return "[Sprite Object]";
+        },
+        teardown:function(){
+            if(this.type === 'image'){
+                Framework.ResourceManager.destroyResource(this.id);
+            }
         }
     });
     return Framework;

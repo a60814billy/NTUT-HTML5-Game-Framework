@@ -136,6 +136,15 @@ var Framework = (function (Framework) {
         },
         toString:function(){
             return "[AnimationSprite Object]";
+        },
+        teardown:function(){
+            if(this.type === 'one'){
+                Framework.ResourceManager.destroyResource(this.id);
+            }else if(this.type === 'more'){
+                this._sprites.forEach(function(s){
+                    s.teardown();
+                },this)
+            }
         }
     });
     return Framework;

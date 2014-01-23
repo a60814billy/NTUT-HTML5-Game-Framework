@@ -6,6 +6,10 @@ var Framework = (function (Framework) {
 		return (typeof obj === 'undefined');
 	};
 
+    Framework.Util.isNull = function(obj){
+        return (obj === null);
+    };
+
 	Framework.Util.isFunction = function (obj) {
 		return (typeof  obj === 'function');
 	};

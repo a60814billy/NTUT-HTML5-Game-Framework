@@ -10,7 +10,8 @@ Framework = (function (Framework) {
         },
         update: function(){},
         draw: function(){},
-        toString:function(){return "[Scene Object]"}
+        toString:function(){return "[Scene Object]"},
+        teardown:function(){}
     });
     return Framework;
 })(Framework || {});

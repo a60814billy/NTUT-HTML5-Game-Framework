@@ -1,284 +1,291 @@
 <!DOCTYPE html>
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
-    <meta charset="utf-8">
-    <title>Snake</title>
-   
-    <script type="text/javascript" src="../core.js"></script>
-    <script type="text/javascript" src="../Game.js"></script>
-    <script type="text/javascript" src="../Util.js"></script>
-    <script type="text/javascript" src="../DebugInfo.js"></script>
-    <script type="text/javascript" src="../FpsAnalysis.js"></script>
-    <script type="text/javascript" src="../scene.js"></script>
-    <script type="text/javascript" src="../Sprite.js"></script>
-    <script type="text/javascript" src="../KeyBoardManager.js"></script>
-    <script type="text/javascript" src="../ResourceManager.js"></script>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-    <script type="text/javascript">        
-        window.onload = function () {
-            var $ = Framework;
-        
-            var mineGame = $.inheritance($.Game, {
-                initializeProgressResource: function() {
-                    
-                },
-                loadingProgress: function(ctx) {
-                    //console.log($.ResourceManager.getFinishedRequestPercent())
-                    ctx.font="90px Arial";
-                    ctx.fillText($.ResourceManager.getFinishedRequestPercent() + "%",10,50);
-                },
-                initialize: function () {
-                   //console.log('initialize')
-                    
-                    this.f = new $.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?lll=55555');
-                    this.g = new $.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?yyy=55555');
-                    this.e = new $.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?ccc=55555');
-                    this.d = new $.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?nnn=55555');
-                    this.c = new $.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?mmm=55555');
-                    this.b = new $.Sprite("https://dl.dropboxusercontent.com/s/ibzeksz1x7ew82x/doorAnimate.png?dl=1&token_hash=AAFaUoR0A3_b1ckwGJIUAei8brkTNEmOdaOaVNh3rbVO5Q");
-                    this.drawSnake = new $.Sprite("snake_files/body.png"); 
-                    this.drawFood = new $.Sprite("snake_files/food.jpg");
-                  
-                    this.size = 48;
-                    //this.setCanvas(document.getElementById("viewport"));
-                    this.snakeArray = new Array(this.size);
-                    for (var i = 0; i < this.size; i++) {
-                        this.snakeArray[i] = new Array(this.size);
-                        for (var j = 0; j < this.size; j++) {
-                            this.snakeArray[i][j] = 0;
+<meta charset="utf-8">
+<title>Snake</title>
+
+<script type="text/javascript" src="../Util.js"></script>
+<script type="text/javascript" src="../core.js"></script>
+<script type="text/javascript" src="../DebugInfo.js"></script>
+<script type="text/javascript" src="../FpsAnalysis.js"></script>
+
+<script type="text/javascript" src="../scene.js"></script>
+<script type="text/javascript" src="../Sprite.js"></script>
+<script type="text/javascript" src="../animationSprite.js"></script>
+<script type="text/javascript" src="../CompositeSprite.js"></script>
+
+<script type="text/javascript" src="../KeyBoardManager.js"></script>
+<script type="text/javascript" src="../ResourceManager.js"></script>
+<script type="text/javascript" src="../level.js"></script>
+<script type="text/javascript" src="../Game.js"></script>
+
+<script type="text/javascript">
+window.onload = function () {
+    var $ = Framework;
+
+    var mineGame = $.Class($.Level, {
+        initializeProgressResource: function () {
+
+        },
+        loadingProgress: function (ctx) {
+            //console.log($.ResourceManager.getFinishedRequestPercent())
+            ctx.font = "90px Arial";
+            ctx.fillText($.ResourceManager.getFinishedRequestPercent() + "%", 10, 50);
+        },
+        initialize: function () {
+            //console.log('initialize')
+
+            this.f = new $.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?lll=55555');
+            this.g = new $.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?yyy=55555');
+            this.e = new $.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?ccc=55555');
+            this.d = new $.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?nnn=55555');
+            this.c = new $.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?mmm=55555');
+            this.b = new $.Sprite("https://dl.dropboxusercontent.com/s/ibzeksz1x7ew82x/doorAnimate.png?dl=1&token_hash=AAFaUoR0A3_b1ckwGJIUAei8brkTNEmOdaOaVNh3rbVO5Q");
+            this.drawSnake = new $.Sprite("snake_files/body.png");
+            this.drawFood = new $.Sprite("snake_files/food.jpg");
+
+            this.size = 48;
+            //this.setCanvas(document.getElementById("viewport"));
+            this.snakeArray = new Array(this.size);
+            for (var i = 0; i < this.size; i++) {
+                this.snakeArray[i] = new Array(this.size);
+                for (var j = 0; j < this.size; j++) {
+                    this.snakeArray[i][j] = 0;
+                }
+            }
+            this.speed = 10;
+            this.speedCounter = 0;
+            this.dir = 6;
+            this.eaten = false;
+            this.snakeBody = new Array;
+            this.snakeBody.push({ x: 1, y: 1 });
+            this.snakeBody.push({ x: 2, y: 1 });
+            this.snakeBody.push({ x: 3, y: 1 });
+            this.snakeArray[1][1] = 1;
+            this.snakeArray[2][1] = 1;
+            this.snakeArray[3][1] = 1;
+            this.createFood();
+        },
+        update: function () {
+            //console.log('update')
+            var length = this.snakeBody.length - 1;
+            var oldX, oldY;
+            if (this.speedCounter === this.speed) {
+                switch (this.dir) {
+                    case 6:
+                        if (this.snakeBody[length].x === this.size - 1) {
+                            oldY = this.snakeBody[length].y;
+                            this.snakeBody.push({ x: 0, y: oldY });
+                            if (this.snakeArray[0][oldY] === 2) {
+                                this.eaten = true;
+                            }
+                            else if (this.snakeArray[0][oldY] === 1) {
+                                this.stop();
+                                alert("Boom!!");
+                            }
+                            this.snakeArray[0][oldY] = 1;
                         }
-                    }
-                    this.speed = 10;
-                    this.speedCounter = 0;
-                    this.dir = 6;
+                        else {
+                            oldX = this.snakeBody[length].x + 1;
+                            oldY = this.snakeBody[length].y;
+                            this.snakeBody.push({ x: oldX, y: oldY });
+                            if (this.snakeArray[oldX][oldY] === 2) {
+                                this.eaten = true;
+                            }
+                            else if (this.snakeArray[oldX][oldY] === 1) {
+                                this.stop();
+                                alert("Boom!!");
+                            }
+                            this.snakeArray[oldX][oldY] = 1;
+                        }
+                        break;
+                    case 2:
+                        if (this.snakeBody[length].y === this.size - 1) {
+                            oldX = this.snakeBody[length].x;
+                            this.snakeBody.push({ x: oldX, y: 0 });
+                            if (this.snakeArray[oldX][0] === 2) {
+                                this.eaten = true;
+                            }
+                            else if (this.snakeArray[oldX][0] === 1) {
+                                this.stop();
+                                alert("Boom!!");
+                            }
+                            this.snakeArray[oldX][0] = 1;
+                        }
+                        else {
+                            oldX = this.snakeBody[length].x;
+                            oldY = this.snakeBody[length].y + 1;
+                            this.snakeBody.push({ x: oldX, y: oldY });
+                            if (this.snakeArray[oldX][oldY] === 2) {
+                                this.eaten = true;
+                            }
+                            else if (this.snakeArray[oldX][oldY] === 1) {
+                                this.stop();
+                                alert("Boom!!");
+                            }
+                            this.snakeArray[oldX][oldY] = 1;
+                        }
+                        break;
+                    case 4:
+                        if (this.snakeBody[length].x === 0) {
+                            oldY = this.snakeBody[length].y;
+                            this.snakeBody.push({ x: this.size - 1, y: oldY });
+                            if (this.snakeArray[this.size - 1][oldY] === 2) {
+                                this.eaten = true;
+                            }
+                            else if (this.snakeArray[this.size - 1][oldY] === 1) {
+                                this.stop();
+                                alert("Boom!!");
+                            }
+                            this.snakeArray[this.size - 1][oldY] = 1;
+                        }
+                        else {
+                            oldX = this.snakeBody[length].x - 1;
+                            oldY = this.snakeBody[length].y;
+                            this.snakeBody.push({ x: oldX, y: oldY });
+                            if (this.snakeArray[oldX][oldY] === 2) {
+                                this.eaten = true;
+                            }
+                            else if (this.snakeArray[oldX][oldY] === 1) {
+                                this.stop();
+                                alert("Boom!!");
+                            }
+                            this.snakeArray[oldX][oldY] = 1;
+                        }
+                        break;
+                    case 8:
+                        if (this.snakeBody[length].y === 0) {
+                            oldX = this.snakeBody[length].x;
+                            this.snakeBody.push({ x: oldX, y: this.size - 1 });
+                            if (this.snakeArray[oldX][this.size - 1] === 2) {
+                                this.eaten = true;
+                            }
+                            else if (this.snakeArray[oldX][this.size - 1] === 1) {
+                                this.stop();
+                                alert("Boom!!");
+                            }
+                            this.snakeArray[oldX][this.size - 1] = 1;
+                        }
+                        else {
+                            oldX = this.snakeBody[length].x;
+                            oldY = this.snakeBody[length].y - 1;
+                            this.snakeBody.push({ x: oldX, y: oldY });
+                            if (this.snakeArray[oldX][oldY] === 2) {
+                                this.eaten = true;
+                            }
+                            else if (this.snakeArray[oldX][oldY] === 1) {
+                                this.stop();
+                                alert("Boom!!");
+                            }
+                            this.snakeArray[oldX][oldY] = 1;
+                        }
+                        break;
+                }
+                if (this.eaten === false) {
+                    oldX = this.snakeBody[0].x;
+                    oldY = this.snakeBody[0].y;
+                    this.snakeArray[oldX][oldY] = 0;
+                    this.snakeBody.shift();
+                }
+                else {
                     this.eaten = false;
-                    this.snakeBody = new Array;
-                    this.snakeBody.push({ x: 1, y: 1 });
-                    this.snakeBody.push({ x: 2, y: 1 });
-                    this.snakeBody.push({ x: 3, y: 1 });
-                    this.snakeArray[1][1] = 1;
-                    this.snakeArray[2][1] = 1;
-                    this.snakeArray[3][1] = 1;
                     this.createFood();
-                },
-                update: function () {
-                    //console.log('update')
-                    var length = this.snakeBody.length - 1;
-                    var oldX, oldY;
-                    if (this.speedCounter === this.speed) {
-                        switch (this.dir) {
-                            case 6:
-                                if (this.snakeBody[length].x === this.size - 1) {
-                                    oldY = this.snakeBody[length].y;
-                                    this.snakeBody.push({ x: 0, y: oldY });
-                                    if (this.snakeArray[0][oldY] === 2) {
-                                        this.eaten = true;
-                                    }
-                                    else if (this.snakeArray[0][oldY] === 1) {
-                                        this.stop();
-                                        alert("Boom!!");
-                                    }
-                                    this.snakeArray[0][oldY] = 1;
-                                }
-                                else {
-                                    oldX = this.snakeBody[length].x + 1;
-                                    oldY = this.snakeBody[length].y;
-                                    this.snakeBody.push({ x: oldX, y: oldY });
-                                    if (this.snakeArray[oldX][oldY] === 2) {
-                                        this.eaten = true;
-                                    }
-                                    else if (this.snakeArray[oldX][oldY] === 1) {
-                                        this.stop();
-                                        alert("Boom!!");
-                                    }
-                                    this.snakeArray[oldX][oldY] = 1;
-                                }
-                                break;
-                            case 2:
-                                if (this.snakeBody[length].y === this.size - 1) {
-                                    oldX = this.snakeBody[length].x;
-                                    this.snakeBody.push({ x: oldX, y: 0 });
-                                    if (this.snakeArray[oldX][0] === 2) {
-                                        this.eaten = true;
-                                    }
-                                    else if (this.snakeArray[oldX][0] === 1) {
-                                        this.stop();
-                                        alert("Boom!!");
-                                    }
-                                    this.snakeArray[oldX][0] = 1;
-                                }
-                                else {
-                                    oldX = this.snakeBody[length].x;
-                                    oldY = this.snakeBody[length].y + 1;
-                                    this.snakeBody.push({ x: oldX, y: oldY });
-                                    if (this.snakeArray[oldX][oldY] === 2) {
-                                        this.eaten = true;
-                                    }
-                                    else if (this.snakeArray[oldX][oldY] === 1) {
-                                        this.stop();
-                                        alert("Boom!!");
-                                    }
-                                    this.snakeArray[oldX][oldY] = 1;
-                                }
-                                break;
-                            case 4:
-                                if (this.snakeBody[length].x === 0) {
-                                    oldY = this.snakeBody[length].y;
-                                    this.snakeBody.push({ x: this.size - 1, y: oldY });
-                                    if (this.snakeArray[this.size - 1][oldY] === 2) {
-                                        this.eaten = true;
-                                    }
-                                    else if (this.snakeArray[this.size - 1][oldY] === 1) {
-                                        this.stop();
-                                        alert("Boom!!");
-                                    }
-                                    this.snakeArray[this.size - 1][oldY] = 1;
-                                }
-                                else {
-                                    oldX = this.snakeBody[length].x - 1;
-                                    oldY = this.snakeBody[length].y;
-                                    this.snakeBody.push({ x: oldX, y: oldY });
-                                    if (this.snakeArray[oldX][oldY] === 2) {
-                                        this.eaten = true;
-                                    }
-                                    else if (this.snakeArray[oldX][oldY] === 1) {
-                                        this.stop();
-                                        alert("Boom!!");
-                                    }
-                                    this.snakeArray[oldX][oldY] = 1;
-                                }
-                                break;
-                            case 8:
-                                if (this.snakeBody[length].y === 0) {
-                                    oldX = this.snakeBody[length].x;
-                                    this.snakeBody.push({ x: oldX, y: this.size - 1 });
-                                    if (this.snakeArray[oldX][this.size - 1] === 2) {
-                                        this.eaten = true;
-                                    }
-                                    else if (this.snakeArray[oldX][this.size - 1] === 1) {
-                                        this.stop();
-                                        alert("Boom!!");
-                                    }
-                                    this.snakeArray[oldX][this.size - 1] = 1;
-                                }
-                                else {
-                                    oldX = this.snakeBody[length].x;
-                                    oldY = this.snakeBody[length].y - 1;
-                                    this.snakeBody.push({ x: oldX, y: oldY });
-                                    if (this.snakeArray[oldX][oldY] === 2) {
-                                        this.eaten = true;
-                                    }
-                                    else if (this.snakeArray[oldX][oldY] === 1) {
-                                        this.stop();
-                                        alert("Boom!!");
-                                    }
-                                    this.snakeArray[oldX][oldY] = 1;
-                                }
-                                break;
-                        }
-                        if (this.eaten === false) {
-                            oldX = this.snakeBody[0].x;
-                            oldY = this.snakeBody[0].y;
-                            this.snakeArray[oldX][oldY] = 0;
-                            this.snakeBody.shift();
-                        }
-                        else {
-                            this.eaten = false;
-                            this.createFood();
-                        }
-                        this.speedCounter = 0;
+                }
+                this.speedCounter = 0;
+            }
+            else {
+                this.speedCounter++;
+            }
+        },
+        draw: function (ctx) {
+            // console.log('draw')
+            for (var i = 0; i < this.size; i++) {
+                for (var j = 0; j < this.size; j++) {
+                    if (this.snakeArray[i][j] === 1) {
+                        this.drawSnake.position.x = i * 10;
+                        this.drawSnake.position.y = j * 10;
+                        this.drawSnake.draw(ctx);
                     }
-                    else {
-                        this.speedCounter++;
-                    }
-                },
-                draw: function (ctx) {
-                   // console.log('draw')
-                    for (var i = 0; i < this.size; i++) {
-                        for (var j = 0; j < this.size; j++) {
-                            if (this.snakeArray[i][j] === 1) {
-                                this.drawSnake.position.x = i * 10;
-                                this.drawSnake.position.y = j * 10;
-                                this.drawSnake.draw(ctx);
-                            }
-                            if (this.snakeArray[i][j] === 2) {
-                                this.drawFood.position.x = i * 10;
-                                this.drawFood.position.y = j * 10;
-                                this.drawFood.draw(ctx);
-                            }
-                        }
-                    }
-                },
-                click: function (e) {
-                },
-                keydown: function (key, list, e) {
-                    console.log(key);
-                    if (list.Right && (this.dir === 8 || this.dir === 2)) {
-                        this.dir = 6;
-                    }
-                    if (list.Up && (this.dir === 6 || this.dir === 4)) {
-                        this.dir = 8;
-                    }
-                    if (list.Left && (this.dir === 8 || this.dir === 2)) {
-                        this.dir = 4;
-                    }
-                    if (list.Down && (this.dir === 6 || this.dir === 4)) {
-                        this.dir = 2;
-                    }
-                },
-                createFood: function () {
-                    var rx = Math.floor(Math.random() * this.size);
-                    var ry = Math.floor(Math.random() * this.size);
-                    while (this.snakeArray[rx][ry] === 1) {
-                        rx = Math.floor(Math.random() * this.size);
-                        ry = 1;
-                    }
-                    this.snakeArray[rx][ry] = 2;
-                },
-                touchstart: function (e) {
-                    this.isTouch = true;
-                    this.touchPoint = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-                },
-                touchend: function (e) {
-                },
-                touchmove: function (e) {
-                    if (this.isTouch) {
-                        if (this.dir === 2 || this.dir === 8) {
-                            if (Math.abs(event.touches[0].clientX - this.touchPoint.x) > Math.abs(event.touches[0].clientY - this.touchPoint.y)) {
-                                if (event.touches[0].clientX - this.touchPoint.x > 0) {
-                                    this.dir = 6;
-                                }
-                                else {
-                                    this.dir = 4;
-                                }
-                            }
-                        }
-                        else {
-                            if (Math.abs(event.touches[0].clientX - this.touchPoint.x) < Math.abs(event.touches[0].clientY - this.touchPoint.y)) {
-                                if (event.touches[0].clientY - this.touchPoint.y < 0) {
-                                    this.dir = 8;
-                                }
-                                else {
-                                    this.dir = 2;
-                                }
-                            }
-                        }
-                        this.isTouch = false;
+                    if (this.snakeArray[i][j] === 2) {
+                        this.drawFood.position.x = i * 10;
+                        this.drawFood.position.y = j * 10;
+                        this.drawFood.draw(ctx);
                     }
                 }
-
-            });
-            mineGame.start();
+            }
+        },
+        click: function (e) {
+        },
+        keydown: function (key, list, e) {
+            console.log(key);
+            if (list.Right && (this.dir === 8 || this.dir === 2)) {
+                this.dir = 6;
+            }
+            if (list.Up && (this.dir === 6 || this.dir === 4)) {
+                this.dir = 8;
+            }
+            if (list.Left && (this.dir === 8 || this.dir === 2)) {
+                this.dir = 4;
+            }
+            if (list.Down && (this.dir === 6 || this.dir === 4)) {
+                this.dir = 2;
+            }
+        },
+        createFood: function () {
+            var rx = Math.floor(Math.random() * this.size);
+            var ry = Math.floor(Math.random() * this.size);
+            while (this.snakeArray[rx][ry] === 1) {
+                rx = Math.floor(Math.random() * this.size);
+                ry = 1;
+            }
+            this.snakeArray[rx][ry] = 2;
+        },
+        touchstart: function (e) {
+            this.isTouch = true;
+            this.touchPoint = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        },
+        touchend: function (e) {
+        },
+        touchmove: function (e) {
+            if (this.isTouch) {
+                if (this.dir === 2 || this.dir === 8) {
+                    if (Math.abs(event.touches[0].clientX - this.touchPoint.x) > Math.abs(event.touches[0].clientY - this.touchPoint.y)) {
+                        if (event.touches[0].clientX - this.touchPoint.x > 0) {
+                            this.dir = 6;
+                        }
+                        else {
+                            this.dir = 4;
+                        }
+                    }
+                }
+                else {
+                    if (Math.abs(event.touches[0].clientX - this.touchPoint.x) < Math.abs(event.touches[0].clientY - this.touchPoint.y)) {
+                        if (event.touches[0].clientY - this.touchPoint.y < 0) {
+                            this.dir = 8;
+                        }
+                        else {
+                            this.dir = 2;
+                        }
+                    }
+                }
+                this.isTouch = false;
+            }
         }
+    });
+    $.Game.addNewLevel({snakeGame: new mineGame()});
+    $.Game.start();
+}
 </script>
-    <style type="text/css">
-        *
-        {
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+<style type="text/css">
+    * {
+        margin: 0;
+        padding: 0;
+    }
+</style>
 </head>
 <body>
- <!--   <canvas id="viewport" width="480" height="480" style="border: 1px solid #000;" oncontextmenu="return false;"></canvas>-->
-</body></html>
+<!--   <canvas id="viewport" width="480" height="480" style="border: 1px solid #000;" oncontextmenu="return false;"></canvas>-->
+</body>
+</html>
