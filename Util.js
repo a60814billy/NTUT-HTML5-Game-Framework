@@ -26,6 +26,15 @@ var Framework = (function (Framework) {
 		return (typeof  obj === 'string');
 	};
 
+    Framework.Util.isCanvas = function(obj){
+        if(!Framework.Util.isUndefined(obj.tagName)){
+            return (obj.tagName === "CANVAS");
+        }
+        return false;
+    };
+
+
+
 	Framework.Util.namespace = function (ns_string) {
 		var parts = ns_string.split("."),
 			parent = Framework,
@@ -53,23 +62,25 @@ var Framework = (function (Framework) {
 	return Framework;
 })(Framework || {});
 
-// Extend Date's function , add format method
-Date.prototype.format = function (format) {
-    var o = {
-        "M+": this.getMonth() + 1, //month
-        "d+": this.getDate(),    //day
-        "h+": this.getHours(),   //hour
-        "m+": this.getMinutes(), //minute
-        "s+": this.getSeconds(), //second
-        "q+": Math.floor((this.getMonth() + 3) / 3),  //quarter
-        "S": this.getMilliseconds() //millisecond
-    };
+if(Framework.Util.isUndefined(Date.prototype.format)){
+    // Extend Date's function , add format method
+    Date.prototype.format = function (format) {
+        var o = {
+            "M+": this.getMonth() + 1, //month
+            "d+": this.getDate(),    //day
+            "h+": this.getHours(),   //hour
+            "m+": this.getMinutes(), //minute
+            "s+": this.getSeconds(), //second
+            "q+": Math.floor((this.getMonth() + 3) / 3),  //quarter
+            "S": this.getMilliseconds() //millisecond
+        };
 
-    if (/(y+)/.test(format)) format = format.replace(RegExp.$1,
-        (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-    for (var k in o)if (new RegExp("(" + k + ")").test(format))
-        format = format.replace(RegExp.$1,
-            RegExp.$1.length == 1 ? o[k] :
-                ("00" + o[k]).substr(("" + o[k]).length));
-    return format;
-};
+        if (/(y+)/.test(format)) format = format.replace(RegExp.$1,
+            (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)if (new RegExp("(" + k + ")").test(format))
+            format = format.replace(RegExp.$1,
+                RegExp.$1.length == 1 ? o[k] :
+                    ("00" + o[k]).substr(("" + o[k]).length));
+        return format;
+    };
+}
