@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Test</title>
+    
+    <script type="text/javascript" src="../Util.js"></script>
+    <script type="text/javascript" src="../core.js"></script>
+    <script type="text/javascript" src="../DebugInfo.js"></script>
+    <script type="text/javascript" src="../FpsAnalysis.js"></script>
+
+    <script type="text/javascript" src="../scene.js"></script>
+    <script type="text/javascript" src="../Sprite.js"></script>
+    <script type="text/javascript" src="../animationSprite.js"></script>
+    <script type="text/javascript" src="../CompositeSprite.js"></script>
+
+    <script type="text/javascript" src="../KeyBoardManager.js"></script>
+    <script type="text/javascript" src="../ResourceManager.js"></script>
+    <script type="text/javascript" src="../level.js"></script>
+    <script type="text/javascript" src="../Game.js"></script>
+
+    <script type="text/javascript" src="../gameMainMenu.js"></script>
+    <style type="text/css">
+        *{
+            padding:0;
+            margin:0;
+        }
+    </style>
+    <script type="text/javascript">
+        window.onload = function(){
+            Framework.DebugInfo.show();
+
+            var myLevel = Framework.Class( Framework.Level ,{
+                initialize:function(){
+                    this._sprite1 = new Framework.Sprite("levelandsprite_files/body.png");
+                    this._sprite2 = new Framework.Sprite("levelandsprite_files/test.png");
+                    this._ani = new Framework.AnimationSprite({url:"levelandsprite_files/sprite_animation_frames_1.png" ,col:6 , row:5  });
+                    this._number = new Framework.AnimationSprite({url:"levelandsprite_files/number.png" , col:5 , row:1 , loop:false , speed:1});
+                    this._number.position = {x:400,y:100};
+                    this._ani2 = new Framework.AnimationSprite({
+                        url:["levelandsprite_files/door_left_01.bmp" , "levelandsprite_files/door_left_02.bmp"],
+                        speed:1,
+                        loop:false
+                    });
+                    this._ani2.position = {x:200,y:200};
+                    this._ani.position.x = 100;
+                    this._ani.position.y = 100;
+
+                    this._sprite1.position.y = 100;
+                    this._sprite2.position = {x:600 , y: 100};
+                    this._sprite2.rotation = 45 / 180 * Math.PI;
+                    this._sprite2.scale = 1;
+                    this._sprite1.scale = 1;
+                    this._flag = true;
+                    this._rotate = 0;
+                    this._ani.start();
+                    setInterval((function(){
+                        this._ani2.start();
+                        var i = Math.floor((Math.random()*3));
+                        Framework.DebugInfo.Log.warring(i);
+                        switch(i){
+                            case 0:
+
+                                this._number.start(0,1,1);
+                                break;
+                            case 1:
+                                this._number.start(2,4,2);
+                                break;
+                            case 2:
+                                this._number.start();
+                                break;
+                        }
+
+                    }).bind(this) , 8000);
+
+                    setInterval(function(){
+                        Framework.DebugInfo.Log.info("Time");
+                    },1000);
+                },
+                update:function(){
+                    this._rotate += 10;
+                    if(this._flag){
+                        this._sprite1.position.x += 3;
+                        this._sprite1.scale += 0.01;
+                        this._ani.scale += 0.01;
+                        if(this._sprite1.position.x > 500){
+                            this._sprite1.position.x = 20;
+                            this._sprite1.scale = 1;
+                            this._ani.scale = 1;
+                            //this._flag = false;
+                        }
+                    }else{
+                        this._sprite1.position.x -= 2;
+                        this._sprite1.scale -= 0.01;
+                        if(this._sprite1.position.x < 1){
+                            this._flag = true;
+                        }
+                    }
+
+                    this._ani.update();
+                    this._ani2.update();
+                    this._sprite1.rotation = this._rotate;
+                    this._sprite2.rotation = this._rotate;
+                    this._ani.rotation += 1;
+                    this._number.update();
+                },
+                draw:function(ctx){
+                    ctx.clearRect(0,0,800,600);
+                    this._sprite1.draw(ctx);
+                    this._sprite2.draw(ctx);
+                    this._ani.draw(ctx);
+                    this._ani2.draw(ctx);
+                    this._number.draw(ctx);
+                },
+                keydown:function(e){
+                    console.dir(e);
+                    if(e.key === "Numpad +"){
+                        Framework.Game.goToNextLevel();
+                    }else if(e.key === "Numpad -"){
+                        Framework.Game.goToPreviousLevel();
+                    }
+                }
+            });
+
+            var SnakeGame = Framework.Class(Framework.Level, {
+                initializeProgressResource: function() {
+
+                },
+                loadingProgress: function(ctx) {
+                    //console.log(Framework.ResourceManager.getFinishedRequestPercent())
+                    ctx.font="90px Arial";
+                    ctx.fillText(Framework.ResourceManager.getFinishedRequestPercent() + "%" , ctx.canvas.width/2 - 50 , ctx.canvas.height/2);
+                },
+                initialize: function () {
+                    //console.log('initialize')
+
+                    this.f = new Framework.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?lll=55555');
+                    this.g = new Framework.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?yyy=55555');
+                    this.e = new Framework.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?ccc=55555');
+                    this.d = new Framework.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?nnn=55555');
+                    this.c = new Framework.Sprite("https://dl.dropboxusercontent.com/s/98h4k4zip06npv6/bbb.bmp?dl=1&token_hash=AAEvXt_5kWlvmX1CzBCGR-TjHgTVoabcpIaNsXClOdAMCw" + '?mmm=55555');
+                    this.b = new Framework.Sprite("https://dl.dropboxusercontent.com/s/ibzeksz1x7ew82x/doorAnimate.png?dl=1&token_hash=AAFaUoR0A3_b1ckwGJIUAei8brkTNEmOdaOaVNh3rbVO5Q");
+                    this.drawSnake = new Framework.Sprite("levelandsprite_files/body.png");
+                    this.drawFood = new Framework.Sprite("levelandsprite_files/food.jpg");
+                    this.rootScene.attach(this.f);
+                    this.rootScene.attach(this.g);
+                    this.rootScene.attach(this.e);
+                    this.rootScene.attach(this.c);
+                    this.rootScene.attach(this.b);
+                    this.rootScene.attach(this.d);
+                    this.rootScene.attach(this.drawSnake);
+                    this.rootScene.attach(this.drawFood);
+
+
+                    this.size = 48;
+                    //this.setCanvas(document.getElementById("viewport"));
+                    this.snakeArray = new Array(this.size);
+                    for (var i = 0; i < this.size; i++) {
+                        this.snakeArray[i] = new Array(this.size);
+                        for (var j = 0; j < this.size; j++) {
+                            this.snakeArray[i][j] = 0;
+                        }
+                    }
+                    this.speed = 10;
+                    this.speedCounter = 0;
+                    this.dir = 6;
+                    this.eaten = false;
+                    this.snakeBody = new Array;
+                    this.snakeBody.push({ x: 1, y: 1 });
+                    this.snakeBody.push({ x: 2, y: 1 });
+                    this.snakeBody.push({ x: 3, y: 1 });
+                    this.snakeArray[1][1] = 1;
+                    this.snakeArray[2][1] = 1;
+                    this.snakeArray[3][1] = 1;
+                    this.createFood();
+                },
+                update: function () {
+                    //console.log('update')
+                    var length = this.snakeBody.length - 1;
+                    var oldX, oldY;
+                    if (this.speedCounter === this.speed) {
+                        switch (this.dir) {
+                            case 6:
+                                if (this.snakeBody[length].x === this.size - 1) {
+                                    oldY = this.snakeBody[length].y;
+                                    this.snakeBody.push({ x: 0, y: oldY });
+                                    if (this.snakeArray[0][oldY] === 2) {
+                                        this.eaten = true;
+                                    }
+                                    else if (this.snakeArray[0][oldY] === 1) {
+                                        this.stop();
+                                        alert("Boom!!");
+                                    }
+                                    this.snakeArray[0][oldY] = 1;
+                                }
+                                else {
+                                    oldX = this.snakeBody[length].x + 1;
+                                    oldY = this.snakeBody[length].y;
+                                    this.snakeBody.push({ x: oldX, y: oldY });
+                                    if (this.snakeArray[oldX][oldY] === 2) {
+                                        this.eaten = true;
+                                    }
+                                    else if (this.snakeArray[oldX][oldY] === 1) {
+                                        this.stop();
+                                        alert("Boom!!");
+                                    }
+                                    this.snakeArray[oldX][oldY] = 1;
+                                }
+                                break;
+                            case 2:
+                                if (this.snakeBody[length].y === this.size - 1) {
+                                    oldX = this.snakeBody[length].x;
+                                    this.snakeBody.push({ x: oldX, y: 0 });
+                                    if (this.snakeArray[oldX][0] === 2) {
+                                        this.eaten = true;
+                                    }
+                                    else if (this.snakeArray[oldX][0] === 1) {
+                                        this.stop();
+                                        alert("Boom!!");
+                                    }
+                                    this.snakeArray[oldX][0] = 1;
+                                }
+                                else {
+                                    oldX = this.snakeBody[length].x;
+                                    oldY = this.snakeBody[length].y + 1;
+                                    this.snakeBody.push({ x: oldX, y: oldY });
+                                    if (this.snakeArray[oldX][oldY] === 2) {
+                                        this.eaten = true;
+                                    }
+                                    else if (this.snakeArray[oldX][oldY] === 1) {
+                                        this.stop();
+                                        alert("Boom!!");
+                                    }
+                                    this.snakeArray[oldX][oldY] = 1;
+                                }
+                                break;
+                            case 4:
+                                if (this.snakeBody[length].x === 0) {
+                                    oldY = this.snakeBody[length].y;
+                                    this.snakeBody.push({ x: this.size - 1, y: oldY });
+                                    if (this.snakeArray[this.size - 1][oldY] === 2) {
+                                        this.eaten = true;
+                                    }
+                                    else if (this.snakeArray[this.size - 1][oldY] === 1) {
+                                        this.stop();
+                                        alert("Boom!!");
+                                    }
+                                    this.snakeArray[this.size - 1][oldY] = 1;
+                                }
+                                else {
+                                    oldX = this.snakeBody[length].x - 1;
+                                    oldY = this.snakeBody[length].y;
+                                    this.snakeBody.push({ x: oldX, y: oldY });
+                                    if (this.snakeArray[oldX][oldY] === 2) {
+                                        this.eaten = true;
+                                    }
+                                    else if (this.snakeArray[oldX][oldY] === 1) {
+                                        this.stop();
+                                        alert("Boom!!");
+                                    }
+                                    this.snakeArray[oldX][oldY] = 1;
+                                }
+                                break;
+                            case 8:
+                                if (this.snakeBody[length].y === 0) {
+                                    oldX = this.snakeBody[length].x;
+                                    this.snakeBody.push({ x: oldX, y: this.size - 1 });
+                                    if (this.snakeArray[oldX][this.size - 1] === 2) {
+                                        this.eaten = true;
+                                    }
+                                    else if (this.snakeArray[oldX][this.size - 1] === 1) {
+                                        this.stop();
+                                        alert("Boom!!");
+                                    }
+                                    this.snakeArray[oldX][this.size - 1] = 1;
+                                }
+                                else {
+                                    oldX = this.snakeBody[length].x;
+                                    oldY = this.snakeBody[length].y - 1;
+                                    this.snakeBody.push({ x: oldX, y: oldY });
+                                    if (this.snakeArray[oldX][oldY] === 2) {
+                                        this.eaten = true;
+                                    }
+                                    else if (this.snakeArray[oldX][oldY] === 1) {
+                                        this.stop();
+                                        alert("Boom!!");
+                                    }
+                                    this.snakeArray[oldX][oldY] = 1;
+                                }
+                                break;
+                        }
+                        if (this.eaten === false) {
+                            oldX = this.snakeBody[0].x;
+                            oldY = this.snakeBody[0].y;
+                            this.snakeArray[oldX][oldY] = 0;
+                            this.snakeBody.shift();
+                        }
+                        else {
+                            this.eaten = false;
+                            this.createFood();
+                        }
+                        this.speedCounter = 0;
+                    }
+                    else {
+                        this.speedCounter++;
+                    }
+                },
+                draw: function (ctx) {
+                    // console.log('draw')
+                    for (var i = 0; i < this.size; i++) {
+                        for (var j = 0; j < this.size; j++) {
+                            if (this.snakeArray[i][j] === 1) {
+                                this.drawSnake.position.x = i * 10;
+                                this.drawSnake.position.y = j * 10;
+                                this.drawSnake.draw(ctx);
+                            }
+                            if (this.snakeArray[i][j] === 2) {
+                                this.drawFood.position.x = i * 10;
+                                this.drawFood.position.y = j * 10;
+                                this.drawFood.draw(ctx);
+                            }
+                        }
+                    }
+                },
+                click: function (e) {
+                },
+                keydown: function (key, list, e) {
+                    console.log(key);
+                    if (list.Right && (this.dir === 8 || this.dir === 2)) {
+                        this.dir = 6;
+                    }
+                    if (list.Up && (this.dir === 6 || this.dir === 4)) {
+                        this.dir = 8;
+                    }
+                    if (list.Left && (this.dir === 8 || this.dir === 2)) {
+                        this.dir = 4;
+                    }
+                    if (list.Down && (this.dir === 6 || this.dir === 4)) {
+                        this.dir = 2;
+                    }
+                    if(key.key === "Numpad +"){
+                        Framework.Game.goToNextLevel();
+                    }else if(key.key === "Numpad -"){
+                        Framework.Game.goToPreviousLevel();
+                    }
+                },
+                createFood: function () {
+                    var rx = Math.floor(Math.random() * this.size);
+                    var ry = Math.floor(Math.random() * this.size);
+                    while (this.snakeArray[rx][ry] === 1) {
+                        rx = Math.floor(Math.random() * this.size);
+                        ry = 1;
+                    }
+                    this.snakeArray[rx][ry] = 2;
+                },
+                touchstart: function (e) {
+                    this.isTouch = true;
+                    this.touchPoint = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                },
+                touchend: function (e) {
+                },
+                touchmove: function (e) {
+                    if (this.isTouch) {
+                        if (this.dir === 2 || this.dir === 8) {
+                            if (Math.abs(event.touches[0].clientX - this.touchPoint.x) > Math.abs(event.touches[0].clientY - this.touchPoint.y)) {
+                                if (event.touches[0].clientX - this.touchPoint.x > 0) {
+                                    this.dir = 6;
+                                }
+                                else {
+                                    this.dir = 4;
+                                }
+                            }
+                        }
+                        else {
+                            if (Math.abs(event.touches[0].clientX - this.touchPoint.x) < Math.abs(event.touches[0].clientY - this.touchPoint.y)) {
+                                if (event.touches[0].clientY - this.touchPoint.y < 0) {
+                                    this.dir = 8;
+                                }
+                                else {
+                                    this.dir = 2;
+                                }
+                            }
+                        }
+                        this.isTouch = false;
+                    }
+                }
+            });
+
+            var button = function () {
+                var mineButtonState = {
+                    NONE: 0,
+                    OPEN: 1,
+                    FLAG: 2,
+                    QUES: 3,
+                    OVER: 4
+                };
+
+                var num = 0;
+                var boom = 0;
+                var size = 48;
+                var state = mineButtonState.NONE;
+                var canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                var context = canvas.getContext('2d');
+                context.rect(0, 0, size, size);
+                context.stroke();
+                var sprite = new Framework.Sprite(canvas);
+
+                return {
+                    mineButtonState: mineButtonState,
+                    update:function(){
+
+                    },
+                    reflush: function () {
+                        context.fillStyle = "#fff";
+                        context.font="36px Arial";
+                        context.clearRect(0, 0, this.size, this.size);
+                        switch (state) {
+                            case mineButtonState.NONE:
+                                context.fillStyle = "white";
+                                context.fillRect(0, 0, size, size);
+                                context.strokeRect(0, 0, size, size);
+                                break;
+                            case mineButtonState.OPEN:
+                                context.strokeRect(0, 0, size, size);
+                                if (boom == 0) {
+                                    context.fillStyle = "yellow";
+                                } else {
+                                    context.fillStyle = "blue";
+                                }
+                                context.fillRect(0, 0, size, size);
+                                context.fillStyle = 'black';
+                                if (num != 0 && boom == 0) {
+                                    context.fillText(num, 12, 36);
+                                }
+                                break;
+                            case mineButtonState.FLAG:
+                                context.strokeRect(0, 0, size, size);
+                                context.fillStyle = "red";
+                                context.fillRect(0, 0, size, size);
+                                context.fillStyle = 'white';
+                                context.fillText("!!", 12, 36);
+                                break;
+                            case mineButtonState.QUES:
+                                context.strokeRect(0, 0, size, size);
+                                context.fillStyle = "blue";
+                                context.fillRect(0, 0, size, size);
+                                context.fillStyle = 'white';
+                                context.fillText("??", 12, 36);
+                                break;
+                            case mineButtonState.OVER:
+                                context.strokeRect(0, 0, size, size);
+                                context.fillStyle = "#ff2020";
+                                context.fillRect(0, 0, size, size);
+                                context.fillStyle = 'white';
+                                context.fillText("*", 12, 36);
+                                break;
+                        }
+                    },
+                    draw: function (ctx) {
+                        sprite.draw(ctx);
+                    },
+                    setPosition: function (x, y) {
+                        sprite.position.x = x;
+                        sprite.position.y = y;
+                    },
+                    getSize: function () {
+                        return size;
+                    },
+                    setNum: function (n) {
+                        num = n;
+                    },
+                    setBoom: function (b) {
+                        boom = b;
+                    },
+                    setState: function (s) {
+                        state = s;
+                        this.reflush();
+                    },
+                    getState: function () {
+                        return state;
+                    }
+                }
+            };
+
+            var mineGame = Framework.Class(Framework.Level, {
+                initialize: function () {
+                    this.size = 9;
+                    this.buttonWidth = 0;
+                    this.numberOfMine = 10;
+                    this.buttonOffset = {
+                        x:400,
+                        y:200
+                    };
+                    this.mineArray = new Array(this.size);
+                    this.mineNumArray = new Array(this.size);
+                    this.mineButtonArray = new Array(this.size);
+                    this._isStart = false;
+                    for (var i = 0; i < this.size; i++) {
+                        this.mineArray[i] = new Array(this.size);
+                        this.mineNumArray[i] = new Array(this.size);
+                        this.mineButtonArray[i] = new Array(this.size);
+                        for (var j = 0; j < this.size; j++) {
+                            this.mineArray[i][j] = 0;
+                            this.mineNumArray[i][j] = 0;
+                            this.mineButtonArray[i][j] = new button();
+                            this.buttonWidth = this.mineButtonArray[i][j].getSize();
+                            this.mineButtonArray[i][j].setPosition(i * (this.buttonWidth + 2) + this.buttonOffset.x, j * (this.buttonWidth + 2 ) + this.buttonOffset.y);
+                        }
+                    }
+                    console.dir(this.mineArray);
+                },
+                update: function () {
+                    var open = 0;
+                    for (var i = 0; i < this.size; i++) {
+                        for (var j = 0; j < this.size; j++) {
+                            this.mineButtonArray[i][j].update();
+                            if(this.mineButtonArray[i][j].getState() == this.mineButtonArray[i][j].mineButtonState.NONE)open++;
+                        }
+                    }
+                    this.final();
+                },
+                draw: function (ctx) {
+                    for (var i = 0; i < this.size; i++) {
+                        for (var j = 0; j < this.size; j++) {
+                            this.mineButtonArray[i][j].draw(ctx);
+                        }
+                    }
+                },
+                click: function (e) {
+                    Framework.DebugInfo.Log.info(e.button);
+                    Framework.DebugInfo.Log.info((e.pageX- e.target.offsetLeft) + ", " + (e.pageY - e.target.offsetTop));
+                    console.dir(e);
+                    //Framework.DebugInfo.Log.info((Math.floor((e.pageX - this.buttonOffset.x) / (this.buttonWidth + 2))) + "," + (Math.floor((e.pageY - this.buttonOffset.y) / (this.buttonWidth + 2))));
+                    var x = (Math.floor(((e.pageX- e.target.offsetLeft) - this.buttonOffset.x+24) / (this.buttonWidth + 2)));
+                    var y = (Math.floor(((e.pageY - e.target.offsetTop) - this.buttonOffset.y+24) / (this.buttonWidth + 2)));
+                    Framework.DebugInfo.Log.warring(x + "," + y);
+                    //var x = (Math.floor(((e.x- e.target.offsetLeft) - this.buttonOffset.x) / (this.buttonWidth + 2)));
+                    //var y = (Math.floor(((e.y - e.target.offsetTop) - this.buttonOffset.y) / (this.buttonWidth + 2)));
+                    switch (e.button) {
+                        case 0: // left button
+                            if (!this._isStart) {
+                                this.generateMine(x, y);
+                                this._isStart = true;
+                            }
+                            if (this.mineButtonArray[x][y].getState() != this.mineButtonArray[x][y].mineButtonState.FLAG) {
+                                this.mineButtonArray[x][y].setState(this.mineButtonArray[x][y].mineButtonState.OPEN);
+                                if (this.mineArray[x][y] == 1) {
+                                    var self = this;
+                                    setTimeout(function(){
+                                        Framework.Game.stop();
+                                        alert("Boom!!");
+                                    },100);
+
+                                }else if (this.mineNumArray[x][y] == 0) {
+                                    this.recursivelyExpand(x, y);
+                                }
+                            }
+
+                            break;
+                        case 2: // right button
+                            if (this.mineButtonArray[x][y].getState() == this.mineButtonArray[x][y].mineButtonState.NONE) {
+                                this.mineButtonArray[x][y].setState(this.mineButtonArray[x][y].mineButtonState.FLAG);
+                            } else if (this.mineButtonArray[x][y].getState() == this.mineButtonArray[x][y].mineButtonState.FLAG) {
+                                this.mineButtonArray[x][y].setState(this.mineButtonArray[x][y].mineButtonState.QUES);
+                            }else if (this.mineButtonArray[x][y].getState() == this.mineButtonArray[x][y].mineButtonState.QUES) {
+                                this.mineButtonArray[x][y].setState(this.mineButtonArray[x][y].mineButtonState.NONE);
+                            }
+
+                            break;
+                    }
+                },
+                generateMine: function (x, y) {
+                    var generateMine = this.numberOfMine;
+                    while (generateMine > 0) {
+                        var randMineX = Math.floor(Math.random() * this.size);
+                        var randMineY = Math.floor(Math.random() * this.size);
+                        if (this.mineArray[randMineX][randMineY] == 0 && (Math.abs(randMineX - x) > 1 || Math.abs(randMineY - y) > 1)) {
+                            this.mineArray[randMineX][randMineY] = 1;
+                            generateMine--;
+                        }
+                    }
+
+                    for (var j = 0; j < this.size; j++) {
+                        for (var i = 0; i < this.size; i++) {
+                            this.mineNumArray[i][j] = this.calcNum(i, j);
+                            this.mineButtonArray[i][j].setNum(this.mineNumArray[i][j]);
+                            this.mineButtonArray[i][j].setBoom(this.mineArray[i][j]);
+                        }
+                    }
+                },
+                calcNum: function (i, j) {
+                    var n = 0;
+                    if (j - 1 >= 0) {
+                        if (i - 1 >= 0) {
+                            n += this.mineArray[i - 1][j - 1];
+                        }
+                        if (i + 1 < this.size) {
+                            n += this.mineArray[i + 1][j - 1];
+                        }
+                        n += this.mineArray[i][j - 1];
+                    }
+                    if (j + 1 < this.size) {
+                        if (i - 1 >= 0) {
+                            n += this.mineArray[i - 1][j + 1];
+                        }
+                        if (i + 1 < this.size) {
+                            n += this.mineArray[i + 1][j + 1];
+                        }
+                        n += this.mineArray[i][j + 1];
+                    }
+                    if (i - 1 >= 0) {
+                        n += this.mineArray[i - 1][j];
+                    }
+                    if (i + 1 < this.size) {
+                        n += this.mineArray[i + 1][j];
+                    }
+                    return n;
+                },
+                recursivelyExpand: function (xx, yy) {
+                    var x = xx , y = yy;
+                    var tmp = new Array();
+                    tmp.push({x: x, y: y});
+                    tmp.push({x: x, y: y});
+                    while ((tmp.length > 0)) {
+                        //tmp.push({x: x, y: y});
+                        if (x + 1 < this.size) {
+                            if (this.open(x + 1, y) == 0) {
+                                x = x + 1;
+                                tmp.push({x: x, y: y});
+                                continue;
+                            }
+                            if (y + 1 < this.size) {
+                                if (this.open(x + 1, y + 1) == 0) {
+                                    x = x + 1;
+                                    y = y + 1;
+                                    tmp.push({x: x, y: y});
+                                    continue;
+                                }
+                            }
+                            if (y - 1 >= 0) {
+                                if (this.open(x + 1, y - 1) == 0) {
+                                    x = x + 1;
+                                    y = y - 1;
+                                    tmp.push({x: x, y: y});
+                                    continue;
+                                }
+                            }
+                        }
+                        if (x - 1 >= 0) {
+                            if (this.open(x - 1, y) == 0) {
+                                x = x - 1;
+                                tmp.push({x: x, y: y});
+                                continue;
+                            }
+                            if (y + 1 < this.size) {
+                                if (this.open(x - 1, y + 1) == 0) {
+                                    x = x - 1;
+                                    y = y + 1;
+                                    tmp.push({x: x, y: y});
+                                    continue;
+                                }
+                            }
+                            if (y - 1 >= 0) {
+                                if (this.open(x - 1, y - 1) == 0) {
+                                    x = x - 1;
+                                    y = y - 1;
+                                    tmp.push({x: x, y: y});
+                                    continue;
+                                }
+                            }
+                        }
+                        if (y + 1 < this.size) {
+                            if (this.open(x, y + 1) == 0) {
+                                y = y + 1;
+                                tmp.push({x: x, y: y});
+                                continue;
+                            }
+                        }
+                        if (y - 1 >= 0) {
+                            if (this.open(x, y - 1) == 0) {
+                                y = y - 1;
+                                tmp.push({x: x, y: y});
+                                continue;
+                            }
+                        }
+                        var b = tmp.pop();
+                        x = b.x;
+                        y = b.y;
+                    }
+                    //return false;
+                },
+                open: function (x, y) {
+                    if (this.mineButtonArray[x][y].getState() == this.mineButtonArray[x][y].mineButtonState.OPEN) {
+                        return -2;
+                    }
+                    if (this.mineArray[x][y] == 0) {
+                        this.mineButtonArray[x][y].setState(this.mineButtonArray[x][y].mineButtonState.OPEN);
+                        return this.mineNumArray[x][y];
+                    }
+                    return -1;
+                },
+                final:function(){
+                    var s = 0;
+                    for (var i = 0; i < this.size; i++) {
+                        for (var j = 0; j < this.size; j++) {
+                            if(this.mineButtonArray[i][j].getState() == this.mineButtonArray[i][j].mineButtonState.FLAG || this.mineButtonArray[i][j].getState() == this.mineButtonArray[i][j].mineButtonState.QUES){
+                                s ++;
+                            }
+                        }
+                    }
+                    if(s != 10)return;
+                    for (var i = 0; i < this.size; i++) {
+                        for (var j = 0; j < this.size; j++) {
+                            if(this.mineButtonArray[i][j].getState() == this.mineButtonArray[i][j].mineButtonState.FLAG || this.mineButtonArray[i][j].getState() == this.mineButtonArray[i][j].mineButtonState.QUES){
+                                if(this.mineArray[i][j]==1){
+                                    this.mineButtonArray[i][j].setState(this.mineButtonArray[i][j].mineButtonState.OVER);
+                                }
+                            }
+                        }
+                    }
+                    this.stop();
+                    alert("You win!");
+                },
+                keydown:function(e){
+                    console.dir(e);
+                    if(e.key === "Numpad +"){
+                        Framework.Game.goToNextLevel();
+                    }else if(e.key === "Numpad -"){
+                        Framework.Game.goToPreviousLevel();
+                    }
+                }
+            });
+
+
+            var mymenu = Framework.inheritance(Framework.GameMainMenu , {
+                initialize:function(){
+                    this.bg = new Framework.Sprite("http://farm3.staticflickr.com/2864/12091393133_891db5d80e_k.jpg");
+                    this.rootScene.attach(this.bg);
+                },
+                update:function(){
+                    if(!Framework.Util.isUndefined(this.bg.texture)){
+                        this.bg.position = {
+                            x: this.bg.texture.width /2,
+                            y: this.bg.texture.height /2
+                        };
+                    }
+                },
+                draw:function(ctx){
+                    this.rootScene.draw(ctx);
+                },
+                keydown:function(e){
+                    Framework.DebugInfo.Log.warring(e.key);
+                    switch (e.key){
+                        case "1":
+                            Framework.Game.goToLevel("Level1");
+                            break;
+                        case "2":
+                            Framework.Game.goToLevel("Snake");
+                            break;
+                        case "3":
+                            Framework.Game.goToLevel("Mine");
+                            break;
+                    }
+                }
+            });
+
+            Framework.Game.addNewLevel({Menu: mymenu});
+            Framework.Game.addNewLevel({Level1 : new myLevel()});
+            Framework.Game.addNewLevel({Snake : new SnakeGame()});
+            Framework.Game.addNewLevel({Mine : new mineGame()});
+            Framework.Game.start();
+
+            // Transform
+            // a c e
+            // b d f
+            // 0 0 1
+            // a -> scales hor
+            // d -> scales ver
+            // b -> skew hor
+            // c -> skew ver
+            // e -> move hor
+            // f -> move ver
+        };
+    </script>
+</head>
+<body>
+
+</body></html>
