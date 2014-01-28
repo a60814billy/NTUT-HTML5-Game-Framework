@@ -36,8 +36,8 @@ var Framework = (function (Framework) {
 			_prepareLog("Error", str).style.backgroundColor = "#ff8080";
 		};
 
-		that.Log.warring = function (str) {
-			_prepareLog("Warring", str).style.backgroundColor = "#ffff80";
+		that.Log.warning = function (str) {
+			_prepareLog("Warning", str).style.backgroundColor = "#ffff80";
 		};
 
 		that.Log.console = function (str) {
