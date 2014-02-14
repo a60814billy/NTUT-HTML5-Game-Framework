@@ -79,7 +79,7 @@ var Framework = (function (Framework) {
                 }else{
                     if(this.index > this.to){
                         this._start = this.loop;
-                        this.index = this.to;
+                        this.index = this.from;
                     }
                 }
             }
@@ -105,6 +105,8 @@ var Framework = (function (Framework) {
                 this._sprites[this.index].position = this.position;
                 this._sprites[this.index].rotation = this.rotation;
                 this._sprites[this.index].scale = this.scale;
+                this._sprites[this.index].CountAbsoluteProperty();
+                
             }else{
                 if(this._type === 'one'){
                     // 故意用 closures 隔離變數的scope
@@ -114,16 +116,28 @@ var Framework = (function (Framework) {
                             var tmp = document.createElement("canvas");
                             var realWidth = texture.width * this.scale;
                             var realHeight = texture.height * this.scale;
-                            tmp.width = (realWidth ) / this.col;
-                            tmp.height = (realHeight ) /this.row;
+                            tmp.width = (texture.width ) / this.col;
+                            tmp.height = (texture.height ) /this.row;
                             var tmpContext = tmp.getContext("2d");
                             tmpContext.drawImage(texture,-(texture.width / this.col)*(i%this.col), -(texture.height/this.row) * (Math.floor(i/this.col)) );
                             var sprite = new Framework.Sprite(tmp);
                             sprite.position = this.position;
                             sprite.rotation = this.rotation;
                             sprite.scale = this.scale;
+                            sprite.spriteParent = this.spriteParent;
                             this._sprites.push(sprite);
                         }
+                        if (this.from > this.to) {
+                            var indexFrom = this.from, indexTo = this.to;
+                            while (indexFrom > indexTo) {
+                                var a = this._sprites[indexFrom], b = this._sprites[indexTo]
+                                b = [a, a = b][0];
+                                indexFrom--;
+                                indexTo++;
+                            }
+                            this.from = [this.to, this.to = this.from][0];
+                        }
+
                     }).call(this);
                     this._isLoadSprite = true;
                 }
