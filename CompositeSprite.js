@@ -38,6 +38,19 @@ var Framework = (function (Framework) {
 		    this.attachArray.push(target);
             target.spriteParent = this;
 		},
+        detach: function (target) {   
+            var index = -1, i;
+            for(i = 0; i < this.attachArray.length; i++) {
+                if(this.attachArray[i] === target) {
+                    index = i;
+                    break;
+                }
+            }
+            if(index > -1) {
+                this.attachArray.splice(index, 1);
+                target.spriteParent = {};
+            }
+        },
         toString:function(){
             return "[CompositeSprite Object]";
         }
