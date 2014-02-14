@@ -34,7 +34,6 @@ var Framework = (function (Framework) {
 		};
 		that.mousedown = function (e) {
             that._currentLevel.mousedown(e);
-            console.log(e);
 		};
 		that.mouseup = function (e) {
             that._currentLevel.mouseup(e);
