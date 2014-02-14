@@ -101,7 +101,8 @@ var Framework = (function (Framework) {
                 }
                 this._previousTime = now;
             }
-            if(this._isLoadSprite){
+            if (this._isLoadSprite) {
+                this.texture = this._sprites[this.index];
                 this._sprites[this.index].position = this.position;
                 this._sprites[this.index].rotation = this.rotation;
                 this._sprites[this.index].scale = this.scale;
@@ -111,15 +112,16 @@ var Framework = (function (Framework) {
                 if(this._type === 'one'){
                     // 故意用 closures 隔離變數的scope
                     (function(){
+                        this.texture = Framework.ResourceManager.getResource(this._id);
                         for(var i=0;i<this.col*this.row;i++){
-                            var texture = Framework.ResourceManager.getResource(this._id);
+
                             var tmp = document.createElement("canvas");
-                            var realWidth = texture.width * this.scale;
-                            var realHeight = texture.height * this.scale;
-                            tmp.width = (texture.width ) / this.col;
-                            tmp.height = (texture.height ) /this.row;
+                            var realWidth = this.texture.width * this.scale;
+                            var realHeight = this.texture.height * this.scale;
+                            tmp.width = (this.texture.width ) / this.col;
+                            tmp.height = (this.texture.height ) /this.row;
                             var tmpContext = tmp.getContext("2d");
-                            tmpContext.drawImage(texture,-(texture.width / this.col)*(i%this.col), -(texture.height/this.row) * (Math.floor(i/this.col)) );
+                            tmpContext.drawImage(this.texture,-(this.texture.width / this.col)*(i%this.col), -(this.texture.height/this.row) * (Math.floor(i/this.col)) );
                             var sprite = new Framework.Sprite(tmp);
                             sprite.position = this.position;
                             sprite.rotation = this.rotation;

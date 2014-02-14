@@ -13,7 +13,6 @@ Framework = (function (Framework) {
                 set: function(newValue) {
                     this.relativePosition = newValue;
                 },
-                //value: {x: 0, y: 0},
             });
 
             Object.defineProperty(this, "rotation", {
@@ -24,8 +23,6 @@ Framework = (function (Framework) {
                 set: function(newValue) {
                     this.relativeRotation = newValue;
                 },
-                //value: 0,
-
             });
 
             Object.defineProperty(this, "scale", {
@@ -36,12 +33,38 @@ Framework = (function (Framework) {
                 set: function(newValue) {
                     this.relativeScale = newValue;
                 },
+            }); 
 
+            Object.defineProperty(this, "width", {
+                get: function() {
+                    var width = 0;
+                    if(this.texture) {
+                        width = this.texture.width;
+                    }
+                    if (this.col) {
+                        width = this.texture.width / this.col;
+                    }
+                    return width * this.absoluteScale;
+                }
+            });
+
+            Object.defineProperty(this, "height", {
+                get: function() {
+                    var height = 0;//this.texture.height;
+                    if(this.texture) {
+                        height = this.texture.height;
+                    }
+                    if (this.row) {
+                        height = this.texture.height / this.row;
+                    }
+                    return height * this.absoluteScale;
+                }
             });
 
             this.rotation = 0;
             this.scale = 1;
             this.position = {x: 0, y: 0};
+
 
             this.relativePosition = {x:0,y:0};
             this.relativeRotation = 0;

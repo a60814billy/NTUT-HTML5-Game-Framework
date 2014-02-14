@@ -6,7 +6,7 @@ var Framework = (function (Framework) {
 			this.id = undefined;
             this.type = undefined;
             this.texture = undefined;
-            this.attachArray=new Array();
+            this.attachArray=[];
         },
         update: function () {
             this.CountAbsoluteProperty();

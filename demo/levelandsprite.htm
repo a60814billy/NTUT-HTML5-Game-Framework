@@ -2,7 +2,8 @@
 
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Test</title>
-
+<script type="text/javascript" src="../game.min.js"></script>
+<!--
     <script type="text/javascript" src="../Util.js"></script>
     <script type="text/javascript" src="../core.js"></script>
     <script type="text/javascript" src="../DebugInfo.js"></script>
@@ -18,7 +19,7 @@
     <script type="text/javascript" src="../level.js"></script>
     <script type="text/javascript" src="../Game.js"></script>
 
-    <script type="text/javascript" src="../gameMainMenu.js"></script>
+    <script type="text/javascript" src="../gameMainMenu.js"></script> -->
     <style type="text/css">
         *{
             padding:0;
@@ -31,6 +32,13 @@
 
             var myLevel = Framework.Class( Framework.Level ,{
                 initialize:function(){
+
+                    this.secondHand = new Framework.Sprite("game_sameple/secondhand.png");   
+
+                    this.secondHand.position = {
+                        x: 400,
+                        y: 200
+                    };                
                     this._sprite1 = new Framework.Sprite("levelandsprite_files/body.png");
                     this._sprite2 = new Framework.Sprite("levelandsprite_files/test.png");
                     this._ani = new Framework.AnimationSprite({url:"levelandsprite_files/sprite_animation_frames_1.png" ,col:6 , row:5  });
@@ -77,6 +85,8 @@
                     },1000);
                 },
                 update:function(){
+
+                    this.secondHand.rotation +=  1 / 60 *360;
                     this._rotate += 10;
                     if(this._flag){
                         this._sprite1.position.x += 3;
@@ -105,6 +115,8 @@
                 },
                 draw:function(ctx){
                     ctx.clearRect(0,0,800,600);
+
+                    this.secondHand.draw(ctx);
                     this._sprite1.draw(ctx);
                     this._sprite2.draw(ctx);
                     this._ani.draw(ctx);
