@@ -28,21 +28,37 @@ var Framework = (function (Framework) {
                 realWidth = this.texture.width * this.scale;
                 realHeight = this.texture.height * this.scale;
                 // 將canvas 放大才不會被切到
-                tmp.width = realWidth * 2;
-                tmp.height = realHeight * 2;
+                if(realHeight > realWidth)
+                {
+                    tmp.width = realHeight;
+                    tmp.height = realHeight;
+                }
+                 else
+                {
+                    tmp.width = realWidth;
+                    tmp.height = realWidth;
+                }
+                var widthRatio = tmp.width / realWidth,
+                    heightRatio = tmp.height / realHeight,
+                    tranlateX = tmp.width/2,
+                    tranlateY = tmp.height/2;
+                
                 tmpContext = tmp.getContext("2d");
                 // 將Canvas 中心點移動到左上角(0,0)
-                tmpContext.translate(tmp.width/2 , tmp.height/2);
+                tmpContext.translate(tranlateX , tranlateY);
                 // 旋轉Canvas
-                tmpContext.rotate(this.rotation / 180 * Math.PI);
+                tmpContext.rotate(this.absoluteRotation / 180 * Math.PI);
                 // 移回來
-                tmpContext.translate(-tmp.width/2 , -tmp.height/2);
+                tmpContext.translate(-tranlateX , -tranlateY);
                 // 縮放
-                tmpContext.scale(this.scale, this.scale);
+                tmpContext.scale(this.absoluteScale, this.absoluteScale);
                 // 畫圖
-                tmpContext.drawImage(this.texture, this.texture.width /2, this.texture.height/2);
+                // 
+                tmpContext.drawImage(this.texture, (tmp.width - realWidth) / 2 / this.absoluteScale, (tmp.height - realHeight) / 2 / this.absoluteScale);
+
                 // 再畫到主Canvas上
-                context.drawImage(tmpContext.canvas, this.position.x - this.texture.width*this.scale, this.position.y - this.texture.height*this.scale);
+                
+                context.drawImage(tmpContext.canvas, this.absolutePosition.x - tmp.width / 2, this.absolutePosition.y - tmp.height / 2);
             }
         },
         toString:function(){
