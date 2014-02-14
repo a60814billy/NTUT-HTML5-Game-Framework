@@ -28,20 +28,14 @@ var Framework = (function (Framework) {
                 realWidth = this.texture.width * this.scale;
                 realHeight = this.texture.height * this.scale;
                 // 將canvas 放大才不會被切到
-                if(realHeight > realWidth)
-                {
-                    tmp.width = realHeight;
-                    tmp.height = realHeight;
-                }
-                 else
-                {
-                    tmp.width = realWidth;
-                    tmp.height = realWidth;
-                }
+                var diagonalLength = Math.ceil(Math.sqrt(Math.pow(realHeight, 2) + Math.pow(realWidth, 2)));
+                tmp.width = diagonalLength;
+                tmp.height = diagonalLength;
+
                 var widthRatio = tmp.width / realWidth,
                     heightRatio = tmp.height / realHeight,
-                    tranlateX = tmp.width/2,
-                    tranlateY = tmp.height/2;
+                    tranlateX = tmp.width / 2,
+                    tranlateY = tmp.height / 2;
                 
                 tmpContext = tmp.getContext("2d");
                 // 將Canvas 中心點移動到左上角(0,0)
