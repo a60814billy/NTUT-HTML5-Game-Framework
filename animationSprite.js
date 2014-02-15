@@ -108,18 +108,24 @@ var Framework = (function (Framework) {
         stop: function() {
             this._start = false;
         },
-        update: function(){
-            /*if(!this._start)
-                return;*/
+        resume: function() {
+            this._previousTime = (new Date()).getTime();
+            this._start = true;
+        },
+        update: function(){  
             var now = (new Date()).getTime();
             if((now - this._previousTime) > (1000 / this.speed)){
                 for (var i = 1, l = Math.floor((now - this._previousTime)/(1000 / this.speed)); i <= l; i++) {
-                    this._nextFrame();
+                    if(this._start) {
+                        this._nextFrame();
+                    }
                 }
                 this._previousTime = now;
             }
             if (this._isLoadSprite) {
-                this.texture = this._sprites[this.index];
+                if(this._type === 'more') {
+                    this.texture = this._sprites[this.index];
+                }
                 this._sprites[this.index].position = this.position;
                 this._sprites[this.index].rotation = this.rotation;
                 this._sprites[this.index].scale = this.scale;
