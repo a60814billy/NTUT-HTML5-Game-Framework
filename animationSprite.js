@@ -108,9 +108,9 @@ var Framework = (function (Framework) {
             this.userInputTo = this.to;
             if (this.userInputFrom > this.userInputTo) {
                 this.from = this.maxIndex - this.from;
-                this.to = this.maxIndex - this.to;   
-                this.index = this.from;
+                this.to = this.maxIndex - this.to;
             }
+            this.index = this.from;
         },
         stop: function() {
             this._start = false;
