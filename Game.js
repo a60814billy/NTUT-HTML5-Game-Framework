@@ -143,7 +143,7 @@ var Framework = (function (Framework) {
 
         // Level
         that.addNewLevel = function(leveldata){
-            console.dir(leveldata);
+            //console.dir(leveldata);
             for(var i in leveldata){
                 if(leveldata.hasOwnProperty(i)){
                     if(Framework.Util.isNull(that._findLevel(i))){

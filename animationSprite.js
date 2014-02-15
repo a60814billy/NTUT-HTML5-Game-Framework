@@ -15,11 +15,12 @@ var Framework = (function (Framework) {
             this.col = 1;
             this.row = 1;
             this.from = 0;
-            this.to = -1;
+            this.to = 0;
             this.index = 0;
             this.speed = 10;
             this.loop = true;
             this.maxIndex = 0;
+            this.finishPlaying = function(){};
 
             // 建構子參數判斷
             if(!Framework.Util.isUndefined(options.url)){
@@ -31,7 +32,7 @@ var Framework = (function (Framework) {
                     }else{
                         this.col = options.col;
                         this.row = options.row;
-                        this.maxIndex = this.col * this.row;
+                        this.maxIndex = this.col * this.row - 1;
                     }
                 }else if(Array.isArray(options.url)){
                     this.maxIndex = options.url.length;
@@ -66,8 +67,17 @@ var Framework = (function (Framework) {
         },
         _nextFrame: function(){
             if(this._start){
-                this.index ++;
-                if(this.to === -1){
+                this.index++;
+                if(this.index > this.to) {
+                    if(this.loop) {
+                        this.index = this.from;
+                    } else {
+                        this.index = this.to
+                        this._start = false;
+                        this.finishPlaying.call(this);
+                    }
+                }
+                /*if(this.to === -1){
                     if(this.index >= this.maxIndex){
                         this._start = this.loop;
                         if(this._start){
@@ -81,22 +91,29 @@ var Framework = (function (Framework) {
                         this._start = this.loop;
                         this.index = this.from;
                     }
-                }
+                }*/
             }
         },
-        start:function(from , to , speed , loop){
-            this.from = (Framework.Util.isUndefined(from) ? this.from : from);
-            this.to = (Framework.Util.isUndefined(to) ? this.to : to);
-            this.speed = (Framework.Util.isUndefined(speed) ? this.speed : speed);
-            this.loop = (Framework.Util.isUndefined(loop) ? this.loop : loop);
+        start:function(option){
+            option = option || {};            
+            this.from = option.from || 0;//(Framework.Util.isUndefined(from) ? this.from : from);
+            this.to = option.to || this.maxIndex//(Framework.Util.isUndefined(to) ? this.to : to);
+            this.speed = option.speed || this.speed//(Framework.Util.isUndefined(option.speed) ? this.speed : speed);
+            this.loop = option.loop || this.loop//(Framework.Util.isUndefined(option.loop) ? this.loop : loop);
             this.index = this.from;
             this._start = true;
             this._previousTime = (new Date()).getTime();
+            this.finishPlaying = option.finishPlaying || function() {};
         },
-        update:function(){
+        stop: function() {
+            this._start = false;
+        },
+        update: function(){
+            /*if(!this._start)
+                return;*/
             var now = (new Date()).getTime();
-            if( (now - this._previousTime) > (1000 / this.speed) ){
-                for(var i= 1,l=Math.floor((now - this._previousTime)/(1000 / this.speed));i<=l;i++){
+            if((now - this._previousTime) > (1000 / this.speed)){
+                for (var i = 1, l = Math.floor((now - this._previousTime)/(1000 / this.speed)); i <= l; i++) {
                     this._nextFrame();
                 }
                 this._previousTime = now;
