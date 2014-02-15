@@ -100,10 +100,17 @@ var Framework = (function (Framework) {
             this.to = option.to || this.maxIndex//(Framework.Util.isUndefined(to) ? this.to : to);
             this.speed = option.speed || this.speed//(Framework.Util.isUndefined(option.speed) ? this.speed : speed);
             this.loop = option.loop || this.loop//(Framework.Util.isUndefined(option.loop) ? this.loop : loop);
-            this.index = this.from;
+            
             this._start = true;
             this._previousTime = (new Date()).getTime();
             this.finishPlaying = option.finishPlaying || function() {};
+            this.userInputFrom = this.from;
+            this.userInputTo = this.to;
+            if (this.userInputFrom > this.userInputTo) {
+                this.from = this.maxIndex - this.from;
+                this.to = this.maxIndex - this.to;   
+                this.index = this.from;
+            }
         },
         stop: function() {
             this._start = false;
@@ -152,15 +159,16 @@ var Framework = (function (Framework) {
                             sprite.spriteParent = this.spriteParent;
                             this._sprites.push(sprite);
                         }
-                        if (this.from > this.to) {
-                            var indexFrom = this.from, indexTo = this.to;
+                        if (this.userInputFrom > this.userInputTo) {
+                            var indexFrom = this.maxIndex, indexTo = 0;
                             while (indexFrom > indexTo) {
-                                var a = this._sprites[indexFrom], b = this._sprites[indexTo]
-                                b = [a, a = b][0];
+                                this._sprites[indexFrom] = [this._sprites[indexTo], this._sprites[indexTo] = this._sprites[indexFrom]][0];
+                                /*var a = this._sprites[indexFrom], b = this._sprites[indexTo],tempA = a, tempB = b;
+                                b = [a, a = b][0];*/
                                 indexFrom--;
                                 indexTo++;
                             }
-                            this.from = [this.to, this.to = this.from][0];
+                            /*this.from = [this.to, this.to = this.from][0];*/
                         }
 
                     }).call(this);
