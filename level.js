@@ -5,7 +5,7 @@ var Framework = (function (Framework) {
 
     Framework.Level = Framework.Class({
         __construct: function () {
-            this.rootScene = new Framework.CompositeSprite();
+            this.rootScene = new Framework.Scene();
             this.autoDelete = true;
         },
         initializeProgressResource: function () {

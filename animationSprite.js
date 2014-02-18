@@ -1,7 +1,7 @@
 // By Raccoon
 // include namespace
 var Framework = (function (Framework) {
-    Framework.AnimationSprite = Framework.Class(Framework.Scene , {
+    Framework.AnimationSprite = Framework.Class(Framework.GameObject , {
         __construct: function(options){
             // Define variable
             // private

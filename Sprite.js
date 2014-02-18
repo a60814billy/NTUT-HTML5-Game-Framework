@@ -1,7 +1,7 @@
 // By Raccoon
 // include namespace
 var Framework = (function (Framework) {
-    Framework.Sprite = Framework.Class(Framework.Scene , {
+    Framework.Sprite = Framework.Class(Framework.GameObject , {
         __construct: function(options){
             this.id = undefined;
             this.type = undefined;
