@@ -6,6 +6,8 @@ var Framework = (function (Framework) {
             this.id = undefined;
             this.type = undefined;
             this.texture = undefined;
+            this.isDrawBoundry = false;
+            this.isDrawPace = false;
             if(Framework.Util.isString(options)){
                 this.id = options;
                 Framework.ResourceManager.loadImage({id:options, url:options});
@@ -48,13 +50,26 @@ var Framework = (function (Framework) {
                 tmpContext.scale(this.absoluteScale, this.absoluteScale);
                 // 畫圖
                 // 
+                // 
+                
                 tmpContext.drawImage(this.texture, (tmp.width - realWidth) / 2 / this.absoluteScale, (tmp.height - realHeight) / 2 / this.absoluteScale);
 
                 // 再畫到主Canvas上
                 
+                if(this.isDrawBoundry) {
+                    tmpContext.rect((tmp.width - realWidth) / 2 / this.absoluteScale, (tmp.height - realHeight) / 2 / this.absoluteScale, this.texture.width, this.texture.height);                    
+                } 
+
+                if(this.isDrawPace) {
+                    context.rect(this.absolutePosition.x, this.absolutePosition.y, 1, 1);
+                } 
+
+                tmpContext.stroke();
+                
+                
                 context.drawImage(tmpContext.canvas, this.absolutePosition.x - tmp.width / 2, this.absolutePosition.y - tmp.height / 2);
             }
-        },
+        },    
         toString:function(){
             return "[Sprite Object]";
         },

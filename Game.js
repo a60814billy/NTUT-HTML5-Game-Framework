@@ -113,7 +113,7 @@ var Framework = (function (Framework) {
             that._currentLevel.initializeProgressResource();
 		};
 		that.loadingProgress = function(context) {
-            that._currentLevel.loadingProgress(context);
+            that._currentLevel.loadingProgress(context, { request: Framework.ResourceManager.getRequestCount(), response: Framework.ResourceManager.getResponseCount(), percent: Framework.ResourceManager.getFinishedRequestPercent()});
 		};
 		that.initialize = function () {
             that._currentLevel.initialize();

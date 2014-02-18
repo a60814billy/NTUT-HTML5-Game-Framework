@@ -61,27 +61,58 @@ Framework = (function (Framework) {
                 }
             });
 
+            //計算以原點為圓心旋轉後的point
+            var countRotatePoint = function(point,angle)
+            {
+                var currentRotate = (angle / 180) * Math.PI,
+                    cosRatio = Math.cos(currentRotate),
+                    sinRatio = Math.sin(currentRotate),
+                    pointX =  point.x * cosRatio - point.y * sinRatio,
+                    pointY = point.x * sinRatio + point.y * cosRatio;
+                return { x:pointX, y: pointY};
+            }
+
             Object.defineProperty(this, "upperLeft", {
-                get: function() {                    
-                    return { x: this.absolutePosition.x - this.width / 2, y: this.absolutePosition.y - this.height / 2 };
+                get: function() {    
+
+                    var oriX = -this.width / 2,
+                        oriY = -this.height / 2,
+                        positionDif = countRotatePoint({x:oriX,y:oriY},this.absoluteRotation);
+
+                    return { x: this.absolutePosition.x + positionDif.x, y: this.absolutePosition.y + positionDif.y };
                 }
             });
 
             Object.defineProperty(this, "upperRight", {
-                get: function() {                    
-                    return { x: this.absolutePosition.x + this.width / 2, y: this.absolutePosition.y - this.height / 2 };
+                get: function() {    
+
+                    var oriX = this.width / 2,
+                        oriY = -this.height / 2,
+                        positionDif = countRotatePoint({x:oriX,y:oriY},this.absoluteRotation);
+
+                    return { x: this.absolutePosition.x + positionDif.x, y: this.absolutePosition.y + positionDif.y };
                 }
             });
 
             Object.defineProperty(this, "lowerLeft", {
                 get: function() {                    
-                    return { x: this.absolutePosition.x - this.width / 2, y: this.absolutePosition.y + this.height / 2 };
+                    
+                    var oriX = -this.width / 2,
+                        oriY = this.height / 2,
+                        positionDif = countRotatePoint({x:oriX,y:oriY},this.absoluteRotation);
+
+                    return { x: this.absolutePosition.x + positionDif.x, y: this.absolutePosition.y + positionDif.y };
                 }
             });
 
             Object.defineProperty(this, "lowerRight", {
                 get: function() {                    
-                    return { x: this.absolutePosition.x + this.width / 2, y: this.absolutePosition.y + this.height / 2 };
+                 
+                    var oriX = this.width / 2,
+                        oriY = this.height / 2,
+                        positionDif = countRotatePoint({x:oriX,y:oriY},this.absoluteRotation);
+
+                    return { x: this.absolutePosition.x + positionDif.x, y: this.absolutePosition.y + positionDif.y };
                 }
             });
             
@@ -118,13 +149,6 @@ Framework = (function (Framework) {
             rad = (parentRotation / 180) * Math.PI;
             this.absolutePosition.x = Math.floor((this.relativePosition.x * Math.cos(rad) - this.relativePosition.y * Math.sin(rad))) * parentScale + parentPositionX;
             this.absolutePosition.y = Math.floor((this.relativePosition.x * Math.sin(rad) + this.relativePosition.y * Math.cos(rad))) * parentScale + parentPositionY;
-        },
-        isCollided: function (target) {
-            var isUpperLeftCollide = (this.upperLeft.x <= target.lowerRight.x && this.upperLeft.y <= target.lowerRight.y),
-                isUpperRightCollide = (this.upperRight.x >= target.lowerLeft.x && this.upperRight.y <= target.lowerLeft.y),
-                isLowerLeftCollide = (this.lowerLeft.x <= target.upperRight.x && this.lowerLeft.y >= target.upperRight.y),
-                isLowerRightCollide = (this.lowerRight.x >= target.upperLeft.x && this.lowerRight.y >= target.upperLeft.y);
-            return (isUpperLeftCollide && isUpperRightCollide && isLowerLeftCollide && isLowerRightCollide);
         },
         update: function(){},
         draw: function(){},

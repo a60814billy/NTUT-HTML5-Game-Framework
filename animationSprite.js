@@ -35,7 +35,7 @@ var Framework = (function (Framework) {
                         this.maxIndex = this.col * this.row - 1;
                     }
                 }else if(Array.isArray(options.url)){
-                    this.maxIndex = options.url.length;
+                    this.maxIndex = options.url.length - 1;
                     this.row = options.url.length;
                 }else{
                     Framework.DebugInfo.Log.error("AnimationSprite Error : 建構子參數錯誤，url格式不正確");
@@ -132,14 +132,19 @@ var Framework = (function (Framework) {
                 }
                 this._previousTime = now;
             }
-            if (this._isLoadSprite) {
+            if (this._isLoadSprite) {                
                 if(this._type === 'more') {
+                    //為了要確保圖片大小是對的(如果是連續圖則必須使用原本的圖形, 非切割過後的)
                     this.texture = this._sprites[this.index];
-                }
+                } 
+                
+                this._sprites[this.index].spriteParent = this.spriteParent;
                 this._sprites[this.index].position = this.position;
                 this._sprites[this.index].rotation = this.rotation;
                 this._sprites[this.index].scale = this.scale;
                 this._sprites[this.index].CountAbsoluteProperty();
+                this._sprites[this.index].isDrawBoundry = this.isDrawBoundry;
+                this._sprites[this.index].isDrawPace = this.isDrawPace;
                 
             }else{
                 if(this._type === 'one'){
