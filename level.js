@@ -46,6 +46,7 @@ var Framework = (function (Framework) {
                 this.rootScene.attachArray[i].teardown();
                 this.rootScene.attachArray[i] = null;
                 delete this.rootScene.attachArray[i];
+                this.rootScene.attachArray.length = 0;
             }
             this.teardown();
         }
