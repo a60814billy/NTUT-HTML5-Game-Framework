@@ -18,7 +18,10 @@
 
     var wait_for_script_load = function(jsConf, callback) {
         var interval = setInterval(function() {
-            if (eval("typeof " + jsConf[0].lookFor) !== 'undefined') {
+            if (jsConf[0].lookFor === '') {
+                clearInterval(interval);
+                callback();
+            } else if (eval("typeof " + jsConf[0].lookFor) !== 'undefined') {
                     clearInterval(interval);
                     callback();      
                 }
