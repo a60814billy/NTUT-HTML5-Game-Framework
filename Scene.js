@@ -7,19 +7,23 @@ var Framework = (function (Framework) {
             this.type = undefined;
             this.texture = undefined;
             this.attachArray=[];
+            /*this.position = {
+                x: Framework.Game._canvas.width / 2,
+                y: Framework.Game._canvas.height / 2
+            }*/
         },
         update: function () {
-            this.CountAbsoluteProperty();
+            //this.CountAbsoluteProperty();
 		    var i;
 		    for (i = 0; i < this.attachArray.length ; i++) {
 
-		        this.attachArray[i].CountAbsoluteProperty();
+		        //this.attachArray[i].CountAbsoluteProperty();
 		        this.attachArray[i].update();
 		    }
 		},
         draw:function(context){
-            var i,target;
-           
+            this.countAbsoluteProperty();
+            var i,target;           
             for (i = 0; i < this.attachArray.length ; i++) {
                 this.attachArray[i].draw(context);
                 

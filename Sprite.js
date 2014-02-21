@@ -20,6 +20,7 @@ var Framework = (function (Framework) {
             }
         },
         draw:function(context){
+            this.countAbsoluteProperty();
             var texture , tmp , realWidth , realHeight , tmpContext;
             if(Framework.Util.isUndefined(this.texture)){
                 this.texture = Framework.ResourceManager.getResource(this.id);

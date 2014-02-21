@@ -11,6 +11,13 @@ Framework = (function (Framework) {
                 },
 
                 set: function(newValue) {
+                    if(Framework.Util.isUndefined(newValue.x)) {
+                        newValue.x = this.position.x;
+                    }
+                    if(Framework.Util.isUndefined(newValue.y)) {
+                        newValue.y = this.position.y;
+                    }
+
                     this.relativePosition = newValue;
                 },
             });
@@ -133,7 +140,7 @@ Framework = (function (Framework) {
             //this.spriteParent = {};
         },
 
-        CountAbsoluteProperty: function() {
+        countAbsoluteProperty: function() {
             var rad,parentRotation = 0,parentScale = 1,parentPositionX = 0,parentPositionY = 0;
 
             if(this.spriteParent){
