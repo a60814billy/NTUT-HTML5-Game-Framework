@@ -3,8 +3,20 @@
 var Framework;
 Framework = (function (Framework) {
     Framework.GameObject = Framework.Class({
+        /**
+        * 所有Sprite和Scene的Base Class, 
+        * 一般而言, 應該不會直接new它, 而是new其他的concrete class
+        * @class GameObject
+        * @constructor
+        */ 
         __construct:function() {
 
+            /**
+            * 相對位置的getter/setter
+            * @property position
+            * @type {Object} 
+            * @default { x: 0, y: 0 }
+            */
             Object.defineProperty(this, "position", {
                 get: function() {
                     return this.relativePosition;
@@ -22,6 +34,12 @@ Framework = (function (Framework) {
                 },
             });
 
+            /**
+            * 相對旋轉角度的getter/setter
+            * @property rotation
+            * @type {number} 
+            * @default 0
+            */
             Object.defineProperty(this, "rotation", {
                 get: function() {
                     return this.relativeRotation;
@@ -32,6 +50,12 @@ Framework = (function (Framework) {
                 },
             });
 
+            /**
+            * 相對放大縮小的getter/setter
+            * @property scale
+            * @type {number} 
+            * @default 1
+            */
             Object.defineProperty(this, "scale", {
                 get: function() {
                     return this.relativeScale;
@@ -42,6 +66,12 @@ Framework = (function (Framework) {
                 },
             }); 
 
+            /**
+            * 絕對寬度的getter/setter
+            * @property width
+            * @type {number} 
+            * @default 0
+            */
             Object.defineProperty(this, "width", {
                 get: function() {
                     var width = 0;
@@ -55,6 +85,12 @@ Framework = (function (Framework) {
                 }
             });
 
+            /**
+            * 絕對寬度的getter/setter
+            * @property height
+            * @type {number} 
+            * @default 0
+            */
             Object.defineProperty(this, "height", {
                 get: function() {
                     var height = 0;//this.texture.height;
@@ -79,6 +115,13 @@ Framework = (function (Framework) {
                 return { x:pointX, y: pointY};
             }
 
+            /**
+            * 絕對位置左上角的getter
+            * @property upperLeft
+            * @type {number} 
+            * @default 0
+            * @readOnly
+            */
             Object.defineProperty(this, "upperLeft", {
                 get: function() {    
 
@@ -90,6 +133,13 @@ Framework = (function (Framework) {
                 }
             });
 
+            /**
+            * 絕對位置右上角的getter
+            * @property upperRight
+            * @type {number}  
+            * @default 0
+            * @readOnly
+            */
             Object.defineProperty(this, "upperRight", {
                 get: function() {    
 
@@ -101,6 +151,13 @@ Framework = (function (Framework) {
                 }
             });
 
+            /**
+            * 絕對位置左下角的getter
+            * @property lowerLeft
+            * @type {number}  
+            * @default 0
+            * @readOnly
+            */
             Object.defineProperty(this, "lowerLeft", {
                 get: function() {                    
                     
@@ -112,6 +169,13 @@ Framework = (function (Framework) {
                 }
             });
 
+            /**
+            * 絕對位置右下角的getter
+            * @property lowerRight
+            * @type {number}  
+            * @default 0
+            * @readOnly
+            */
             Object.defineProperty(this, "lowerRight", {
                 get: function() {                    
                  
@@ -127,7 +191,6 @@ Framework = (function (Framework) {
             this.rotation = 0;
             this.scale = 1;
             this.position = {x: 0, y: 0};
-
 
             this.relativePosition = {x:0,y:0};
             this.relativeRotation = 0;

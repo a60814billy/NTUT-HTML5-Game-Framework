@@ -2,6 +2,17 @@
 // include namespace
 var Framework = (function (Framework) {
     Framework.Sprite = Framework.Class(Framework.GameObject , {
+        /**
+        * 可以用來繪製圖片的物件
+        *
+        * @class Sprite
+        * @constructor 
+        * @extends GameObject
+        * @param  {string} filePath 圖片路徑
+        * @example
+        *     new Framework.Sprite('clock.png');
+        * 
+        */
         __construct: function(options){
             this.id = undefined;
             this.type = undefined;

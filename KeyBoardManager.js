@@ -43,7 +43,7 @@ var Framework = (function (Framework) {
 			}
 
 			for(i = 0; i < _subjectLenth; i++) {
-				userKeyupEvent.call(_subjectArr[i], e);
+				userKeyupEvent.call(_subjectArr[i], e, _keypressHistory);
 			}
 		};
 
@@ -55,6 +55,13 @@ var Framework = (function (Framework) {
 			userKeyupEvent = userFunction;
 		};
 
+		/**
+		* 設定需要多久清除一次曾被按壓過key的紀錄, 預設值為一秒
+		* 該設定與 {{#crossLink "Level/keyup:event"}}{{/crossLink}} 有關		
+		* @method setClearHistoryTime
+		* @static
+		* @param {number} userClearHistoryTime 需要多久清除一次曾被按壓過key的紀錄
+		*/
 		var setClearHistoryTime = function(userClearHistoryTime) {
 			_clearHistoryTime = userClearHistoryTime;
 		};
@@ -84,6 +91,14 @@ var Framework = (function (Framework) {
 			_subjectLenth--;
 		};
 
+		/**
+		 * 管理KeyBoard所有的事件, 一般來說, 不會在此處處理相關邏輯
+		 * 而會在Level進行設定, 請參照
+		 * {{#crossLink "Level/keydown:event"}}{{/crossLink}},
+		 * {{#crossLink "Level/keyup:event"}}{{/crossLink}},
+		 * 
+		 * @class KeyBoardManager
+		 */
 		KeyBoardManagerClass = function() {
 			window.addEventListener("keydown", keydownEvent, false);
 			window.addEventListener("keyup", keyupEvent, false);
@@ -98,8 +113,8 @@ var Framework = (function (Framework) {
 			setKeydownEvent: setKeydownEvent,
 			setKeyupEvent: setKeyupEvent,
 			keydownList: _keydownList,			/* 為了要像洛克人, 按壓一段時間後可以集氣 */
-			mappingTable: _keyCodeToChar,	
-			keypressHistory: _keypressHistory,	/* 為了要可以做出類似小朋友齊打交的功能(一定時間內, 連續按多個鍵後, 會有招式) */
+			mappingTable: _keyCodeToChar,
+			keypressHistory: _keypressHistory,	
 		}
 
 		KeyBoardManagerInstance = new KeyBoardManagerClass();

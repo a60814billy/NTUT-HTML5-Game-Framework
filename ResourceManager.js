@@ -1,7 +1,3 @@
-/** 
-	* @constructor
-	* @param {Game} game funny
-*/
 var Framework = (function (Framework) {
 	//Framework.Util.namespace("Framework.ResourceManager");	
 	Framework.ResourceManager = (function(){
@@ -12,7 +8,7 @@ var Framework = (function (Framework) {
 			_intervalID = 0, 
 			_responsedResource = {}, 
 			_subjectFunction = function() {},
-			ResourceManagerClass = function() {},
+			ResourceManager = function() {},
 			ResourceManagerIntance = function() {};
 
 		
@@ -165,7 +161,8 @@ var Framework = (function (Framework) {
 			}
 		};
 		
-		ResourceManagerClass = function(subjectFunction) {
+		
+		ResourceManager = function(subjectFunction) {
 			_requestCount = 0;
 			_responseCount = 0;
 			_responsedResource = {};
@@ -179,15 +176,11 @@ var Framework = (function (Framework) {
 		};
 
 		//Public
-		/** request anything */
-		ResourceManagerClass.prototype = {
-			/** Load image */
+		ResourceManager.prototype = {
+			
 			loadImage: loadImage,
-			/** Load JSON by AJAX */
 			loadJSON: minAjaxJSON,
-			/** Delete Resource */
 			destroyResource: destroyResource,
-			/** Get Resource */
 			getResource: getResource,	
 			setSubjectFunction: setSubjectFunction,	
 			getFinishedRequestPercent: getFinishedRequestPercent,
@@ -195,7 +188,7 @@ var Framework = (function (Framework) {
 			getResponseCount: getResponseCount,
 		};
 
-		ResourceManagerIntance = new ResourceManagerClass();
+		ResourceManagerIntance = new ResourceManager();
 		return ResourceManagerIntance;	
 	})();
 	return Framework;

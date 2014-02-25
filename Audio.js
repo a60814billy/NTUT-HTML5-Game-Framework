@@ -1,5 +1,5 @@
 var Framework = (function (Framework) {
-	//Framework.Util.namespace("Framework.Audio");
+	
 	Framework.Audio = (function(){
 		var $ = Framework,
 			_audioClass = {},
@@ -7,10 +7,20 @@ var Framework = (function (Framework) {
 			_mainPlaylist = {},
 			_errorEvent = function() {};
 
+
 		var setPlaylist = function(playlist) {
 			_mainPlaylist = playlist;
 		};
 
+		/**
+		 * 設定當音樂無法播放時, 要執行的callback
+		 * @method setErrorEvent
+		 * @param {function} errorEvent 音樂無法播放時, 要執行的callback
+		 * @example
+		 * 		setErrorEvent(function() {
+		 * 			console.log('error');
+		 * 		}); 
+		 */
 		var setErrorEvent = function(eventFunction) {
 			_errorEvent = eventFunction;
 		};
@@ -55,7 +65,18 @@ var Framework = (function (Framework) {
 			this.removeEventListener('canplaythrough', playMusic, false);		
 		};
 
-		//must contain the name of a song
+		/**
+        * 
+        * 播放音樂
+        * @method play
+        * @param {Object} audioArgs audioArgs.name為必要項,
+        * 並且需要可以從Constuctor提供的清單上找到, 否則會throw exception
+        * audioArgs可以加入任何一個W3C定義的option參數, 詳細請參考W3C網站
+        * http://www.w3schools.com/tags/tag_audio.asp
+        * @example 
+        *     play({name: 'horse'}); 
+        *     play({name: 'horse', loop: true}); 
+        */
 		var play = function(audioArgs) {
 			var sourceTagStr = 'source',
 				tempSource,
@@ -94,17 +115,36 @@ var Framework = (function (Framework) {
 			//audio.addEventListener('canplaythrough', playMusic, false);
 		};
 
+		/**
+        * 暫停被播放音樂
+        * @method pause
+        * @param {string} audioName 歌曲的name
+        * @example 
+        *     pause('horse');  
+        */
 		var pause = function(audioName) {
 			var audio = _audioInstanceObj[audioName];
 			audio.pause();
 		};
 
+		/**
+        * 暫停全部被播放音樂
+        * @method pauseAll
+        * @example 
+        *     pauseAll();  
+        */
 		var pauseAll = function() {
 			for(tempName in _audioInstanceObj) {
 				pause(tempName);
 			}
 		};
 
+		/**
+        * 恢復播放被暫停的音樂, 若沒有被暫停, 則不會發生任何事情
+        * @method resume
+        * @param {string} audioName 歌曲的name
+        *     resume('horse');   
+        */
 		var resume = function(audioName) {
 			var audio = _audioInstanceObj[audioName];
 			if(audio.paused) {
@@ -112,12 +152,25 @@ var Framework = (function (Framework) {
 			}
 		}
 
+		/**
+        * 恢復播放被暫停的所有音樂
+        * @method resumeAll
+        * @example 
+        *     resumeAll();  
+        */
 		var resumeAll = function() {
 			for(tempName in _audioInstanceObj) {
 				resume(tempName);
 			}
 		}
 
+		/**
+        * 停止被播放音樂
+        * @method stop
+        * @param {string} audioName 歌曲的name
+        * @example 
+        *     stop('horse');  
+        */
 		//因為stop為native code, 故private命名部分改用stopMusic
 		var stopMusic = function(audioName) {
 			var audio = _audioInstanceObj[audioName];
@@ -125,36 +178,79 @@ var Framework = (function (Framework) {
 			audio.currentTime = 0;
 		};
 
+		/**
+        * 停止所有被播放音樂
+        * @method stopAll
+        * @example 
+        *     stopAll();  
+        */
 		var stopAll = function() {
 			for(tempName in _audioInstanceObj) {
 				stopMusic(tempName);
 			}
 		};
 
+		/**
+        * 設定音樂的音量
+        * @method setVolume
+        * @param {string} audioName 歌曲的name
+        * @param {number} volumeValue 要設定的音量大小 0-1之間
+        * @example 
+        * 	setVolume('horse', 0);	//沒聲音 
+        * 	setVolume('horse', 0.5);  
+        * 	setVolume('horse', 1);	//最大聲
+        */
 		var setVolume = function(name, volumeValue) {
 			var audio = _audioInstanceObj[name];
 			audio.volume = volumeValue;
 		};
 
+		
 		var manageMute = function(name, muted) {
 			var audio = _audioInstanceObj[name];
 			audio.muted = muted;
 		};
 
+		/**
+        * 開起音樂的音效
+        * @method openVolume
+        * @param {string} audioName 歌曲的name
+        * @example 
+        *     openVolume('horse');	
+        */
 		var openVolume = function(name) {
 			manageMute(name, false);
 		};
 
+		/**
+        * 開起所有音樂的音效
+        * @method openVolumeAll
+        * @example 
+        *     openVolumeAll();	
+        */
 		var openVolumeAll = function() {
 			for(tempName in _audioInstanceObj) {
 				openVolume(tempName);
 			}
 		};
 
+		/**
+        * 關閉音樂的音效(靜音)
+        * @method mute
+        * @param {string} audioName 歌曲的name
+        * @example 
+        *     mute('horse');	
+        */
 		var mute = function(name) {
 			manageMute(name, true);
 		};
 
+		/**
+        * 關閉所有音樂的音效(靜音所有歌曲)
+        * @method muteAll
+        * @example 
+        *     muteAll();	
+        */
 		var muteAll = function() {
 			for(tempName in _audioInstanceObj) {
 				mute(tempName);
@@ -193,6 +289,28 @@ var Framework = (function (Framework) {
 			}
 		};*/
 
+		/**
+	    * 控管所有音樂資源的Class
+	    * @class Audio 
+	    * @constructor 
+	    * @param {Object} playlist 全部要被播放的音樂和音效清單
+	    * @example
+	    * 	new Framework.Audio({
+	    *       horse: {
+	    *           mp3: 'horse.mp3',
+	    *           ogg: 'horse.ogg',
+	    *           wav: 'horse.wav'
+	    *       }, song1:{
+	    *           mp3: 'song1.mp3',
+	    *           ogg: 'song1.ogg',
+	    *           wav: 'song1.wav'
+	    *       }, song2:{
+	    *           mp3: 'song2.mp3',
+	    *           ogg: 'song2.ogg',
+	    *           wav: 'song2.wav'
+	    *       }
+	    *   });
+	    */
 		_audioClass = function(playlist) {
 			if(!Framework.Util.isUndefined(playlist)) {
 				setPlaylist(playlist);

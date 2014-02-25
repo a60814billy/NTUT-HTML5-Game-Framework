@@ -1,6 +1,11 @@
 // By Raccoon
 // include namespace
 var Framework = (function (Framework) {
+	/**
+    * 整個遊戲(多個{{#crossLink "Level"}}{{/crossLink}})的主體
+    * 主要功能為新增移除關卡與關卡的切換
+    * @class Game
+    */ 
 	Framework.Game = (function () {
         var that = {};
 		that._isInit = false;
@@ -141,7 +146,14 @@ var Framework = (function (Framework) {
             return null;
         };
 
-        // Level
+        /**
+		* 加入一個新的關卡	
+		* @method addNewLevel
+		* @static
+		* @param {Object} levelData { 關卡名稱: 關卡的instance }
+		* @example
+		* 	Framework.Game.addNewLevel({menu: new MyMenu()});	//MyMen繼承自Level
+		*/
         that.addNewLevel = function(leveldata){
             //console.dir(leveldata);
             for(var i in leveldata){
@@ -156,6 +168,14 @@ var Framework = (function (Framework) {
             }
         };
 
+        /**
+		* 前往另一個關卡(前後皆可), 若沒有該關卡, 會throw exception	
+		* @method goToLevel
+		* @static
+		* @param {Object} levelName 關卡名稱
+		* @example
+		* 	Framework.Game.goToLevel('menu');
+		*/
         that.goToLevel = function(levelName){
             that.stop();
             that._teardown();
@@ -167,6 +187,13 @@ var Framework = (function (Framework) {
             that.start();
         };
 
+        /**
+		* 前往下一個關卡, 若沒有下一個關卡, 會throw exception	
+		* @method goToNextLevel
+		* @static
+		* @example
+		* 	Framework.Game.goToNextLevel();
+		*/
         that.goToNextLevel = function(){
             that.stop();
             that._teardown();
@@ -185,6 +212,13 @@ var Framework = (function (Framework) {
             throw new Error("Game : can't goto next level.");
         };
 
+        /**
+		* 前往前一個關卡, 若沒有前一個關卡, 會throw exception	
+		* @method goToPreviousLevel
+		* @static
+		* @example
+		* 	Framework.Game.goToPreviousLevel();
+		*/
         that.goToPreviousLevel = function(){
             that.stop();
             that._teardown();
@@ -205,6 +239,14 @@ var Framework = (function (Framework) {
             throw new Error("Game : can't goto previous level.");
         };
 
+
+        /**
+		* 讓遊戲開始執行
+		* @method goToPreviousLevel
+		* @static
+		* @example
+		* 	Framework.Game.start();
+		*/
 		that.start = function () {
             if(Framework.Util.isUndefined(that._currentLevel)){
                 that._currentLevel = that._levels[0].level;

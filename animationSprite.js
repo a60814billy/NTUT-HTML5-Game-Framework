@@ -1,7 +1,24 @@
 // By Raccoon
 // include namespace
-var Framework = (function (Framework) {
+var Framework = (function (Framework) {    
     Framework.AnimationSprite = Framework.Class(Framework.GameObject , {
+        /**
+        * 支援播放連續圖片的Sprite
+        *
+        * @class AnimationSprite
+        * @constructor 
+        * @extends GameObject
+        * @param  {Object} options 
+        * options.url為要載入的圖片, 當url為一個Array時表示為零散的多張圖片, 
+        * 當為string時表示是一張大張的連續動作圖, 
+        * 故需要在提供大張連續圖的row和col. 
+        * options.speed可以設定這個Sprite播放的速度(fps), 
+        * options.loop 則可以設定這個Sprite是否需要不斷重複播放
+        * @example
+        *     new Framework.AnimationSprite({url:['image1.png', 'image2.bmp']}); //多張圖片
+        *     new Framework.AnimationSprite({url:' bigImage.png', col: 10 , row: 7 , loop: true , speed: 6}); //只有一張大型的連續動作圖,speed和loop為非必要項
+        * 
+        */
         __construct: function(options){
             // Define variable
             // private
@@ -94,6 +111,23 @@ var Framework = (function (Framework) {
                 }*/
             }
         },
+
+
+        /**
+        * 
+        * 開始播放設定好的AnimationSprite
+        * @method start
+        * @param {Object} options options.from和options.to表示要從第幾張播放到第幾張, 
+        * 若to < from表示要倒著播放, 可以在此設定要被播放的速度和是否重複播放,
+        * finishPlaying可以設定播放完畢後是否要有callback
+        * (loop: true時, 此callback永遠不會被執行)
+        * @example 
+        *     start({from:3, to: 5}); //從第三張圖片播放到第五張
+        *     start({from:6, to: 1}); //倒著從第六張圖片播放到第一張
+        *     start({from:6, to: 1, loop: false, speed: 1, finishPlaying: function(){
+        *         console.log('finish');
+        *     }});
+        */
         start:function(option){
             var option = option || {};            
             this.from = (Framework.Util.isUndefined(option.from) ? 0 : option.from);
@@ -115,12 +149,24 @@ var Framework = (function (Framework) {
             }
             this.index = this.from;
         },
+
+        /**
+        * 停止播放AnimationSprite, 若已經停止, 則不會發生任何事情
+        * @method stop       
+        */
         stop: function() {
             this._start = false;
         },
+
+        /**
+        * 繼續播放AnimationSprite, 若未曾停止, 則不會發生任何事情
+        * @method resume       
+        */
         resume: function() {
-            this._previousTime = (new Date()).getTime();
-            this._start = true;
+            if(!this._start) {
+                this._previousTime = (new Date()).getTime();
+                this._start = true;
+            }            
         },
         update: function(){  
             var now = (new Date()).getTime();
