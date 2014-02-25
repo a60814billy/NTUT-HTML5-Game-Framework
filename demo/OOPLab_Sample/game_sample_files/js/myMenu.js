@@ -93,15 +93,15 @@ var MyMenu = Framework.Class(Framework.Level , {
     },
 
     mousedown: function(e) {
+        //console.log為Browser提供的function, 可以在debugger的console內看到被印出的訊息                    
+        console.log(e.x, e.y);
         this.previousTouch = { x: e.x, y: e.y };
         if (this.previousTouch.x > this.rightArrow.upperLeft.x && this.previousTouch.x < this.rightArrow.upperRight.x && this.previousTouch.y > this.rightArrow.upperLeft.y && this.previousTouch.y < this.rightArrow.lowerLeft.y) {
             this.isTouchArrow = true;
         }
     },
 
-    mousemove: function(e) {
-        //console.log為Browser提供的function, 可以在debugger的console內看到被印出的訊息                    
-        console.log(e.x, e.y);
+    mousemove: function(e) {        
         if (this.isTouchArrow) {
             this.currentTouch = { x: e.x, y: e.y };
             if (this.currentTouch.x > this.previousTouch.x && this.currentTouch.y < this.rightArrow.lowerLeft.y && this.currentTouch.y > this.rightArrow.upperLeft.y) {
