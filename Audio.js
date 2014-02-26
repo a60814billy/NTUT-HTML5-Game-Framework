@@ -83,6 +83,7 @@ var Framework = (function (Framework) {
 				audioSourceType = {
 					mp3: 'audio/mpeg',
 					ogg: 'audio/ogg',
+					wav: 'audio/wav'
 				},
 				tempName, 
 				songName = audioArgs['name'], 

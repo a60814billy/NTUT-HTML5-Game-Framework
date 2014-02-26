@@ -52,16 +52,20 @@ var MyGame = Framework.Class(Framework.Level , {
         this.firen.sprite.isDrawBoundry = true;
 
         //載入要被播放的音樂清單
+        //由於WAV檔案通常會太大
         this.audio = new Framework.Audio({
             horse: {
-                mp3: define.musicPath + 'horse.mp3',
-                ogg: define.musicPath + 'horse.ogg'
-            }, song1:{
-                mp3: define.musicPath + 'song1.mp3',
-                ogg: define.musicPath + 'song1.ogg'
+                mp3: define.musicPath + 'kick2.mp3',
+                ogg: define.musicPath + 'kick2.ogg',
+                wav: define.musicPath + 'kick2.wav'
             }, song2:{
-                mp3: define.musicPath + 'song2.mp3',
-                ogg: define.musicPath + 'song2.ogg'
+                //mp3: define.musicPath + 'Hot_Heat.mp3',
+                //ogg: define.musicPath + 'Hot_Heat.ogg',
+                wav: define.musicPath + 'Hot_Heat.wav'
+            }, song1:{
+                mp3: define.musicPath + 'The_Messenger.mp3',
+                ogg: define.musicPath + 'The_Messenger.ogg',
+                wav: define.musicPath + 'The_Messenger.wav'
             }
         });
 

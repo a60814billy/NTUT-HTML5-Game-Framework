@@ -76,7 +76,7 @@ var Framework = (function (Framework) {
 
         /**
         * 將一個Object移開Scene中, 使其不再跟著連動
-        * @method attach
+        * @method detach
         * @param {Object} target 已經被attach的物件
         * @example 
         *     detach(spriteInstace);
