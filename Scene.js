@@ -66,8 +66,13 @@ var Framework = (function (Framework) {
                 throw 'target.draw or target.update is undefined.';
             }
 
+            if(target.layer > this.layer) {
+                throw 'target is the child of the object which be attached.';
+            }
+
 		    this.attachArray.push(target);
             target.spriteParent = this;
+            target.layer = this.layer + 1;
 		},
 
         /**
@@ -88,6 +93,7 @@ var Framework = (function (Framework) {
             if(index > -1) {
                 this.attachArray.splice(index, 1);
                 target.spriteParent = {};
+                target.layer = 1;   //default
             }
         },
         toString:function(){

@@ -199,6 +199,7 @@ Framework = (function (Framework) {
             this.absolutePosition = {x:0,y:0};
             this.absoluteRotation = 0;
             this.absoluteScale = 1;
+            this.layer = 1;
 
             //this.spriteParent = {};
         },

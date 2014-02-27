@@ -14,8 +14,8 @@ var MyGame = Framework.Class(Framework.Level , {
 
         characterPosition = {x: 0, y: -1138 * this.clock.scale};
         this.secondHand = new Framework.Sprite(define.imagePath + 'secondHand.jpg'); 
-        this.firen = new Character(define.imagePath + 'firen.png', {position: characterPosition, run: {from: 20, to: 22}, beBumped: {from:30, to: 35}}); 
-        this.freeze = new Character(define.imagePath + 'freeze.png', {position: characterPosition, scale: 1, run: {from: 29, to: 27}, beBumped: {from:39, to: 35}});
+        this.firen = new Character(define.imagePath + 'firen.png', {position: characterPosition, run: {from: 20, to: 22}, beHit: {from:30, to: 35}, hit: {from: 10, to: 13}}); 
+        this.freeze = new Character(define.imagePath + 'freeze.png', {position: characterPosition, scale: 1, run: {from: 29, to: 27}, beHit: {from:39, to: 35}, hit: {from: 19, to: 16}});
 
         this.clockCenter = new Framework.Scene();
         this.clockCenter.position = {
@@ -52,20 +52,20 @@ var MyGame = Framework.Class(Framework.Level , {
         this.firen.sprite.isDrawBoundry = true;
 
         //載入要被播放的音樂清單
-        //由於WAV檔案通常會太大
+        //由於WAV檔案通常會太大, 故請自行轉檔測試
         this.audio = new Framework.Audio({
-            horse: {
+            kick: {
                 mp3: define.musicPath + 'kick2.mp3',
                 ogg: define.musicPath + 'kick2.ogg',
-                wav: define.musicPath + 'kick2.wav'
-            }, song2:{
-                //mp3: define.musicPath + 'Hot_Heat.mp3',
-                //ogg: define.musicPath + 'Hot_Heat.ogg',
-                wav: define.musicPath + 'Hot_Heat.wav'
+                //wav: define.musicPath + 'kick2.wav'
             }, song1:{
+                mp3: define.musicPath + 'Hot_Heat.mp3',
+                ogg: define.musicPath + 'Hot_Heat.ogg',
+                //wav: define.musicPath + 'Hot_Heat.wav'
+            }, song2:{
                 mp3: define.musicPath + 'The_Messenger.mp3',
                 ogg: define.musicPath + 'The_Messenger.ogg',
-                wav: define.musicPath + 'The_Messenger.wav'
+                //wav: define.musicPath + 'The_Messenger.wav'
             }
         });
 
@@ -74,21 +74,24 @@ var MyGame = Framework.Class(Framework.Level , {
                            
     },
 
-    update:function(){     
-
+    update: function() {     
         var game = this;
         this.rootScene.update(); 
 
-        //以下為當被撞到時會停下來, 並且當被撞到的動畫播放完時便繼續跑的Scenario
+        //以下為當被攻擊時會停下來, 並且當被攻擊的動畫播放完時便繼續跑的Scenario
         if(this.firen.collide(this.freeze) && !this.isStop && !this.isPlayed) {
             this.isStop = true;
             this.isPlayed = true;
-            //當碰撞到時, 播放音效(可一次播放多首音樂)
-            this.audio.play({name: 'horse'});
-            this.freeze.beBumped(function() {
-                game.isStop = false;
-                game.freeze.run();
+            //當碰攻擊時, 播放音效(可一次播放多首音樂)
+            this.audio.play({name: 'kick'});
+            this.firen.hit(function() {
+                game.freeze.beHit(function() {
+                    game.isStop = false;
+                    game.freeze.run();
+                });
+                game.firen.run();
             });
+            
         }
         else if(!this.firen.collide(this.freeze)){
             this.isPlayed = false;
@@ -100,7 +103,7 @@ var MyGame = Framework.Class(Framework.Level , {
             this.clockCenter.rotation += this.secondHandRotationRate;
             this.clockCenterNeg.rotation = -this.clockCenter.rotation;
         }
-        //以上為當被撞到時會停下來, 並且當被撞到的動畫播放完時便繼續跑的Scenario
+        //以上為當被攻擊時會停下來, 並且當被撞到的動畫播放完時便繼續跑的Scenario
 
         this.rectPosition = { 
             x: window.innerWidth / 2 - 130,
@@ -112,7 +115,6 @@ var MyGame = Framework.Class(Framework.Level , {
 
     draw:function(ctx){
         this.rootScene.draw(ctx); 
-
         //可支援畫各種單純的圖形和字
         ctx.fillStyle = (this.secondHandRotationRate > 0)?'green':'red'; 
         ctx.fillRect(this.rectPosition.x , this.rectPosition.y, 260, 90);  
@@ -151,10 +153,7 @@ var MyGame = Framework.Class(Framework.Level , {
         this.click({ x: e.touches[0].clientX, y: e.touches[0].clientY });
     },
     
-    click: function (e) {
-        console.log('e:', e.x, e.y);
-        console.log('rect X range:', this.rectPosition.x, this.rectPosition.x + 260);
-        console.log('rect Y range:', this.rectPosition.y, this.rectPosition.y + 90);
+    click: function (e) {        
         if(e.x >= this.rectPosition.x && e.x <= this.rectPosition.x + 260 && e.y >= this.rectPosition.y && e.y <= this.rectPosition.y + 90) {
             if(!this.isClockStop) {
                 this.secondHandRotationRate = 0;

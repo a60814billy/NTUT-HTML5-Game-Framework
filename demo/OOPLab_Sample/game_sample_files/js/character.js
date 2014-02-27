@@ -19,10 +19,16 @@ var Character = function(file, options) {
         this.sprite.start({ from: options.run.from, to: options.run.to, loop: true });
     };
 
-    //播放人物被撞到的圖
-    this.beBumped = function(finishPlaying) {
+    //播放人物被攻擊的圖
+    this.beHit = function(finishPlaying) {
         //AnimationSprite.start可以指定要播放的張數(可倒著播放), 並且可以設定當播放完動作後, 要發生的事件
-        this.sprite.start({ from: options.beBumped.from, to: options.beBumped.to, loop: false, finishPlaying: finishPlaying });
+        this.sprite.start({ from: options.beHit.from, to: options.beHit.to, loop: false, finishPlaying: finishPlaying });
+    };
+
+    //播放人物在攻擊的圖
+    this.hit = function(finishPlaying) {
+        var characterThis = this;
+        this.sprite.start({ from: options.hit.from, to: options.hit.to, loop: false, finishPlaying: finishPlaying});
     };
 
     //General的碰撞函式, 近期內Framework將加入Box2D, 同學將不需要自行判斷碰撞 
@@ -31,6 +37,7 @@ var Character = function(file, options) {
             this.sprite.lowerLeft.y >= target.sprite.upperLeft.y &&
             this.sprite.upperLeft.x <= target.sprite.lowerRight.x &&
             this.sprite.lowerRight.x >= target.sprite.upperLeft.x) {
+
             return true;
         }
     };

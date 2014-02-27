@@ -188,7 +188,7 @@ var Framework = (function (Framework) {
                 this._sprites[this.index].position = this.position;
                 this._sprites[this.index].rotation = this.rotation;
                 this._sprites[this.index].scale = this.scale;
-                //this._sprites[this.index].CountAbsoluteProperty();
+                this._sprites[this.index].layer = this.layer;
                 this._sprites[this.index].isDrawBoundry = this.isDrawBoundry;
                 this._sprites[this.index].isDrawPace = this.isDrawPace;
                 

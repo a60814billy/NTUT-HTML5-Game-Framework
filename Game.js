@@ -110,8 +110,8 @@ var Framework = (function (Framework) {
 		// defined default Game screen (canvas object)
 		that._canvas = document.createElement("canvas");
 		that._canvas.setAttribute("id", "__game_canvas__");
-		that._canvas.width = innerWidth;
-		that._canvas.height = innerHeight;
+		that._canvas.width = window.innerWidth;
+		that._canvas.height = window.innerHeight;
 		that._context = that._canvas.getContext("2d");
 
 		that.initializeProgressResource = function() {
