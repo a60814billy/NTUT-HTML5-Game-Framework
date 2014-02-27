@@ -23,11 +23,8 @@ var Framework = (function (Framework) {
             }*/
         },
         update: function () {
-            //this.CountAbsoluteProperty();
 		    var i;
 		    for (i = 0; i < this.attachArray.length ; i++) {
-
-		        //this.attachArray[i].CountAbsoluteProperty();
 		        this.attachArray[i].update();
 		    }
 		},
@@ -36,7 +33,6 @@ var Framework = (function (Framework) {
             var i,target;           
             for (i = 0; i < this.attachArray.length ; i++) {
                 this.attachArray[i].draw(context);
-                
             }
         },
 

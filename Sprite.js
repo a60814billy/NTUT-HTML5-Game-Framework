@@ -60,10 +60,7 @@ var Framework = (function (Framework) {
                 tmpContext.translate(-tranlateX , -tranlateY);
                 // 縮放
                 tmpContext.scale(this.absoluteScale, this.absoluteScale);
-                // 畫圖
-                // 
-                // 
-                
+                // 畫圖                
                 tmpContext.drawImage(this.texture, (tmp.width - realWidth) / 2 / this.absoluteScale, (tmp.height - realHeight) / 2 / this.absoluteScale);
 
                 // 再畫到主Canvas上

@@ -230,6 +230,7 @@ var Framework = (function (Framework) {
             }
         },
         draw:function(context){
+            this.countAbsoluteProperty();
             if(this._isLoadSprite){
                 this._sprites[this.index].draw(context);
             }
