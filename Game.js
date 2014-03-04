@@ -411,6 +411,39 @@ var Framework = (function (Framework) {
 		that.getContext = function () {
 			return that.context;
 		};
+
+		that.fullScreen = function(ele) {
+			var ele = ele || that._canvas;			
+			if (!ele.fullscreenElement &&    // alternative standard method
+			  !ele.mozFullScreenElement && 
+			  !ele.webkitFullscreenElement && 
+			  !ele.msFullscreenElement ) {  // current working methods
+				if (ele.requestFullscreen) {
+				  ele.requestFullscreen();
+				} else if (ele.msRequestFullscreen) {
+				  ele.msRequestFullscreen();
+				} else if (ele.mozRequestFullScreen) {
+				  ele.mozRequestFullScreen();
+				} else if (ele.webkitRequestFullscreen) {
+				  ele.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+				}
+				//ele.style.width = '100%'//window.innerWidth;
+				//ele.style.height = '100%'//window.innerHeight;			
+			} 
+		};
+
+		that.exitFullScreen = function() {	
+			if (document.exitFullscreen) {
+			  document.exitFullscreen();
+			} else if (document.msExitFullscreen) {
+			  document.msExitFullscreen();
+			} else if (document.mozCancelFullScreen) {
+			  document.mozCancelFullScreen();
+			} else if (document.webkitExitFullscreen) {
+			  document.webkitExitFullscreen();
+			}
+		};
+
 		return that;
 	})();
 	return Framework;
