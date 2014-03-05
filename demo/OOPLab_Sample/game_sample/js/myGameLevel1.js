@@ -120,7 +120,7 @@ var MyGame = Framework.Class(Framework.Level , {
         //可支援畫各種單純的圖形和字
         ctx.fillStyle = (this.secondHandRotationRate > 0)?'green':'red'; 
         ctx.fillRect(this.rectPosition.x , this.rectPosition.y, 260, 90);  
-        ctx.font = '65px, bold';
+        ctx.font = '65pt bold';
         ctx.fillStyle = 'white';
         ctx.textBaseline = 'top';
         ctx.textAlign = 'center';
@@ -147,6 +147,17 @@ var MyGame = Framework.Class(Framework.Level , {
             //AnimationSprite可以恢復暫停正在播放的圖片
             this.firen.sprite.resume();
         }
+
+        if(e.key === 'Enter') {
+            if(!this.isFullScreen) {
+                Framework.Game.fullScreen();
+                this.isFullScreen = true;
+            } else {
+                Framework.Game.exitFullScreen();
+                this.isFullScreen = false;
+            }
+            
+        }
     },
 
     touchstart: function (e) {
@@ -156,6 +167,10 @@ var MyGame = Framework.Class(Framework.Level , {
     },
     
     click: function (e) { 
+        if (!this.rectPosition) {
+            return;
+        }  
+        
         if(e.x >= this.rectPosition.x && e.x <= this.rectPosition.x + 260 && e.y >= this.rectPosition.y && e.y <= this.rectPosition.y + 90) {
             if(!this.isClockStop) {
                 this.secondHandRotationRate = 0;
@@ -171,7 +186,7 @@ var MyGame = Framework.Class(Framework.Level , {
         } else if(e.x >= this.clock.upperLeft.x && e.x <= this.clock.lowerRight.x && e.y >= this.clock.upperLeft.y && e.y <= this.clock.lowerRight.y) {
             //由於Click Me在太小的螢幕的情況下會蓋到Clock, 導致點擊Click Me時, 會回到前一個Level,
             //故使用else if, 並優先選擇Click Me會觸發的條件
-            Framework.Game.goToPreviousLevel();
+            Framework.Game.goToPreviousLevel();            
             return;
         }
     },
