@@ -212,9 +212,9 @@ var Framework = (function (Framework) {
             for(var i in this.rootScene.attachArray){
                 this.rootScene.attachArray[i].teardown();
                 this.rootScene.attachArray[i] = null;
-                delete this.rootScene.attachArray[i];
-                this.rootScene.attachArray.length = 0;
+                delete this.rootScene.attachArray[i];                
             }
+            this.rootScene.attachArray.length = 0;
             this.teardown();
         }
     });
