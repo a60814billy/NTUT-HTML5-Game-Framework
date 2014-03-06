@@ -26,6 +26,11 @@ var Framework = (function (Framework) {
 
 		var loadImage = function(requestOption) {
 
+			if(_responsedResource[requestOption.id]) {
+				return _responsedResource[requestOption.id];
+			}
+			
+
 			var imageObj = new Image();
 			imageObj.src = requestOption['url'];
 			_requestCount++;
