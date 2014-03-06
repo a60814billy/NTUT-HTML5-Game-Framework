@@ -76,12 +76,18 @@ var Framework = (function (Framework) {
 					return false;
 					break;
 				case "mousedown":
+					e.x = e.x || e.clientX;
+					e.y = e.y || e.clientY;
 					that.mousedown(e);
 					break;
 				case "mouseup":
+					e.x = e.x || e.clientX;
+					e.y = e.y || e.clientY;
 					that.mouseup(e);
 					break;
 				case "mousemove":
+					e.x = e.x || e.clientX;
+					e.y = e.y || e.clientY;
 					that.mousemove(e);
 					break;
 				case "touchstart":
@@ -242,7 +248,7 @@ var Framework = (function (Framework) {
 
         /**
 		* 讓遊戲開始執行
-		* @method goToPreviousLevel
+		* @method start
 		* @static
 		* @example
 		* 	Framework.Game.start();
@@ -412,7 +418,26 @@ var Framework = (function (Framework) {
 			return that.context;
 		};
 
+
+		/**
+		* 讓任何一個在網頁上的元件得以全螢幕, 一定要在有使用者可以觸發的事件內撰寫, 例如: 
+		* {{#crossLink "Level/click:event"}}{{/crossLink}},
+		* {{#crossLink "Level/mousedown:event"}}{{/crossLink}},
+		* {{#crossLink "Level/mouseup:event"}}{{/crossLink}},
+		* {{#crossLink "Level/mousemove:event"}}{{/crossLink}},
+		* {{#crossLink "Level/touchstart:event"}}{{/crossLink}},
+		* {{#crossLink "Level/touchmove:event"}}{{/crossLink}},
+		* {{#crossLink "Level/keydown:event"}}{{/crossLink}},
+		* {{#crossLink "Level/keyup:event"}}{{/crossLink}}
+		* 否則會無法全螢幕
+		* @method fullScreen
+		* @param {Object} ele 要被全螢幕的DOM, 若不設定則為遊戲的CANVAS
+		* @static
+		* @example
+		* 	Framework.Game.fullScreen();
+		*/
 		that.fullScreen = function(ele) {
+			console.log(ele)
 			var ele = ele || that._canvas;			
 			if (!ele.fullscreenElement &&    // alternative standard method
 			  !ele.mozFullScreenElement && 
@@ -432,6 +457,13 @@ var Framework = (function (Framework) {
 			} 
 		};
 
+		/**
+		* 退出全螢幕	
+		* @method exitFullScreen
+		* @static
+		* @example
+		* 	Framework.Game.exitFullScreen();
+		*/
 		that.exitFullScreen = function() {	
 			if (document.exitFullscreen) {
 			  document.exitFullscreen();
