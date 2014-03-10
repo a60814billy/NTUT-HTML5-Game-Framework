@@ -1,11 +1,12 @@
 var Framework = (function (Framework) {
-	//Framework.Util.namespace("Framework.ResourceManager");	
+	'use strict'	
 	Framework.ResourceManager = (function(){
 		var _requestCount = 0,
 			_responseCount = 0, 
 			_timeountIDPrevious = 0,
 			_timeountID = 0, 
-			_intervalID = 0, 
+			_intervalID = 0,
+			ajaxProcessing = false, 
 			_responsedResource = {}, 
 			_subjectFunction = function() {},
 			ResourceManager = function() {},
@@ -59,11 +60,11 @@ var Framework = (function (Framework) {
 			userSettings.type = type || 'POST';
 
 			if (!Framework.Util.isUndefined(requestOption.data)) {
-				userSettings["data"] = requestOption.data;
+				userSettings['data'] = requestOption.data;
 			}
 
 			if (!Framework.Util.isUndefined(requestOption.systemSuccess)) {
-				userSettings["success"] = requestOption.systemSuccess;
+				userSettings['success'] = requestOption.systemSuccess;
 			}	
 
 			ajax(requestOption, userSettings);
@@ -77,7 +78,7 @@ var Framework = (function (Framework) {
 				async:true,
 				contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
 				error: function(xmlHttpRequest, textStatus){},
-				//data: "user=admin%20admin&password=12345" //需要自行encode, 且只接受string格式
+				//data: 'user=admin%20admin&password=12345' //需要自行encode, 且只接受string格式
 				statusCode: {
 					/*404: function() {},
 					500: function() {},*/	//這部分USER可以自行設定
@@ -124,7 +125,7 @@ var Framework = (function (Framework) {
 
 		var getResource = function(id) {
 			if(Framework.Util.isUndefined(_responsedResource[id])) {
-				throw ('"' + id + '" is undefined Resource.');
+				throw ('\'' + id + '\' is undefined Resource.');
 			}		
 			return _responsedResource[id].response;
 		};

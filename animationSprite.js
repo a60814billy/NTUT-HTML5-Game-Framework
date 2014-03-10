@@ -1,6 +1,7 @@
 // By Raccoon
 // include namespace
 var Framework = (function (Framework) {    
+    'use strict'
     Framework.AnimationSprite = Framework.Class(Framework.GameObject , {
         /**
         * 支援播放連續圖片的Sprite
@@ -44,8 +45,8 @@ var Framework = (function (Framework) {
                 if(Framework.Util.isString(options.url)){
                     this._id = options.url;
                     if(Framework.Util.isUndefined(options.col) || Framework.Util.isUndefined(options.row)){
-                        Framework.DebugInfo.Log.error("AnimationSprite Error : 建構子參數錯誤，需指定col、row");
-                        throw new SyntaxError("AnimationSprite constructor arguments error");
+                        Framework.DebugInfo.Log.error('AnimationSprite Error : 建構子參數錯誤，需指定col、row');
+                        throw new SyntaxError('AnimationSprite constructor arguments error');
                     }else{
                         this.col = options.col;
                         this.row = options.row;
@@ -55,12 +56,12 @@ var Framework = (function (Framework) {
                     this.maxIndex = options.url.length - 1;
                     this.row = options.url.length;
                 }else{
-                    Framework.DebugInfo.Log.error("AnimationSprite Error : 建構子參數錯誤，url格式不正確");
-                    throw new SyntaxError("AnimationSprite constructor arguments error");
+                    Framework.DebugInfo.Log.error('AnimationSprite Error : 建構子參數錯誤，url格式不正確');
+                    throw new SyntaxError('AnimationSprite constructor arguments error');
                 }
             }else{
-                Framework.DebugInfo.Log.error("AnimationSprite Error : 建構子參數錯誤");
-                throw new SyntaxError("AnimationSprite constructor arguments error");
+                Framework.DebugInfo.Log.error('AnimationSprite Error : 建構子參數錯誤');
+                throw new SyntaxError('AnimationSprite constructor arguments error');
             }
             this.speed = options.speed || 24 ;
             this.loop = (Framework.Util.isUndefined(options.loop) ? true : options.loop);
@@ -79,7 +80,7 @@ var Framework = (function (Framework) {
                 } , this);
                 this._isLoadSprite = true;
             }else if(!Framework.Util.isUndefined(options)){
-                Framework.DebugInfo.Log.error("AnimationSprite 不支援的參數 " + options);
+                Framework.DebugInfo.Log.error('AnimationSprite 不支援的參數 ' + options);
             }
         },
         _nextFrame: function(){
@@ -192,19 +193,19 @@ var Framework = (function (Framework) {
                 this._sprites[this.index].isDrawBoundry = this.isDrawBoundry;
                 this._sprites[this.index].isDrawPace = this.isDrawPace;
                 
-            }else{
+            } else {
                 if(this._type === 'one'){
                     // 故意用 closures 隔離變數的scope
-                    (function(){
+                    (function() {
                         this.texture = Framework.ResourceManager.getResource(this._id);
-                        for(var i=0;i<this.col*this.row;i++){
+                        for (var i = 0; i < this.col * this.row; i++){
 
-                            var tmp = document.createElement("canvas");
+                            var tmp = document.createElement('canvas');
                             var realWidth = this.texture.width * this.scale;
                             var realHeight = this.texture.height * this.scale;
                             tmp.width = (this.texture.width ) / this.col;
                             tmp.height = (this.texture.height ) /this.row;
-                            var tmpContext = tmp.getContext("2d");
+                            var tmpContext = tmp.getContext('2d');
                             tmpContext.drawImage(this.texture,-(this.texture.width / this.col)*(i%this.col), -(this.texture.height/this.row) * (Math.floor(i/this.col)) );
                             var sprite = new Framework.Sprite(tmp);
                             sprite.position = this.position;
@@ -230,13 +231,14 @@ var Framework = (function (Framework) {
             }
         },
         draw:function(context){
+            context = context || Framework.Game._context;
             this.countAbsoluteProperty();
             if(this._isLoadSprite){
                 this._sprites[this.index].draw(context);
             }
         },
         toString:function(){
-            return "[AnimationSprite Object]";
+            return '[AnimationSprite Object]';
         },
         teardown:function(){
             if(this.type === 'one'){

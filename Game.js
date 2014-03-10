@@ -1,8 +1,9 @@
 // By Raccoon
 // include namespace
 var Framework = (function (Framework) {
+	'use strict'
 	/**
-    * 整個遊戲(多個{{#crossLink "Level"}}{{/crossLink}})的主體
+    * 整個遊戲(多個{{#crossLink 'Level'}}{{/crossLink}})的主體
     * 主要功能為新增移除關卡與關卡的切換
     * @class Game
     */ 
@@ -70,43 +71,43 @@ var Framework = (function (Framework) {
 
 		that.eventHandler = function (e) {
 			switch (e.type) {
-				case "contextmenu":
-				case "click":
+				case 'contextmenu':
+				case 'click':
 					that.click(e);
 					return false;
 					break;
-				case "mousedown":
+				case 'mousedown':
 					e.x = e.x || e.clientX;
 					e.y = e.y || e.clientY;
 					that.mousedown(e);
 					break;
-				case "mouseup":
+				case 'mouseup':
 					e.x = e.x || e.clientX;
 					e.y = e.y || e.clientY;
 					that.mouseup(e);
 					break;
-				case "mousemove":
+				case 'mousemove':
 					e.x = e.x || e.clientX;
 					e.y = e.y || e.clientY;
 					that.mousemove(e);
 					break;
-				case "touchstart":
+				case 'touchstart':
 					e.preventDefault();
 					that.touchstart(e);
 					break;
-				case "touchend":
+				case 'touchend':
 					e.preventDefault();
 					that.touchend(e);
 					break;
-				case "touchmove":
+				case 'touchmove':
 					e.preventDefault();
 					that.touchmove(e);
 					break;
-				/*case "keydown":
+				/*case 'keydown':
 					e.preventDefault();
 					this.keydown(e);
 					break;
-				case "keypress":
+				case 'keypress':
 					e.preventDefault();
 					this.keypress(e);
 					break;*/
@@ -114,26 +115,26 @@ var Framework = (function (Framework) {
 		};
 
 		// defined default Game screen (canvas object)
-		that._canvas = document.createElement("canvas");
-		that._canvas.setAttribute("id", "__game_canvas__");
+		that._canvas = document.createElement('canvas');
+		that._canvas.setAttribute('id', '__game_canvas__');
 		that._canvas.width = window.innerWidth;
 		that._canvas.height = window.innerHeight;
-		that._context = that._canvas.getContext("2d");
+		that._context = that._canvas.getContext('2d');
 
 		that.initializeProgressResource = function() {
-            that._currentLevel.initializeProgressResource();
+            that._currentLevel._initializeProgressResource();
 		};
 		that.loadingProgress = function(context) {
-            that._currentLevel.loadingProgress(context, { request: Framework.ResourceManager.getRequestCount(), response: Framework.ResourceManager.getResponseCount(), percent: Framework.ResourceManager.getFinishedRequestPercent()});
+            that._currentLevel._loadingProgress(context, { request: Framework.ResourceManager.getRequestCount(), response: Framework.ResourceManager.getResponseCount(), percent: Framework.ResourceManager.getFinishedRequestPercent()});
 		};
 		that.initialize = function () {
-            that._currentLevel.initialize();
+            that._currentLevel._initialize();
 		};
 		that.update = function () {
-            that._currentLevel.update();
+            that._currentLevel._update();
 		};
 		that.draw = function () {
-            that._currentLevel.draw();
+            that._currentLevel._draw();
 		};
 
         that._teardown = function(){
@@ -167,8 +168,8 @@ var Framework = (function (Framework) {
                     if(Framework.Util.isNull(that._findLevel(i))){
                         that._levels.push({name : i , level : leveldata[i]});
                     }else{
-                        Framework.DebugInfo.Log.error("Game : 關卡名稱不能重複");
-                        throw new Error("Game: already has same level name");
+                        Framework.DebugInfo.Log.error('Game : 關卡名稱不能重複');
+                        throw new Error('Game: already has same level name');
                     }
                 }
             }
@@ -187,8 +188,8 @@ var Framework = (function (Framework) {
             that._teardown();
             that._currentLevel = that._findLevel(levelName);
             if(Framework.Util.isUndefined(that._currentLevel)){
-                Framework.DebugInfo.Log.error("Game : 找不到關卡");
-                throw new Error("Game : levelname not found.");
+                Framework.DebugInfo.Log.error('Game : 找不到關卡');
+                throw new Error('Game : levelname not found.');
             }
             that.start();
         };
@@ -214,8 +215,8 @@ var Framework = (function (Framework) {
                     flag = true;
                 }
             }
-            Framework.DebugInfo.Log.error("Game : 無下一關");
-            throw new Error("Game : can't goto next level.");
+            Framework.DebugInfo.Log.error('Game : 無下一關');
+            throw new Error('Game : can\'t goto next level.');
         };
 
         /**
@@ -241,8 +242,8 @@ var Framework = (function (Framework) {
                 }
                 prev = that._levels[i].level;
             }
-            Framework.DebugInfo.Log.error("Game : 無前一關");
-            throw new Error("Game : can't goto previous level.");
+            Framework.DebugInfo.Log.error('Game : 無前一關');
+            throw new Error('Game : can\'t goto previous level.');
         };
 
 
@@ -261,34 +262,34 @@ var Framework = (function (Framework) {
 
             if(!that._isInit){
                 document.body.appendChild(that._canvas);
-                that._canvas.addEventListener("click", function (e) {
+                that._canvas.addEventListener('click', function (e) {
                     self.eventHandler(e);
                 });
-                that._canvas.addEventListener("mousedown", function (e) {
+                that._canvas.addEventListener('mousedown', function (e) {
                     self.eventHandler(e);
                 });
-                that._canvas.addEventListener("mouseup", function (e) {
+                that._canvas.addEventListener('mouseup', function (e) {
                     self.eventHandler(e);
                 });
-                that._canvas.addEventListener("mousemove", function (e) {
+                that._canvas.addEventListener('mousemove', function (e) {
                     self.eventHandler(e);
                 });
-                that._canvas.addEventListener("touchstart", function (e) {
+                that._canvas.addEventListener('touchstart', function (e) {
                     self.eventHandler(e);
                 });
-                that._canvas.addEventListener("touchend", function (e) {
+                that._canvas.addEventListener('touchend', function (e) {
                     self.eventHandler(e);
                 });
-                that._canvas.addEventListener("touchmove", function (e) {
+                that._canvas.addEventListener('touchmove', function (e) {
                     self.eventHandler(e);
                 });
-                that._canvas.addEventListener("contextmenu", function (e) {
+                that._canvas.addEventListener('contextmenu', function (e) {
                     self.eventHandler(e);
                 });
             }
 
-			that._tempDraw = self._currentLevel.draw;
-			that._tempUpdate = self._currentLevel.update;
+			that._tempDraw = self._currentLevel._draw;
+			that._tempUpdate = self._currentLevel._update;
 			that.initializeProgressResource();
 
 
@@ -345,17 +346,17 @@ var Framework = (function (Framework) {
 						// update FPS counter
 						that._fpsAnalysis.update();
 						// show FPS information
-						if (that.fpsContext) that.fpsContext.innerHTML = "update FPS:" + that._fpsAnalysis.getUpdateFPS() + "<br />draw FPS:" + that._drawfpsAnalysis.getUpdateFPS();
+						if (that.fpsContext) that.fpsContext.innerHTML = 'update FPS:' + that._fpsAnalysis.getUpdateFPS() + '<br />draw FPS:' + that._drawfpsAnalysis.getUpdateFPS();
 						// run Game's update
 						that.update();
 						// setup next run update time
 						nextGameTick += skipTicks;
 					}
 					// run Game's draw
-					that._context.clearRect(0,0,that._canvas.width , that._canvas.height);
+					that._context.clearRect(0, 0, that._canvas.width, that._canvas.height);				
 					that.draw(that._context);
 					that._drawfpsAnalysis.update();
-					if (that.fpsContext) that.fpsContext.innerHTML = "update FPS:" + that._fpsAnalysis.getUpdateFPS() + "<br />draw FPS:" + that._drawfpsAnalysis.getUpdateFPS();
+					if (that.fpsContext) that.fpsContext.innerHTML = 'update FPS:' + that._fpsAnalysis.getUpdateFPS() + '<br />draw FPS:' + that._drawfpsAnalysis.getUpdateFPS();
 				}
 			})(that);
 			that._runInstance = setInterval(that._run, 1000 / that._drawFPS);
@@ -383,7 +384,7 @@ var Framework = (function (Framework) {
 
 		that.setDrawFPS = function (fps) {
 			if (fps > 60) {
-				Framework.DebugInfo.Log.warring("FPS must be smaller than 60");
+				Framework.DebugInfo.Log.warring('FPS must be smaller than 60');
 				fps = 60;
 			}
 			that._drawFPS = fps;
@@ -400,17 +401,17 @@ var Framework = (function (Framework) {
 				that._canvas = null;
 				that._context = null;
 				that._canvas = canvas;
-				that._context = that._canvas.getContext("2d");
+				that._context = that._canvas.getContext('2d');
 			}
 		};
 
 		that.setContext = function (context) {
-			if (context) {
+			if (!Framework.Util.isUndefined(context)) {
 				that.context = null;
 				that._canvas = null;
 				that.context = context;
 			} else {
-				Framework.DebugInfo.Log.error("Game SetContext Error")
+				Framework.DebugInfo.Log.error('Game SetContext Error')
 			}
 		};
 
@@ -421,14 +422,14 @@ var Framework = (function (Framework) {
 
 		/**
 		* 讓任何一個在網頁上的元件得以全螢幕, 一定要在有使用者可以觸發的事件內撰寫, 例如: 
-		* {{#crossLink "Level/click:event"}}{{/crossLink}},
-		* {{#crossLink "Level/mousedown:event"}}{{/crossLink}},
-		* {{#crossLink "Level/mouseup:event"}}{{/crossLink}},
-		* {{#crossLink "Level/mousemove:event"}}{{/crossLink}},
-		* {{#crossLink "Level/touchstart:event"}}{{/crossLink}},
-		* {{#crossLink "Level/touchmove:event"}}{{/crossLink}},
-		* {{#crossLink "Level/keydown:event"}}{{/crossLink}},
-		* {{#crossLink "Level/keyup:event"}}{{/crossLink}}
+		* {{#crossLink 'Level/click:event'}}{{/crossLink}},
+		* {{#crossLink 'Level/mousedown:event'}}{{/crossLink}},
+		* {{#crossLink 'Level/mouseup:event'}}{{/crossLink}},
+		* {{#crossLink 'Level/mousemove:event'}}{{/crossLink}},
+		* {{#crossLink 'Level/touchstart:event'}}{{/crossLink}},
+		* {{#crossLink 'Level/touchmove:event'}}{{/crossLink}},
+		* {{#crossLink 'Level/keydown:event'}}{{/crossLink}},
+		* {{#crossLink 'Level/keyup:event'}}{{/crossLink}}
 		* 否則會無法全螢幕
 		* @method fullScreen
 		* @param {Object} ele 要被全螢幕的DOM, 若不設定則為遊戲的CANVAS

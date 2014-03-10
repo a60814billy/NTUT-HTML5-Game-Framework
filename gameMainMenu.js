@@ -3,7 +3,7 @@
  */
 
 var Framework = (function (Framework) {
-
+	'use strict'
     Framework.GameMainMenu = Framework.Class(Framework.Level , {
         __construct : function(){
             this.autoDelete = false;

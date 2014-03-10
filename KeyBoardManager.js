@@ -1,5 +1,5 @@
 var Framework = (function (Framework) {
-	//Framework.Util.namespace("Framework.KeyBoardManager");
+	'use strict'
 	Framework.KeyBoardManager = (function(){
 		var _timeountID = 0,
 			_clearHistoryTime = 1000,
@@ -9,7 +9,7 @@ var Framework = (function (Framework) {
 			KeyBoardManagerClass = {},
 			KeyBoardManagerInstance = {},
 			userKeydownEvent = function() {},
-			userKeyupEvent = function() {}
+			userKeyupEvent = function() {},
 			_subjectArr = [],
 			_subjectLenth = 0;
 
@@ -42,7 +42,7 @@ var Framework = (function (Framework) {
 				_keydownList[temp][keyCode] = false;
 			}
 
-			for(i = 0; i < _subjectLenth; i++) {
+			for(var i = 0; i < _subjectLenth; i++) {
 				userKeyupEvent.call(_subjectArr[i], e, _keypressHistory);
 			}
 		};
@@ -57,7 +57,7 @@ var Framework = (function (Framework) {
 
 		/**
 		* 設定需要多久清除一次曾被按壓過key的紀錄, 預設值為一秒
-		* 該設定與 {{#crossLink "Level/keyup:event"}}{{/crossLink}} 有關		
+		* 該設定與 {{#crossLink 'Level/keyup:event'}}{{/crossLink}} 有關		
 		* @method setClearHistoryTime
 		* @static
 		* @param {number} userClearHistoryTime 需要多久清除一次曾被按壓過key的紀錄
@@ -94,14 +94,14 @@ var Framework = (function (Framework) {
 		/**
 		 * 管理KeyBoard所有的事件, 一般來說, 不會在此處處理相關邏輯
 		 * 而會在Level進行設定, 請參照
-		 * {{#crossLink "Level/keydown:event"}}{{/crossLink}},
-		 * {{#crossLink "Level/keyup:event"}}{{/crossLink}},
+		 * {{#crossLink 'Level/keydown:event'}}{{/crossLink}},
+		 * {{#crossLink 'Level/keyup:event'}}{{/crossLink}},
 		 * 
 		 * @class KeyBoardManager
 		 */
 		KeyBoardManagerClass = function() {
-			window.addEventListener("keydown", keydownEvent, false);
-			window.addEventListener("keyup", keyupEvent, false);
+			window.addEventListener('keydown', keydownEvent, false);
+			window.addEventListener('keyup', keyupEvent, false);
 			clearHistory();
 		};
 

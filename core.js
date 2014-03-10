@@ -1,12 +1,10 @@
 // By Raccoon , undyingmoon
-
 var Framework = (function (Framework) {
-
-    Framework.Class = function(){
-        "use strict";
+    'use strict'
+    Framework.Class = function() {        
         if(this instanceof Framework.Class){
-            Framework.DebugInfo.Log.error("不能在Framework.Class之前使用new關鍵字");
-            throw "can't use new keywork on Framework.Class";
+            Framework.DebugInfo.Log.error('不能在Framework.Class之前使用new關鍵字');
+            throw 'can\'t use new keywork on Framework.Class';
         }
         var parent, props , child , f , i;
         if(arguments.length === 1){
@@ -19,14 +17,14 @@ var Framework = (function (Framework) {
         // 1. new constructor
         child = function(){
             if(Framework.Util.isUndefined(this)){
-                Framework.DebugInfo.Log.error("必須使用new關鍵字");
-                throw "must be use new keyword";
+                Framework.DebugInfo.Log.error('必須使用new關鍵字');
+                throw 'must be use new keyword';
             }
             // 這邊應該是要執行uber的constructor，但是會因為參數的順序產生問題..
-            if(child.uber && child.uber.hasOwnProperty("__construct")){
+            if(child.uber && child.uber.hasOwnProperty('__construct')){
                 child.uber.__construct.apply(this , arguments);
             }
-            if(child.prototype.hasOwnProperty("__construct")){
+            if(child.prototype.hasOwnProperty('__construct')){
                 child.prototype.__construct.apply(this, arguments);
             }
         };

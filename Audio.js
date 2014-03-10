@@ -1,5 +1,5 @@
 var Framework = (function (Framework) {
-	
+	'use strict'
 	Framework.Audio = (function(){
 		var $ = Framework,
 			_audioClass = {},
@@ -54,7 +54,7 @@ var Framework = (function (Framework) {
 
 			var audioInstance = new Audio();
 			//document.body.appendChild(audioInstance);
-			//audioInstance.controls="controls";
+			//audioInstance.controls='controls';
 			audioInstance.preload = 'auto';			
 			_audioInstanceObj[songName] = audioInstance;
 			return audioInstance;
@@ -112,8 +112,10 @@ var Framework = (function (Framework) {
 				audio.appendChild(tempSource);
 			}
 
-			audio.play();
-			//audio.addEventListener('canplaythrough', playMusic, false);
+			
+			//audio.addEventListener('canplaythrough', this.playMusic, true);
+			//audio.load(); 
+			audio.play(); 
 		};
 
 		/**
@@ -135,7 +137,7 @@ var Framework = (function (Framework) {
         *     pauseAll();  
         */
 		var pauseAll = function() {
-			for(tempName in _audioInstanceObj) {
+			for(var tempName in _audioInstanceObj) {
 				pause(tempName);
 			}
 		};
@@ -160,7 +162,7 @@ var Framework = (function (Framework) {
         *     resumeAll();  
         */
 		var resumeAll = function() {
-			for(tempName in _audioInstanceObj) {
+			for(var tempName in _audioInstanceObj) {
 				resume(tempName);
 			}
 		}
@@ -186,7 +188,7 @@ var Framework = (function (Framework) {
         *     stopAll();  
         */
 		var stopAll = function() {
-			for(tempName in _audioInstanceObj) {
+			for(var tempName in _audioInstanceObj) {
 				stopMusic(tempName);
 			}
 		};
@@ -230,7 +232,7 @@ var Framework = (function (Framework) {
         *     openVolumeAll();	
         */
 		var openVolumeAll = function() {
-			for(tempName in _audioInstanceObj) {
+			for(var tempName in _audioInstanceObj) {
 				openVolume(tempName);
 			}
 		};
@@ -253,7 +255,7 @@ var Framework = (function (Framework) {
         *     muteAll();	
         */
 		var muteAll = function() {
-			for(tempName in _audioInstanceObj) {
+			for(var tempName in _audioInstanceObj) {
 				mute(tempName);
 			}
 		};

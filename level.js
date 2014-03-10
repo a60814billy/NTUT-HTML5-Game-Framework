@@ -2,17 +2,17 @@
 // include namespace
 
 var Framework = (function (Framework) {
-
+    'use strict'
     Framework.Level = Framework.Class({
         /**
         * 遊戲關卡的Class, 一個Game中可能有無數個Level
         * (當然Game的開始和結束頁面也可以是一個Level)
         * 每個Level都會有 
-        * {{#crossLink "Level/initializeProgressResource:method"}}{{/crossLink}},
-        * {{#crossLink "Level/loadingProgress:method"}}{{/crossLink}},
-        * {{#crossLink "Level/initialize:method"}}{{/crossLink}},
-        * {{#crossLink "Level/update:method"}}{{/crossLink}},
-        * {{#crossLink "Level/draw:method"}}{{/crossLink}},
+        * {{#crossLink 'Level/initializeProgressResource:method'}}{{/crossLink}},
+        * {{#crossLink 'Level/loadingProgress:method'}}{{/crossLink}},
+        * {{#crossLink 'Level/initialize:method'}}{{/crossLink}},
+        * {{#crossLink 'Level/update:method'}}{{/crossLink}},
+        * {{#crossLink 'Level/draw:method'}}{{/crossLink}},
         * 五個基本的生命週期
         * @class Level
         * @constructor 
@@ -30,6 +30,28 @@ var Framework = (function (Framework) {
             this.rootScene = new Framework.Scene();
             this.autoDelete = true;
         },
+
+        _initializeProgressResource: function() {
+            this.initializeProgressResource();
+        },
+        _loadingProgress: function(ctx, requestInfo) {
+            this.loadingProgress(ctx, requestInfo);
+        },
+        _initialize: function() {
+            this.initialize();
+        },
+        _update: function() {
+            this.rootScene.update();
+            this.update();
+        },
+        _draw: function(ctx) {
+            this.rootScene.draw();
+            this.draw(ctx);
+        },
+
+        _teardown: function(ctx) {
+            this.teardown();
+        },
         
         /**
         * 初始化loadingProgress事件中會用到的圖片素材, 
@@ -43,11 +65,14 @@ var Framework = (function (Framework) {
         * 在載入圖片資源時, 要被繪製的畫面, 當不設定時, 會有預設的顯示畫面
         * 若不想要有該畫面, 可以override一個空的function
         * @param {Object} context 用來繪製的工具
+        * @param {Object} requestInfo requestInfo.requset為發送request的數量, 
+        * requestInfo.response為已經有response的數量
+        * requestInfo.percent為已完成的百分比
         * @method loadingProgress   
         */
-        loadingProgress: function (context) {
-            context.font = "90px Arial";
-            context.fillText(Framework.ResourceManager.getFinishedRequestPercent() + "%" , context.canvas.width/2 - 50 , context.canvas.height/2);
+        loadingProgress: function (context, requestInfo) {
+            context.font = '90px Arial';
+            context.fillText(Framework.ResourceManager.getFinishedRequestPercent() + '%' , context.canvas.width/2 - 50 , context.canvas.height/2);
         },
 
         /**
@@ -189,7 +214,7 @@ var Framework = (function (Framework) {
         * @param {Object} history 儲存最近幾秒內keyup的按鍵 
         * (可以用來處理類似小朋友齊打交, 發動攻擊技能的Scenario)
         * history可以設定多久清除一次, 請參考 
-        * {{#crossLink "KeyBoardManager/setClearHistoryTime:method"}}{{/crossLink}}
+        * {{#crossLink 'KeyBoardManager/setClearHistoryTime:method'}}{{/crossLink}}
         * @example
         *     keyup: function(e, history) {
         *         var right = history.length >= 3, i;
@@ -215,7 +240,7 @@ var Framework = (function (Framework) {
                 delete this.rootScene.attachArray[i];                
             }
             this.rootScene.attachArray.length = 0;
-            this.teardown();
+            this._teardown();
         }
     });
 

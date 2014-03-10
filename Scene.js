@@ -1,6 +1,7 @@
 // By Raccoon
 // include namespace
 var Framework = (function (Framework) {
+    'use strict'
     Framework.Scene = Framework.Class(Framework.GameObject, {
         /**
         * 可以用來盛裝多個GameObject的容器, 當該容器位移時, 其所屬的GameObject也會跟著改變
@@ -18,22 +19,31 @@ var Framework = (function (Framework) {
             this.texture = undefined;
             this.attachArray=[];
             /*this.position = {
-                x: Framework.Game._canvas.width / 2,
-                y: Framework.Game._canvas.height / 2
+                x: this.canvas.width / 2,
+                y: this.canvas.height / 2
             }*/
         },
+
         update: function () {
 		    var i;
 		    for (i = 0; i < this.attachArray.length ; i++) {
 		        this.attachArray[i].update();
 		    }
 		},
-        draw:function(context){
+
+        draw: function(context){
+            context = context || Framework.Game._context;            
             this.countAbsoluteProperty();
-            var i,target;           
+            var i, target;           
             for (i = 0; i < this.attachArray.length ; i++) {
-                this.attachArray[i].draw(context);
+                this.attachArray[i].draw(this.context);
             }
+
+            if(context instanceof Framework.GameObject) {
+                context = context.context;  //表示傳進來的其實是GameObject或其 Concrete Class
+            }
+            context.drawImage(this.context.canvas, 0, 0);
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         },
 
         /**
@@ -66,7 +76,7 @@ var Framework = (function (Framework) {
                 throw 'target.draw or target.update is undefined.';
             }
 
-            if(target.layer > this.layer) {
+            if(this.layer > target.layer && target.spriteParent) {
                 throw 'target is the child of the object which be attached.';
             }
 
@@ -96,8 +106,9 @@ var Framework = (function (Framework) {
                 target.layer = 1;   //default
             }
         },
+
         toString:function(){
-            return "[Scene Object]";
+            return '[Scene Object]';
         }
     });
     return Framework;

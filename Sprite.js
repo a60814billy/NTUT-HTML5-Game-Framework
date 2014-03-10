@@ -1,6 +1,7 @@
 // By Raccoon
 // include namespace
 var Framework = (function (Framework) {
+    'use strict'
     Framework.Sprite = Framework.Class(Framework.GameObject , {
         /**
         * 可以用來繪製圖片的物件
@@ -25,19 +26,20 @@ var Framework = (function (Framework) {
                 this.type = 'image';
             }else if(Framework.Util.isCanvas(options)){
                 this.texture = options;
-                this.type = "canvas";
+                this.type = 'canvas';
             }else if(!Framework.Util.isUndefined(options)){
-                Framework.DebugInfo.Log.error("Sprite 不支援的參數 " + options);
+                Framework.DebugInfo.Log.error('Sprite 不支援的參數' + options);
             }
         },
-        draw:function(context){
+        draw: function(context){
+            context = context || Framework.Game._context;
             this.countAbsoluteProperty();
-            var texture , tmp , realWidth , realHeight , tmpContext;
+            var texture, tmp, realWidth, realHeight, tmpContext;
             if(Framework.Util.isUndefined(this.texture)){
                 this.texture = Framework.ResourceManager.getResource(this.id);
             }
             if(this.type === 'image' || this.type === 'canvas'){
-                tmp = document.createElement("canvas");
+                tmp = document.createElement('canvas');
                 // 計算縮放後的大小
                 realWidth = this.texture.width * this.scale;
                 realHeight = this.texture.height * this.scale;
@@ -51,7 +53,7 @@ var Framework = (function (Framework) {
                     tranlateX = tmp.width / 2,
                     tranlateY = tmp.height / 2;
                 
-                tmpContext = tmp.getContext("2d");
+                tmpContext = tmp.getContext('2d');
                 // 將Canvas 中心點移動到左上角(0,0)
                 tmpContext.translate(tranlateX , tranlateY);
                 // 旋轉Canvas
@@ -75,12 +77,14 @@ var Framework = (function (Framework) {
 
                 tmpContext.stroke();
                 
-                
+                if(context instanceof Framework.GameObject) {
+                    context = context.context;  //表示傳進來的其實是GameObject或其 Concrete Class
+                }
                 context.drawImage(tmpContext.canvas, this.absolutePosition.x - tmp.width / 2, this.absolutePosition.y - tmp.height / 2);
             }
         },    
         toString:function(){
-            return "[Sprite Object]";
+            return '[Sprite Object]';
         },
         teardown:function(){
             if(this.type === 'image'){
