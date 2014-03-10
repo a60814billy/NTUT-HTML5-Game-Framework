@@ -3,7 +3,7 @@
 var Framework = (function (Framework) {
 	'use strict'
 	/**
-    * 整個遊戲(多個{{#crossLink 'Level'}}{{/crossLink}})的主體
+    * 整個遊戲(多個{{#crossLink "Level"}}{{/crossLink}})的主體
     * 主要功能為新增移除關卡與關卡的切換
     * @class Game
     */ 
@@ -422,14 +422,14 @@ var Framework = (function (Framework) {
 
 		/**
 		* 讓任何一個在網頁上的元件得以全螢幕, 一定要在有使用者可以觸發的事件內撰寫, 例如: 
-		* {{#crossLink 'Level/click:event'}}{{/crossLink}},
-		* {{#crossLink 'Level/mousedown:event'}}{{/crossLink}},
-		* {{#crossLink 'Level/mouseup:event'}}{{/crossLink}},
-		* {{#crossLink 'Level/mousemove:event'}}{{/crossLink}},
-		* {{#crossLink 'Level/touchstart:event'}}{{/crossLink}},
-		* {{#crossLink 'Level/touchmove:event'}}{{/crossLink}},
-		* {{#crossLink 'Level/keydown:event'}}{{/crossLink}},
-		* {{#crossLink 'Level/keyup:event'}}{{/crossLink}}
+		* {{#crossLink "Level/click:event"}}{{/crossLink}},
+		* {{#crossLink "Level/mousedown:event"}}{{/crossLink}},
+		* {{#crossLink "Level/mouseup:event"}}{{/crossLink}},
+		* {{#crossLink "Level/mousemove:event"}}{{/crossLink}},
+		* {{#crossLink "Level/touchstart:event"}}{{/crossLink}},
+		* {{#crossLink "Level/touchmove:event"}}{{/crossLink}},
+		* {{#crossLink "Level/keydown:event"}}{{/crossLink}},
+		* {{#crossLink "Level/keyup:event"}}{{/crossLink}}
 		* 否則會無法全螢幕
 		* @method fullScreen
 		* @param {Object} ele 要被全螢幕的DOM, 若不設定則為遊戲的CANVAS

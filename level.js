@@ -8,11 +8,11 @@ var Framework = (function (Framework) {
         * 遊戲關卡的Class, 一個Game中可能有無數個Level
         * (當然Game的開始和結束頁面也可以是一個Level)
         * 每個Level都會有 
-        * {{#crossLink 'Level/initializeProgressResource:method'}}{{/crossLink}},
-        * {{#crossLink 'Level/loadingProgress:method'}}{{/crossLink}},
-        * {{#crossLink 'Level/initialize:method'}}{{/crossLink}},
-        * {{#crossLink 'Level/update:method'}}{{/crossLink}},
-        * {{#crossLink 'Level/draw:method'}}{{/crossLink}},
+        * {{#crossLink "Level/initializeProgressResource:method"}}{{/crossLink}},
+        * {{#crossLink "Level/loadingProgress:method"}}{{/crossLink}},
+        * {{#crossLink "Level/initialize:method"}}{{/crossLink}},
+        * {{#crossLink "Level/update:method"}}{{/crossLink}},
+        * {{#crossLink "Level/draw:method"}}{{/crossLink}},
         * 五個基本的生命週期
         * @class Level
         * @constructor 
@@ -214,7 +214,7 @@ var Framework = (function (Framework) {
         * @param {Object} history 儲存最近幾秒內keyup的按鍵 
         * (可以用來處理類似小朋友齊打交, 發動攻擊技能的Scenario)
         * history可以設定多久清除一次, 請參考 
-        * {{#crossLink 'KeyBoardManager/setClearHistoryTime:method'}}{{/crossLink}}
+        * {{#crossLink "KeyBoardManager/setClearHistoryTime:method"}}{{/crossLink}}
         * @example
         *     keyup: function(e, history) {
         *         var right = history.length >= 3, i;
