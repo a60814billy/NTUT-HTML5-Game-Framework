@@ -497,7 +497,6 @@ var Framework = (function (Framework) {
 		* 	Framework.Game.fullScreen();
 		*/
 		that.fullScreen = function(ele) {
-			console.log(ele)
 			var ele = ele || that._canvas;			
 			if (!ele.fullscreenElement &&    // alternative standard method
 			  !ele.mozFullScreenElement && 
