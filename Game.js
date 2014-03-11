@@ -16,7 +16,7 @@ var Framework = (function (Framework) {
 		that._updateFPS = 60;
 		that._drawFPS = 60;
 		// show fps's div
-		that._fpsContext = null;
+		that._fpsContext = undefined;
 		// FPS analysis object
 		that._fpsAnalysis = new Framework.FpsAnalysis();
 		that._drawfpsAnalysis = new Framework.FpsAnalysis();
@@ -296,24 +296,28 @@ var Framework = (function (Framework) {
 			var runFunction = function() {
 				self._isRun = true;
 				self.stop();
+				//bind會產生一個同樣的function, 但this為指定的參數
 				self.draw = self._tempDraw.bind(self._currentLevel);
 				self.update = self._tempUpdate.bind(self._currentLevel);
 				self.run();
 			};
 
 			var	initFunction = function() {
+				if (Framework.ResourceManager.getRequestCount() !==  Framework.ResourceManager.getResponseCount()) {
+					return;
+				}
 				self._isInit = true;					
 				self.draw = self.loadingProgress;
 				self.update = function() {};
 				self.run();
 				self._isRun = false;
 				self.initialize();
-				if(Framework.ResourceManager.getRequestCount() ===  Framework.ResourceManager.getResponseCount()) {
+				if (Framework.ResourceManager.getRequestCount() ===  Framework.ResourceManager.getResponseCount()) {
 					runFunction();
 				}
 			};
 
-			Framework.ResourceManager.setSubjectFunction(function() {				
+			Framework.ResourceManager.setSubjectFunction(function() {			
 				if(!self._isInit) {
 					initFunction();
 					return;
@@ -326,7 +330,7 @@ var Framework = (function (Framework) {
 
 			
 			//if(Framework.ResourceManager.getRequestCount() === 0) {
-				initFunction();
+			initFunction();
 			//}
 
 			Framework.KeyBoardManager.addSubject(self._currentLevel);
@@ -335,37 +339,86 @@ var Framework = (function (Framework) {
 			
 		};
 
-		that.run = function () {
-			// dynamic product runnable function
-			that._run = (function (that) {
-				// local variable for Game loop use
-				var nextGameTick = (new Date()).getTime();
-				var skipTicks = 1000 / that._updateFPS;
-				return function () {
-					while ((new Date()).getTime() > nextGameTick) {
-						// update FPS counter
-						that._fpsAnalysis.update();
-						// show FPS information
-						if (that.fpsContext) that.fpsContext.innerHTML = 'update FPS:' + that._fpsAnalysis.getUpdateFPS() + '<br />draw FPS:' + that._drawfpsAnalysis.getUpdateFPS();
-						// run Game's update
-						that.update();
-						// setup next run update time
-						nextGameTick += skipTicks;
-					}
-					// run Game's draw
-					that._context.clearRect(0, 0, that._canvas.width, that._canvas.height);				
-					that.draw(that._context);
-					that._drawfpsAnalysis.update();
-					if (that.fpsContext) that.fpsContext.innerHTML = 'update FPS:' + that._fpsAnalysis.getUpdateFPS() + '<br />draw FPS:' + that._drawfpsAnalysis.getUpdateFPS();
+		that.run = function() {			
+			var updateFunc = function() {				
+					that._fpsAnalysis.update();
+					// show FPS information
+					if (that.fpsContext) {
+						that.fpsContext.innerHTML = 'update FPS:' + that._fpsAnalysis.getUpdateFPS() + '<br />draw FPS:' + that._drawfpsAnalysis.getUpdateFPS();
+					}							
+					// run Game's update
+					that.update();							
+			};
+
+			var drawFunc = function() {
+				that._context.clearRect(0, 0, that._canvas.width, that._canvas.height);			
+				that.draw(that._context);
+				that._drawfpsAnalysis.update();
+				if (that.fpsContext) {
+					that.fpsContext.innerHTML = 'update FPS:' + that._fpsAnalysis.getUpdateFPS() + '<br />draw FPS:' + that._drawfpsAnalysis.getUpdateFPS();
 				}
-			})(that);
-			that._runInstance = setInterval(that._run, 1000 / that._drawFPS);
+			};
+
+			that.runAnimationFrame(updateFunc, drawFunc);
 			that._isRun = true;
+		};
+		
+		that.runAnimationFrame = function (updateFunc, drawFunc) {
+			// dynamic product runnable function
+			var self = that,			
+				updateTicks = 1000 / that._updateFPS,
+				drawTicks = 1000 / that._drawFPS,
+				previousUpdateTime = updateTicks,
+				previousDrawTime = drawTicks;
+
+			var _run = function (timeStamp) {	
+				that._runInstance = requestAnimationFrame(_run);			
+				while ((timeStamp - updateTicks > previousUpdateTime)) {
+					updateFunc();					
+					previousUpdateTime += updateTicks;
+				}
+
+				//一般而言, 要update的時候, 應該也已經要draw了, 故不多加if判斷是否要draw
+				drawFunc();
+				previousDrawTime = timeStamp;
+			};
+			_run();
+		};						
+
+		that.runInterval = function (updateFunc, drawFunc) {
+			// dynamic product runnable function
+			var self = that,
+				nowFunc = function() { return (new Date()).getTime(); },				
+				updateTicks = 1000 / that._updateFPS,
+				drawTicks = 1000 / that._drawFPS,
+				now = nowFunc(),
+				previousUpdateTime = nowFunc(),
+				previousDrawTime = nowFunc();
+			var _run = function () {	
+					now = nowFunc();			
+					while (now - updateTicks > previousUpdateTime) {
+						updateFunc();						
+						previousUpdateTime += updateTicks;
+					}
+
+					//一般而言, 要update的時候, 應該也已經要draw了, 故不多加if判斷是否要draw
+					drawFunc();
+					previousDrawTime = now;
+				};
+			that._runInstance = setInterval(_run, drawTicks);			
+		};
+
+		that.stopInterval = function() {
+			clearInterval(that._runInstance);
+		};
+
+		that.stopAnimationFrame = function() {
+			cancelAnimationFrame(that._runInstance);
 		};
 
 		that.stop = function () {
 			if (that._isRun) {
-				clearInterval(that._runInstance);
+				that.stopAnimationFrame();
 				that._runInstance = null;
 				that._isRun = false;
 			}
@@ -373,6 +426,11 @@ var Framework = (function (Framework) {
 
 		// propetity
 		that.setUpdateFPS = function (fps) {
+			if (fps > 60) {
+				Framework.DebugInfo.Log.warring('FPS must be smaller than 60.');
+				throw 'FPS must be smaller than 60.';
+				fps = 60;
+			}
 			that._updateFPS = fps;
 			that.stop();
 			that.run();
@@ -384,7 +442,8 @@ var Framework = (function (Framework) {
 
 		that.setDrawFPS = function (fps) {
 			if (fps > 60) {
-				Framework.DebugInfo.Log.warring('FPS must be smaller than 60');
+				Framework.DebugInfo.Log.warring('FPS must be smaller than 60.');
+				throw 'FPS must be smaller than 60.';
 				fps = 60;
 			}
 			that._drawFPS = fps;

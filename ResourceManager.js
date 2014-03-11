@@ -158,6 +158,7 @@ var Framework = (function (Framework) {
 			if(!ajaxProcessing) {
 				stopDetectingAjax();
 				_subjectFunction();
+				ajaxProcessing = false;
 			} else {
 				_timeountIDPrevious = _timeountID;
 				_timeountID = setTimeout(function() {  
