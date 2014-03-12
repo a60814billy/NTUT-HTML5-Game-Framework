@@ -322,7 +322,6 @@ var Framework = (function (Framework) {
 					initFunction();
 					return;
 				}
-
 				if (!self._isRun) {
 					runFunction();
 				}
@@ -339,71 +338,65 @@ var Framework = (function (Framework) {
 			
 		};
 
-		that.run = function() {			
-			var updateFunc = function() {				
+		that.run = function() {	
+			var self = that,	
+				nowFunc = function() { return (new Date()).getTime(); },		
+				updateTicks = 1000 / that._updateFPS,
+				drawTicks = 1000 / that._drawFPS,
+				previousUpdateTime = nowFunc(),
+				previousDrawTime = nowFunc(),
+				now = nowFunc();
+
+			var updateFunc = function() {	
+				now = nowFunc();	
+				while (now - updateTicks > previousUpdateTime) {		
 					that._fpsAnalysis.update();
 					// show FPS information
 					if (that.fpsContext) {
 						that.fpsContext.innerHTML = 'update FPS:' + that._fpsAnalysis.getUpdateFPS() + '<br />draw FPS:' + that._drawfpsAnalysis.getUpdateFPS();
 					}							
 					// run Game's update
-					that.update();							
+					that.update();	
+					previousUpdateTime = nowFunc();
+				}						
 			};
 
 			var drawFunc = function() {
-				that._context.clearRect(0, 0, that._canvas.width, that._canvas.height);			
-				that.draw(that._context);
-				that._drawfpsAnalysis.update();
-				if (that.fpsContext) {
-					that.fpsContext.innerHTML = 'update FPS:' + that._fpsAnalysis.getUpdateFPS() + '<br />draw FPS:' + that._drawfpsAnalysis.getUpdateFPS();
+				now = nowFunc();
+				if(now - drawTicks > previousDrawTime) {
+					that._context.clearRect(0, 0, that._canvas.width, that._canvas.height);			
+					that.draw(that._context);
+					that._drawfpsAnalysis.update();
+					if (that.fpsContext) {
+						that.fpsContext.innerHTML = 'update FPS:' + that._fpsAnalysis.getUpdateFPS() + '<br />draw FPS:' + that._drawfpsAnalysis.getUpdateFPS();
+					}
+					previousDrawTime = now;
 				}
 			};
 
-			that.runAnimationFrame(updateFunc, drawFunc);
+			var gameLoopFunc = function() {
+				updateFunc();
+				drawFunc();				
+			}
+
+			that.runAnimationFrame(gameLoopFunc);
 			that._isRun = true;
 		};
 		
-		that.runAnimationFrame = function (updateFunc, drawFunc) {
+		that.runAnimationFrame = function (gameLoopFunc) {
 			// dynamic product runnable function
-			var self = that,			
-				updateTicks = 1000 / that._updateFPS,
-				drawTicks = 1000 / that._drawFPS,
-				previousUpdateTime = updateTicks,
-				previousDrawTime = drawTicks;
-
-			var _run = function (timeStamp) {	
-				that._runInstance = requestAnimationFrame(_run);			
-				while ((timeStamp - updateTicks > previousUpdateTime)) {
-					updateFunc();					
-					previousUpdateTime += updateTicks;
-				}
-
-				//一般而言, 要update的時候, 應該也已經要draw了, 故不多加if判斷是否要draw
-				drawFunc();
-				previousDrawTime = timeStamp;
+			var _run = function () {
+				that._runInstance = requestAnimationFrame(_run);
+				gameLoopFunc();
 			};
 			_run();
 		};						
 
-		that.runInterval = function (updateFunc, drawFunc) {
+		that.runInterval = function (gameLoopFunc) {
 			// dynamic product runnable function
-			var self = that,
-				nowFunc = function() { return (new Date()).getTime(); },				
-				updateTicks = 1000 / that._updateFPS,
-				drawTicks = 1000 / that._drawFPS,
-				now = nowFunc(),
-				previousUpdateTime = nowFunc(),
-				previousDrawTime = nowFunc();
-			var _run = function () {	
-					now = nowFunc();			
-					while (now - updateTicks > previousUpdateTime) {
-						updateFunc();						
-						previousUpdateTime += updateTicks;
-					}
-
-					//一般而言, 要update的時候, 應該也已經要draw了, 故不多加if判斷是否要draw
-					drawFunc();
-					previousDrawTime = now;
+			var drawTicks = 1000 / that._drawFPS;
+			var _run = function () {
+					gameLoopFunc();
 				};
 			that._runInstance = setInterval(_run, drawTicks);			
 		};
