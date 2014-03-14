@@ -1,44 +1,45 @@
 var Framework = (function (Framework) {
 	'use strict'
-    // 宣告 namespace
-	Framework.Util = {};
 
-	Framework.Util.isUndefined = function (obj) {
+	var utilClass = function() {};
+
+
+	var isUndefined = function (obj) {
 		return (typeof obj === 'undefined');
 	};
 
-    Framework.Util.isNull = function(obj){
+    var isNull = function(obj){
         return (obj === null);
     };
 
-	Framework.Util.isFunction = function (obj) {
+	var isFunction = function (obj) {
 		return (typeof  obj === 'function');
 	};
 
-	Framework.Util.isNumber = function (obj) {
+	var isNumber = function (obj) {
 		return (typeof  obj === 'number');
 	};
 
-	Framework.Util.isObject = function (obj) {
+	var isObject = function (obj) {
 		return (typeof  obj === 'object');
 	};
 
-	Framework.Util.isBoolean = function (obj) {
+	var isBoolean = function (obj) {
 		return (typeof  obj === 'boolean');
 	};
 
-	Framework.Util.isString = function (obj) {
+	var isString = function (obj) {
 		return (typeof  obj === 'string');
 	};
 
-    Framework.Util.isCanvas = function(obj){
-        if(!Framework.Util.isUndefined(obj.tagName)){
+    var isCanvas = function(obj){
+        if(isUndefined(obj.tagName)){
             return (obj.tagName === 'CANVAS');
         }
         return false;
     };
 
-	Framework.Util.namespace = function (ns_string) {
+	var namespace = function (ns_string) {
 		var parts = ns_string.split('.'),
 			parent = Framework,
 			i;
@@ -46,7 +47,7 @@ var Framework = (function (Framework) {
 			parts = parts.slice(1);
 		}
 		for (i = 0; i < parts.length; i += 1) {
-			if ( Framework.Util.isUndefined(typeof parent[parts[i]])) {
+			if (isUndefined(typeof parent[parts[i]])) {
 				parent[parts[i]] = {};
 			}
 			parent = parent[parts[i]];
@@ -54,14 +55,32 @@ var Framework = (function (Framework) {
 		return parts;
 	};
 
-	Framework.Util.overrideProperty = function (defaultSettings, userSettings) {
+	var overrideProperty = function (defaultSettings, userSettings) {
 		for (var key in defaultSettings) {
-			if (Framework.Util.isUndefined(userSettings[key])) {
+			if isUndefined(userSettings[key])) {
 				userSettings[key] = defaultSettings[key];
 			}
 		}
 		return userSettings;
 	};
+
+	utilClass.prototype = {
+		isUndefined: isUndefined,
+		isNull: isNull,
+		isFunction: isFunction,
+		isNumber: isNumber,
+		isObject: isObject,
+		isBoolean: isBoolean,
+		isString: isString,
+		isCanvas: isCanvas,
+		namespace: namespace,
+		overrideProperty: overrideProperty
+	}
+
+
+    // 宣告 namespace
+	Framework.Util = new utilClass();
+
 	return Framework;
 })(Framework || {});
 
