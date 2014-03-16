@@ -33,7 +33,7 @@ var Framework = (function (Framework) {
 	};
 
     var isCanvas = function(obj){
-        if(isUndefined(obj.tagName)){
+        if(!isUndefined(obj.tagName)){
             return (obj.tagName === 'CANVAS');
         }
         return false;
@@ -57,7 +57,7 @@ var Framework = (function (Framework) {
 
 	var overrideProperty = function (defaultSettings, userSettings) {
 		for (var key in defaultSettings) {
-			if isUndefined(userSettings[key])) {
+			if (isUndefined(userSettings[key])) {
 				userSettings[key] = defaultSettings[key];
 			}
 		}
