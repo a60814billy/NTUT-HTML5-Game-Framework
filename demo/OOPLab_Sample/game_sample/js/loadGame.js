@@ -38,7 +38,9 @@
     var listScript = 
     [
         { src: 'game_sample/js/define.js', lookFor: 'define' },
-        { src: 'game_sample/js/game.min.js', lookFor: 'Framework' },
+        //{ src: 'game_sample/js/game.min.js', lookFor: 'Framework' },
+        { src: 'game_sample/js/plane.js', lookFor: 'plane' },
+        { src: 'game_sample/js/MyBox2D.js', lookFor: 'MyBox2D' },
         { src: 'game_sample/js/myMenu.js', lookFor: 'MyMenu' },
         { src: 'game_sample/js/character.js', lookFor: 'Character' },
         { src: 'game_sample/js/myGameLevel1.js', lookFor: 'MyGame' },

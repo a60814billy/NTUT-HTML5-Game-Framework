@@ -4,15 +4,14 @@ var MyMenu = Framework.Class(Framework.Level , {
         this.loading = new Framework.Sprite(define.imagePath + 'loading.jpg');
         this.loading.position = {x: window.innerWidth / 2 , y: window.innerHeight / 2};
 
-        //為了或得到this.loading這個Sprite的絕對位置, 故需要先計算一次(在Game Loop執行時, 則會自動計算, 但因為loadingProgress只支援draw故需要自行計算)
-        //this.loading.CountAbsoluteProperty();                    
+        //為了或得到this.loading這個Sprite的絕對位置, 故需要先計算一次(在Game Loop執行時, 則會自動計算, 但因為loadingProgress只支援draw故需要自行計算)                  
     },
 
     //在initialize時會觸發的事件
     loadingProgress: function(ctx, requestInfo) {
         //console.log(Framework.ResourceManager.getFinishedRequestPercent())
         this.loading.draw(ctx);
-        ctx.font='90px Arial';
+        ctx.font ='90px Arial';
         ctx.textAlign = 'center';
         ctx.fillStyle = 'white';
         ctx.fillText(Math.round(requestInfo.percent) + '%' , ctx.canvas.width / 2 , ctx.canvas.height / 2 + 300);
@@ -80,12 +79,17 @@ var MyMenu = Framework.Class(Framework.Level , {
     },
 
     update:function(){     
-        //this.rootScene.update();一定要在第一行              
-        this.rootScene.update(); 
+        //this.rootScene.update();一定要在第一行
+        //this.rootScene.update(); 
+
+        //目前的Framework, 當任何一個GameObject不做attach時, 則必須要自行update
+        this.center.update();        
+        this.scrollBar.update();
     },
 
-    draw:function(ctx) {
-        this.rootScene.draw(ctx);
+    draw: function(parentCtx) { 
+        //this.rootScene.draw();一定要在第一行
+        //this.rootScene.draw(parentCtx);
     },
 
     mouseup: function(e) {
@@ -94,7 +98,10 @@ var MyMenu = Framework.Class(Framework.Level , {
 
     mousedown: function(e) {
         //console.log為Browser提供的function, 可以在debugger的console內看到被印出的訊息                    
-        console.log(e.x, e.y);
+        if (e) {
+            console.log(e.x, e.y);
+        }
+        
         this.previousTouch = { x: e.x, y: e.y };
         if (this.previousTouch.x > this.rightArrow.upperLeft.x && this.previousTouch.x < this.rightArrow.upperRight.x && this.previousTouch.y > this.rightArrow.upperLeft.y && this.previousTouch.y < this.rightArrow.lowerLeft.y) {
             this.isTouchArrow = true;

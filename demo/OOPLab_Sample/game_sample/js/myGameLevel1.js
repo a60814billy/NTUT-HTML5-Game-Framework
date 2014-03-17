@@ -61,11 +61,11 @@ var MyGame = Framework.Class(Framework.Level , {
                 //ogg: define.musicPath + 'kick2.ogg',
                 //wav: define.musicPath + 'kick2.wav'
             }, song1:{
-                mp3: define.musicPath + 'Hot_Heat.mp3',
+                mp3: define.musicPath + 'NTUT_classic.mp3',
                 //ogg: define.musicPath + 'Hot_Heat.ogg',
                 //wav: define.musicPath + 'Hot_Heat.wav'
             }, song2:{
-                mp3: define.musicPath + 'The_Messenger.mp3',
+                mp3: define.musicPath + 'NTUT_modern.mp3',
                 //ogg: define.musicPath + 'The_Messenger.ogg',
                 //wav: define.musicPath + 'The_Messenger.wav'
             }
@@ -73,12 +73,17 @@ var MyGame = Framework.Class(Framework.Level , {
 
         //播放時, 需要給name, 其餘參數可參考W3C
         this.audio.play({name: 'song2', loop: true});
+
+        this.rectPosition = { 
+            x: window.innerWidth / 2 - 130,
+            y: window.innerHeight / 2 - 90
+        };
                            
     },
 
     update: function() {     
         var game = this;
-        this.rootScene.update(); 
+        //this.rootScene.update(); 
 
         //以下為當被攻擊時會停下來, 並且當被攻擊的動畫播放完時便繼續跑的Scenario
         if(this.firen.collide(this.freeze) && !this.isStop && !this.isPlayed) {
@@ -107,24 +112,22 @@ var MyGame = Framework.Class(Framework.Level , {
         }
         //以上為當被攻擊時會停下來, 並且當被撞到的動畫播放完時便繼續跑的Scenario
 
-        this.rectPosition = { 
-            x: window.innerWidth / 2 - 130,
-            y: window.innerHeight - 90
-        };
 
         this.isPlayHit = this.firen.collide(this.freeze)                               
     },
 
-    draw:function(ctx){
-        this.rootScene.draw(ctx); 
+    draw:function(parentCtx){
+        //this.rootScene.draw();
         //可支援畫各種單純的圖形和字
-        ctx.fillStyle = (this.secondHandRotationRate > 0)?'green':'red'; 
-        ctx.fillRect(this.rectPosition.x , this.rectPosition.y, 260, 90);  
-        ctx.font = '65pt bold';
-        ctx.fillStyle = 'white';
-        ctx.textBaseline = 'top';
-        ctx.textAlign = 'center';
-        ctx.fillText('Click Me', this.rectPosition.x + 130, this.rectPosition.y, 260);
+        parentCtx.fillStyle = (this.secondHandRotationRate > 0)?'green':'red'; 
+        parentCtx.fillRect(this.rectPosition.x , this.rectPosition.y, 260, 90);  
+        parentCtx.font = '65pt bold';
+        parentCtx.fillStyle = 'white';
+        parentCtx.textBaseline = 'top';
+        parentCtx.textAlign = 'center';
+        parentCtx.fillText('Click Me', this.rectPosition.x + 130, this.rectPosition.y, 260);
+         
+        
     },
 
     keydown:function(e, list){
@@ -166,7 +169,7 @@ var MyGame = Framework.Class(Framework.Level , {
         this.click({ x: e.touches[0].clientX, y: e.touches[0].clientY });
     },
     
-    click: function (e) { 
+    click: function (e) {         
         if (!this.rectPosition) {
             return;
         }  
