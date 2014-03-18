@@ -2,7 +2,7 @@
 // include namespace
 var Framework = (function (Framework) {
     'use strict'
-    Framework.Sprite = Framework.Class(Framework.GameObject , {
+    Framework.Sprite = Framework.exClass(Framework.GameObject , {
         /**
         * 可以用來繪製圖片的物件
         *

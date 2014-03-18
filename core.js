@@ -1,13 +1,16 @@
 // By Raccoon , undyingmoon
 var Framework = (function (Framework) {
     'use strict'
-
     Framework.exClass = function(){
+        // 如果用了new keyword 就拋例外
         if(this instanceof Framework.exClass){
             Framework.DebugInfo.Log.error('不能再Framework.exClass之前使用new關鍵字');
             throw 'can\'t use new keyword on Framework.exClass';
         }
+        // 宣告變數......
         var parent, props, childClass , i;
+
+        // 抓取parent & child object
         if(arguments.length === 1){
             if(Framework.Util.isObject(arguments[0])){
                 props = arguments[0];
@@ -20,17 +23,34 @@ var Framework = (function (Framework) {
             parent = arguments[0];
             props = arguments[1];
         }
-
+        // 建立 Child Class 的 Constructor 
         childClass = function(){
             if(Framework.Util.isUndefined(this)){
                 Framework.DebugInfo.Log.error('必須使用new關鍵字');
                 throw 'must be use new keyword';
             }
-            if(childClass.prototype.hasOwnProperty("__construct")){
-                    childClass.prototype.__construct.apply(this, arguments);
-            }
-        }
+            var that = this.prototype;
+            
+            var recursionRunConstruction = function r(a , b , arg){
+                // 不明原因無法使用isUndefined 判斷所以只好用Try了
+                try{
+                    if(a.hasOwnProperty("__construct")){
+                        r(a.uber , b,  arg);
+                        a.__construct.apply(b , arg);
+                    }
+                }catch(e){}
+            };
+            // 使用遞迴的方式找出所有parent的__construct執行
+            recursionRunConstruction(childClass.uber , this , arguments);
+            // 
+            try{
+                if(childClass.prototype.hasOwnProperty("__construct")){
+                    childClass.prototype.__construct.apply(this , arguments);
+                }
+            }catch(e){}
+        };
         childClass.prototype = new parent();
+        childClass.uber = parent.prototype;
         childClass.prototype.constructor = childClass;
         for(i in props){
             if(props.hasOwnProperty(i)){
@@ -102,4 +122,4 @@ var Framework = (function (Framework) {
     };
 
     return Framework;
-})(Framework || {});
+ })(Framework || {});

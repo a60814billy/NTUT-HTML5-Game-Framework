@@ -1,4 +1,4 @@
-var MyMenu = Framework.Class(Framework.Level , {
+var MyMenu = Framework.exClass(Framework.GameMainMenu , {
             //初始化loadingProgress需要用到的圖片
     initializeProgressResource: function() {
         this.loading = new Framework.Sprite(define.imagePath + 'loading.jpg');
@@ -90,6 +90,7 @@ var MyMenu = Framework.Class(Framework.Level , {
     draw: function(parentCtx) { 
         //this.rootScene.draw();一定要在第一行
         //this.rootScene.draw(parentCtx);
+        
     },
 
     mouseup: function(e) {

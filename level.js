@@ -3,7 +3,7 @@
 
 var Framework = (function (Framework) {
     'use strict'
-    Framework.Level = Framework.Class({
+    Framework.Level = Framework.exClass({
         /**
         * 遊戲關卡的Class, 一個Game中可能有無數個Level
         * (當然Game的開始和結束頁面也可以是一個Level)
@@ -45,7 +45,7 @@ var Framework = (function (Framework) {
             this.update();
         },
         _draw: function(ctx) {
-            this.rootScene.draw();
+            this.rootScene.draw(ctx);
             this.draw(ctx);
         },
 
@@ -96,7 +96,7 @@ var Framework = (function (Framework) {
         * @param {Object} context 用來繪製的工具
         * @method draw   
         */
-        draw: function () {
+        draw: function (context) {
         },
 
         /**

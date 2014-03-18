@@ -2,7 +2,7 @@
 // include namespace
 var Framework = (function (Framework) {    
     'use strict'
-    Framework.AnimationSprite = Framework.Class(Framework.GameObject , {
+    Framework.AnimationSprite = Framework.exClass(Framework.GameObject , {
         /**
         * 支援播放連續圖片的Sprite
         *

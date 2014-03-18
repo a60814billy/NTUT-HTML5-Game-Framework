@@ -2,7 +2,7 @@
 // include namespace
 var Framework = (function (Framework) {
     'use strict'
-    Framework.Scene = Framework.Class(Framework.GameObject, {
+    Framework.Scene = Framework.exClass(Framework.GameObject, {
         /**
         * 可以用來盛裝多個GameObject的容器, 當該容器位移時, 其所屬的GameObject也會跟著改變
         *
