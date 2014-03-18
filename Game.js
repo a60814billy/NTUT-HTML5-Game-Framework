@@ -29,6 +29,11 @@ var Framework = (function (Framework) {
 
 		that._context = null;
 
+		that._ideaWidth = 16;
+		that._ideaHeight = 9;
+		that._widthRatio = 1;
+		that._heightRatio = 1;
+
 		that._tempUpdate = function() {};
 		that._tempDraw = function(context) {};
 
@@ -70,26 +75,30 @@ var Framework = (function (Framework) {
 		};
 
 		that.eventHandler = function (e) {
+			var pos = {}, totalOffsetX = 0, totalOffsetY = 0, ele = that._canvas;
+			do {
+				totalOffsetX += ele.offsetLeft;
+				totalOffsetY += ele.offsetTop;
+				ele = ele.offsetParent;
+			} while(ele);
+			pos.x = e.x || e.clientX;
+			pos.y = e.y || e.clientY;
+			pos.x = Math.round((e.x - totalOffsetX) / that._widthRatio);
+			pos.y = Math.round((e.y - totalOffsetY) / that._heightRatio);
 			switch (e.type) {
 				case 'contextmenu':
 				case 'click':
-					that.click(e);
+					that.click(pos);
 					return false;
 					break;
-				case 'mousedown':
-					e.x = e.x || e.clientX;
-					e.y = e.y || e.clientY;
-					that.mousedown(e);
+				case 'mousedown':				
+					that.mousedown(pos);
 					break;
-				case 'mouseup':
-					e.x = e.x || e.clientX;
-					e.y = e.y || e.clientY;
-					that.mouseup(e);
+				case 'mouseup':					
+					that.mouseup(pos);
 					break;
-				case 'mousemove':
-					e.x = e.x || e.clientX;
-					e.y = e.y || e.clientY;
-					that.mousemove(e);
+				case 'mousemove':					
+					that.mousemove(pos);
 					break;
 				case 'touchstart':
 					e.preventDefault();
@@ -113,12 +122,24 @@ var Framework = (function (Framework) {
 					break;*/
 			}
 		};
-
-		// defined default Game screen (canvas object)
-		that._canvas = document.createElement('canvas');
+		
+		that._mainContainer = document.createElement('div');
+		that._mainContainer.style.backgroundColor = '#000';
+		that._mainContainer.style.width = '100%';
+		that._mainContainer.style.height = '100%';
+		that._mainContainer.style.display = 'table';
+		that._canvasContainer = document.createElement('div');				
+		//that._canvasContainer.style.margin = '0px auto';
+		that._canvasContainer.style.display = 'table-cell';
+		that._canvasContainer.style.textAlign = 'center';
+		that._canvasContainer.style.verticalAlign = 'middle';
+		that._canvas = document.createElement('canvas');	
+		that._canvas.style.backgroundColor = '#fff';		
 		that._canvas.setAttribute('id', '__game_canvas__');
 		that._canvas.width = window.innerWidth;
 		that._canvas.height = window.innerHeight;
+		that._canvasContainer.appendChild(that._canvas);
+		that._mainContainer.appendChild(that._canvasContainer);
 		that._context = that._canvas.getContext('2d');
 
 		that.initializeProgressResource = function() {
@@ -261,7 +282,8 @@ var Framework = (function (Framework) {
             var self = that;
 
             if(!that._isInit){
-                document.body.appendChild(that._canvas);
+                document.body.appendChild(that._mainContainer);
+               	that.resizeEvent();
                 that._canvas.addEventListener('click', function (e) {
                     self.eventHandler(e);
                 });
@@ -286,6 +308,8 @@ var Framework = (function (Framework) {
                 that._canvas.addEventListener('contextmenu', function (e) {
                     self.eventHandler(e);
                 });
+
+                window.addEventListener("resize", that.resizeEvent, false);
             }
 
 			that._tempDraw = self._currentLevel._draw;
@@ -375,8 +399,8 @@ var Framework = (function (Framework) {
 			};
 
 			var gameLoopFunc = function() {
-				updateFunc();
-				drawFunc();				
+				drawFunc();	
+				updateFunc();							
 			}
 
 			that.runAnimationFrame(gameLoopFunc);
@@ -453,6 +477,8 @@ var Framework = (function (Framework) {
 				that._canvas = null;
 				that._context = null;
 				that._canvas = canvas;
+				that._canvasContainer.innerHTML = '';
+				that._canvasContainer.appendChild(that._canvas);
 				that._context = that._canvas.getContext('2d');
 			}
 		};
@@ -526,6 +552,28 @@ var Framework = (function (Framework) {
 			} else if (document.webkitExitFullscreen) {
 			  document.webkitExitFullscreen();
 			}
+		};
+
+		that.resizeEvent = function() {
+			var base = 0,
+				baseWidth = window.innerWidth / 16,
+				baseHeight = window.innerHeight / 9,
+				scaledWidth = 0,
+				scaledHeight = 0;
+			if(baseWidth < baseHeight) {
+				base = baseWidth;
+			} else {
+				base = baseHeight;
+			}
+
+			scaledWidth = Math.round(base * 16);
+			scaledHeight = Math.round(base * 9);
+			that._widthRatio = scaledWidth / that._canvas.width;
+			that._heightRatio = scaledHeight / that._canvas.height;		
+			that._canvasContainer.style.width = scaledWidth;
+			that._canvasContainer.style.height = scaledHeight;
+			that._canvas.style.width = scaledWidth;
+			that._canvas.style.height = scaledHeight;			
 		};
 
 		return that;
