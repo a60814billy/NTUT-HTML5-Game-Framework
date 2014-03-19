@@ -7,8 +7,8 @@ var Framework = (function (Framework) {
 		//FpsAnalysis, user不會用到, 形成沒有意義的防呆		
 		//if (!(this instanceof arguments.callee)) 
 		//	return new arguments.callee();
-		var timeData = [];
-		var fpsData = [];
+		var timeData = new Array(60);
+		var fpsData = new Array(60);
 		for (var i = 0; i < fpsData.length; i++) {
 			timeData[i] = 0;
 			fpsData[i] = 0;
