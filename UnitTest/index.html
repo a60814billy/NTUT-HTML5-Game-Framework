@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Unit Test for Html5 Game Framework</title>
+<script type="text/javascript" src="js/yui-min.js"></script>
+<!-- include HTML 5 Game Framework -->
+<script type="text/javascript" src="../Util.js"></script>
+<script type="text/javascript" src="../DebugInfo.js"></script>
+<script type="text/javascript" src="../core.js"></script>
+<script type="text/javascript" src="../FpsAnalysis.js"></script>
+<!-- include test suite-->
+<script type="text/javascript" src="js/fpsAnalysisTest.js"></script>
+<script>
+window.onload = function () {
+    YUI({logInclude: {TestRunner: true}}).use(
+        'test',
+        'test-console',
+        //------------------------------------------------------
+        // 以下加入自己寫的TestSuite
+        //------------------------------------------------------
+        'fpsanalysis-test',
+    function(Y){
+        (new Y.Test.Console({
+            newestOnTop: false,
+            filters:{
+                pass: true
+                ,fail: true
+                //,status: true
+            }
+        })).render("#logger");
+        Y.Test.Runner.run();
+    }); 
+};
+</script>
+</head>
+<body class="yui3-skin-sam">
+    <div id="logger"></div>
+</body>
+</html>

@@ -26,6 +26,9 @@ var Framework = (function (Framework) {
 			},
 			getUpdateFPS: function () {
 				return Math.floor(1000 / (fps / fpsData.length));
+			},
+			toString:function(){
+				return "[FpsAnalysis Object]";
 			}
 		};
 	};

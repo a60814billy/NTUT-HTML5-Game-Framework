@@ -14,6 +14,9 @@ var MyBox2D = Framework.Class(Framework.Level , {
         this.plane.init(this.box2D);
         this.plane.position = {x: 100, y: 100};
 
+        this.plane2 = new plane();
+        this.plane2.init(this.box2D);
+        this.plane2.position = {x: 150, y: 100};
 
         this.goLeftPlane = new Framework.Sprite(define.imagePath + '173.bmp');
         this.goRightPlane = new Framework.Sprite(define.imagePath + '169.bmp');
@@ -33,6 +36,7 @@ var MyBox2D = Framework.Class(Framework.Level , {
 
     update:function(){         
         this.plane.update();
+        this.plane2.update();
     },
 
     draw: function(parentCtx) {   
