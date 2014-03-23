@@ -10,8 +10,10 @@
 <script type="text/javascript" src="../FpsAnalysis.js"></script>
 <!-- include test suite-->
 <script type="text/javascript" src="js/fpsAnalysisTest.js"></script>
+<script type="text/javascript" src="js/utilTest.js"></script>
 <script>
 window.onload = function () {
+    'use strict';
     YUI({logInclude: {TestRunner: true}}).use(
         'test',
         'test-console',
@@ -19,6 +21,7 @@ window.onload = function () {
         // 以下加入自己寫的TestSuite
         //------------------------------------------------------
         'fpsanalysis-test',
+        'util-test',
     function(Y){
         (new Y.Test.Console({
             newestOnTop: false,
@@ -28,8 +31,9 @@ window.onload = function () {
                 //,status: true
             }
         })).render("#logger");
+        Y.Test.Runner.setName("HTML5 Game Framewrok");
         Y.Test.Runner.run();
-    }); 
+    });
 };
 </script>
 </head>

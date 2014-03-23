@@ -1,4 +1,5 @@
 YUI.add("fpsanalysis-test" , function(Y){
+    'use strict';
 	var suite = new Y.Test.Suite("fpsanalysis-test");
 	suite.add(new Y.Test.Case({
 		name:"FpsAnalysis Test",
@@ -9,7 +10,7 @@ YUI.add("fpsanalysis-test" , function(Y){
 			this.fps = new Framework.FpsAnalysis();
 		},
 		tearDown:function(){
-			delete this.fps;
+			this.fps = null;
 		},
 		//------------------------------------------------------
 		// Tests
