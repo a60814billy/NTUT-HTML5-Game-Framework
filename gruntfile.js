@@ -121,7 +121,7 @@ module.exports = function (grunt) {
                     'src/Game.js',
                     'src/gameMainMenu.js',
                     'src/Audio.js',
-                    'src/Box2dWeb-2.1.a.3.js.js',
+                    'src/Box2dWeb-2.1.a.3.js',
                     'src/Box2D.js',
                 ],
                 dest: 'build/<%= pkg.name %>.<%= pkg.version %>.js',
