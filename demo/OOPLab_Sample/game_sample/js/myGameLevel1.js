@@ -36,9 +36,10 @@ var MyGame = Framework.Class(Framework.Level , {
 
         this.wholeClock = new Framework.Scene();
         this.wholeClock.position = {
-            x: window.innerWidth / 2,
-            y: window.innerHeight / 2
+            x: Framework.Game._canvas.width / 2,
+            y: Framework.Game._canvas.height / 2
         };
+
 
         this.secondHandRotationRate = 0.3;
         this.wholeClock.attach(this.clock);
@@ -75,8 +76,8 @@ var MyGame = Framework.Class(Framework.Level , {
         this.audio.play({name: 'song2', loop: true});
 
         this.rectPosition = { 
-            x: window.innerWidth / 2 - 130,
-            y: window.innerHeight / 2 - 90
+            x: Framework.Game._canvas.width / 2 - 130,
+            y: Framework.Game._canvas.height / 2 - 90
         };
                            
     },
@@ -169,7 +170,9 @@ var MyGame = Framework.Class(Framework.Level , {
         this.click({ x: e.touches[0].clientX, y: e.touches[0].clientY });
     },
     
-    click: function (e) {         
+    click: function (e) {  
+
+        console.log(e.x, e.y);
         if (!this.rectPosition) {
             return;
         }  
@@ -189,6 +192,7 @@ var MyGame = Framework.Class(Framework.Level , {
         } else if(e.x >= this.clock.upperLeft.x && e.x <= this.clock.lowerRight.x && e.y >= this.clock.upperLeft.y && e.y <= this.clock.lowerRight.y) {
             //由於Click Me在太小的螢幕的情況下會蓋到Clock, 導致點擊Click Me時, 會回到前一個Level,
             //故使用else if, 並優先選擇Click Me會觸發的條件
+            this.audio.stopAll();
             Framework.Game.goToPreviousLevel();            
             return;
         }

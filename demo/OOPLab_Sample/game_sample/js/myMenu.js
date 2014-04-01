@@ -2,7 +2,7 @@ var MyMenu = Framework.exClass(Framework.GameMainMenu , {
             //初始化loadingProgress需要用到的圖片
     initializeProgressResource: function() {
         this.loading = new Framework.Sprite(define.imagePath + 'loading.jpg');
-        this.loading.position = {x: window.innerWidth / 2 , y: window.innerHeight / 2};
+        this.loading.position = {x: Framework.Game._canvas.width / 2 , y: Framework.Game._canvas.height / 2};
 
         //為了或得到this.loading這個Sprite的絕對位置, 故需要先計算一次(在Game Loop執行時, 則會自動計算, 但因為loadingProgress只支援draw故需要自行計算)                  
     },
@@ -41,15 +41,15 @@ var MyMenu = Framework.exClass(Framework.GameMainMenu , {
         //注意, Position都是用中心點
         this.center = new Framework.Scene();
         this.center.position = {
-            x: window.innerWidth / 2,
-            y: window.innerHeight / 2
+            x: Framework.Game._canvas.width / 2,
+            y: Framework.Game._canvas.height / 2
         };
 
         //由於scrollBar將會被attach到this.center上
         //故x設為0, 表示x也是要正中心
         this.scrollBar.position = {
-            x: window.innerWidth / 2,
-            y: window.innerHeight / 4 * 3
+            x: Framework.Game._canvas.width / 2,
+            y: Framework.Game._canvas.height / 4 * 3
         };
 
         this.photo.position = {
@@ -60,8 +60,8 @@ var MyMenu = Framework.exClass(Framework.GameMainMenu , {
         //Framework支援scale, rotation等功能
         this.rightArrow.scale = 0.35;
         this.rightArrow.position = {
-            x: window.innerWidth / 2 - 500,
-            y: window.innerHeight / 4 * 3
+            x: Framework.Game._canvas.width / 2 - 500,
+            y: Framework.Game._canvas.height / 4 * 3
         };
 
         
@@ -115,7 +115,7 @@ var MyMenu = Framework.exClass(Framework.GameMainMenu , {
             if (this.currentTouch.x > this.previousTouch.x && this.currentTouch.y < this.rightArrow.lowerLeft.y && this.currentTouch.y > this.rightArrow.upperLeft.y) {
                 //當arrow被Touch到時, 會跟隨著觸控的位置移動
                 this.rightArrow.position.x = this.rightArrow.position.x + this.currentTouch.x - this.previousTouch.x 
-                if(this.currentTouch.x > window.innerWidth - this.rightArrow.width) {
+                if(this.currentTouch.x > Framework.Game._canvas.width - this.rightArrow.width) {
                     //當要換關時, 可以呼叫goToNextLevel, goToPreviousLevel, goToLevel(levelName)
                     Framework.Game.goToNextLevel();
                 }
