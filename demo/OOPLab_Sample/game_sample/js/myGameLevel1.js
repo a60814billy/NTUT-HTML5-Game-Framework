@@ -36,8 +36,8 @@ var MyGame = Framework.Class(Framework.Level , {
 
         this.wholeClock = new Framework.Scene();
         this.wholeClock.position = {
-            x: Framework.Game._canvas.width / 2,
-            y: Framework.Game._canvas.height / 2
+            x: Framework.Game.getCanvasWidth() / 2,
+            y: Framework.Game.getCanvasHeight() / 2
         };
 
 
@@ -76,8 +76,8 @@ var MyGame = Framework.Class(Framework.Level , {
         this.audio.play({name: 'song2', loop: true});
 
         this.rectPosition = { 
-            x: Framework.Game._canvas.width / 2 - 130,
-            y: Framework.Game._canvas.height / 2 - 90
+            x: Framework.Game.getCanvasWidth() / 2 - 130,
+            y: Framework.Game.getCanvasHeight() / 2 - 90
         };
                            
     },
