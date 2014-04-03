@@ -18,10 +18,6 @@ var Framework = (function (Framework) {
             this.type = undefined;
             this.texture = undefined;
             this.attachArray=[];
-            /*this.position = {
-                x: this.canvas.width / 2,
-                y: this.canvas.height / 2
-            }*/
         },
 
         update: function () {
@@ -32,7 +28,7 @@ var Framework = (function (Framework) {
 		},
 
         draw: function(context){
-            context = context || Framework.Game._context;            
+            var context = context || Framework.Game._context;            
             this.countAbsoluteProperty();
             var i, target;           
             for (i = 0; i < this.attachArray.length ; i++) {

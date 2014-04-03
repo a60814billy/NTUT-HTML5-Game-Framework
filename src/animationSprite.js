@@ -231,7 +231,7 @@ var Framework = (function (Framework) {
             }
         },
         draw:function(context){
-            context = context || Framework.Game._context;
+            var context = context || Framework.Game._context;
             this.countAbsoluteProperty();
             if(this._isLoadSprite){
                 this._sprites[this.index].draw(context);

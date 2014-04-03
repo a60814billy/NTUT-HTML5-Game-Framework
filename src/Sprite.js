@@ -32,7 +32,7 @@ var Framework = (function (Framework) {
             }
         },
         draw: function(context){
-            context = context || Framework.Game._context;
+            var context = context || Framework.Game._context;
             this.countAbsoluteProperty();
             var texture, tmp, realWidth, realHeight, tmpContext;
             if(Framework.Util.isUndefined(this.texture)){
