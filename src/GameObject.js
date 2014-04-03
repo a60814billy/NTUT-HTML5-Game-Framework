@@ -56,6 +56,8 @@ Framework = (function (Framework) {
     */
     Object.defineProperty(Framework.GameObject.prototype, 'position', {
         get: function() {
+            this.relativePosition.x = Math.floor(this.relativePosition.x);
+            this.relativePosition.y = Math.floor(this.relativePosition.y);
             return this.relativePosition;
         },
 
@@ -111,7 +113,7 @@ Framework = (function (Framework) {
             if (this.col) {
                 width = this.texture.width / this.col;
             }
-            return width * this.absoluteScale;
+            return Math.floor(width * this.absoluteScale);
         }
     });
 
@@ -130,19 +132,19 @@ Framework = (function (Framework) {
             if (this.row) {
                 height = this.texture.height / this.row;
             }
-            return height * this.absoluteScale;
+            return Math.floor(height * this.absoluteScale);
         }
     });
 
     //計算以原點為圓心旋轉後的point
-    var countRotatePoint = function(point,angle)
+    var countRotatePoint = function(point, angle)
     {
         var currentRotate = (angle / 180) * Math.PI,
             cosRatio = Math.cos(currentRotate),
             sinRatio = Math.sin(currentRotate),
             pointX =  point.x * cosRatio - point.y * sinRatio,
             pointY = point.x * sinRatio + point.y * cosRatio;
-        return { x:pointX, y: pointY};
+        return { x: pointX, y: pointY };
     }
 
     /**
@@ -159,7 +161,7 @@ Framework = (function (Framework) {
                 oriY = -this.height / 2,
                 positionDif = countRotatePoint({x:oriX,y:oriY},this.absoluteRotation);
 
-            return { x: this.absolutePosition.x + positionDif.x, y: this.absolutePosition.y + positionDif.y };
+            return { x: Math.floor(this.absolutePosition.x + positionDif.x), y: Math.floor(this.absolutePosition.y + positionDif.y) };
         }
     });
 
@@ -177,7 +179,7 @@ Framework = (function (Framework) {
                 oriY = -this.height / 2,
                 positionDif = countRotatePoint({x:oriX,y:oriY},this.absoluteRotation);
 
-            return { x: this.absolutePosition.x + positionDif.x, y: this.absolutePosition.y + positionDif.y };
+            return { x: Math.floor(this.absolutePosition.x + positionDif.x), y: Math.floor(this.absolutePosition.y + positionDif.y) };
         }
     });
 
@@ -195,7 +197,7 @@ Framework = (function (Framework) {
                 oriY = this.height / 2,
                 positionDif = countRotatePoint({x:oriX,y:oriY},this.absoluteRotation);
 
-            return { x: this.absolutePosition.x + positionDif.x, y: this.absolutePosition.y + positionDif.y };
+            return { x: Math.floor(this.absolutePosition.x + positionDif.x), y: Math.floor(this.absolutePosition.y + positionDif.y) };
         }
     });
 
@@ -213,7 +215,7 @@ Framework = (function (Framework) {
                 oriY = this.height / 2,
                 positionDif = countRotatePoint({x:oriX,y:oriY},this.absoluteRotation);
 
-            return { x: this.absolutePosition.x + positionDif.x, y: this.absolutePosition.y + positionDif.y };
+            return { x: Math.floor(this.absolutePosition.x + positionDif.x), y: Math.floor(this.absolutePosition.y + positionDif.y) };
         }
     });
     
