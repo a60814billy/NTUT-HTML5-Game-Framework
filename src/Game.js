@@ -21,7 +21,7 @@ var Framework = (function (Framework) {
 		that._fpsAnalysis = new Framework.FpsAnalysis();
 		that._drawfpsAnalysis = new Framework.FpsAnalysis();
 		// for gameloop -
-		that._runInstance = null;
+		that._runInstance = undefined;
         // game state
         that._levels = [];
         // current level
@@ -91,13 +91,13 @@ var Framework = (function (Framework) {
 					that.click(pos);
 					return false;
 					break;
-				case 'mousedown':				
+				case 'mousedown':
 					that.mousedown(pos);
 					break;
-				case 'mouseup':					
+				case 'mouseup':
 					that.mouseup(pos);
 					break;
-				case 'mousemove':					
+				case 'mousemove':
 					that.mousemove(pos);
 					break;
 				case 'touchstart':
@@ -122,7 +122,7 @@ var Framework = (function (Framework) {
 					break;*/
 			}
 		};
-		
+
 		that._mainContainer = document.createElement('div');
 		that._mainContainer.style.backgroundColor = '#000';
 		that._mainContainer.style.width = '100%';
@@ -136,8 +136,8 @@ var Framework = (function (Framework) {
 		that._canvas = document.createElement('canvas');	
 		that._canvas.style.backgroundColor = '#fff';		
 		that._canvas.setAttribute('id', '__game_canvas__');
-		that._canvas.width = window.innerWidth;
-		that._canvas.height = window.innerHeight;
+		that._canvas.width = 1600;
+		that._canvas.height = 900;
 		that._canvasContainer.appendChild(that._canvas);
 		that._mainContainer.appendChild(that._canvasContainer);
 		that._context = that._canvas.getContext('2d');
@@ -160,9 +160,17 @@ var Framework = (function (Framework) {
 
         that._teardown = function(){
             Framework.KeyBoardManager.removeSubject(that._currentLevel);
-            if(this._currentLevel.autoDelete){
+          	//if(this._currentLevel.autoDelete){
                 this._currentLevel.autodelete();
-            }
+           // }
+        };
+
+        that.getCanvasWidth = function() {
+        	return that._canvas.width;
+        };
+
+        that.getCanvasHeight = function() {
+        	return that._canvas.height;
         };
 
         that._findLevel = function(name){
@@ -205,7 +213,7 @@ var Framework = (function (Framework) {
 		* 	Framework.Game.goToLevel('menu');
 		*/
         that.goToLevel = function(levelName){
-            that.stop();
+            that.pause();
             that._teardown();
             that._currentLevel = that._findLevel(levelName);
             if(Framework.Util.isUndefined(that._currentLevel)){
@@ -223,7 +231,7 @@ var Framework = (function (Framework) {
 		* 	Framework.Game.goToNextLevel();
 		*/
         that.goToNextLevel = function(){
-            that.stop();
+            that.pause();
             that._teardown();
             var flag = false;
             for(var i in that._levels){
@@ -248,7 +256,7 @@ var Framework = (function (Framework) {
 		* 	Framework.Game.goToPreviousLevel();
 		*/
         that.goToPreviousLevel = function(){
-            that.stop();
+            that.pause();
             that._teardown();
             var flag = false;
             var prev = undefined;
@@ -276,14 +284,14 @@ var Framework = (function (Framework) {
 		* 	Framework.Game.start();
 		*/
 		that.start = function () {
-            if(Framework.Util.isUndefined(that._currentLevel)){
+            if (Framework.Util.isUndefined(that._currentLevel)){
                 that._currentLevel = that._levels[0].level;
             }
             var self = that;
 
-            if(!that._isInit){
+            if (!that._isInit) {
+            	that.resizeEvent();
                 document.body.appendChild(that._mainContainer);
-               	that.resizeEvent();
                 that._canvas.addEventListener('click', function (e) {
                     self.eventHandler(e);
                 });
@@ -319,7 +327,7 @@ var Framework = (function (Framework) {
 
 			var runFunction = function() {
 				self._isRun = true;
-				self.stop();
+				self.pause();
 				//bind會產生一個同樣的function, 但this為指定的參數
 				self.draw = self._tempDraw.bind(self._currentLevel);
 				self.update = self._tempUpdate.bind(self._currentLevel);
@@ -371,58 +379,74 @@ var Framework = (function (Framework) {
 				previousDrawTime = nowFunc(),
 				now = nowFunc();
 
+			var nextGameTick = (new Date()).getTime(),
+				nextGameDrawTick = (new Date()).getTime();
+			var skipTicks = Math.round(1000 / that._updateFPS);
+
 			var updateFunc = function() {	
-				now = nowFunc();	
-				while (now - updateTicks > previousUpdateTime) {		
+				now = nowFunc();						
+				while (now > nextGameTick) {
+					//console.log('now: ' + now + ', nextGameTick: ' + nextGameTick + ', diff:' + (now-nextGameTick));	
 					that._fpsAnalysis.update();
 					// show FPS information
 					if (that.fpsContext) {
 						that.fpsContext.innerHTML = 'update FPS:' + that._fpsAnalysis.getUpdateFPS() + '<br />draw FPS:' + that._drawfpsAnalysis.getUpdateFPS();
 					}							
 					// run Game's update
-					that.update();	
-					previousUpdateTime = nowFunc();
+					that.update();
+					nextGameTick += skipTicks;
 				}						
 			};
 
 			var drawFunc = function() {
-				now = nowFunc();
-				if(now - drawTicks > previousDrawTime) {
-					that._context.clearRect(0, 0, that._canvas.width, that._canvas.height);			
+				if (now > nextGameDrawTick) {
+					that._context.clearRect(0, 0, that._canvas.width, that._canvas.height);	
 					that.draw(that._context);
 					that._drawfpsAnalysis.update();
 					if (that.fpsContext) {
 						that.fpsContext.innerHTML = 'update FPS:' + that._fpsAnalysis.getUpdateFPS() + '<br />draw FPS:' + that._drawfpsAnalysis.getUpdateFPS();
 					}
-					previousDrawTime = now;
+					nextGameDrawTick += skipTicks;
 				}
 			};
 
-			var gameLoopFunc = function() {
-				drawFunc();	
-				updateFunc();							
+			var gameLoopFunc = function() {				
+				updateFunc();
+				drawFunc();								
 			}
 
-			that.runAnimationFrame(gameLoopFunc);
+			that.runInterval(gameLoopFunc);
 			that._isRun = true;
 		};
 		
 		that.runAnimationFrame = function (gameLoopFunc) {
+			/*if(!Framework.Util.isUndefined(that._runInstance)) {
+				that.stopAnimationFrame();
+			}*/
 			// dynamic product runnable function
+			window.requestAnimationFrame = window.requestAnimationFrame || 
+                        window.mozRequestAnimationFrame || 
+                        window.webkitRequestAnimationFrame || 
+                        window.msRequestAnimationFrame;
 			var _run = function () {
 				that._runInstance = requestAnimationFrame(_run);
 				gameLoopFunc();
 			};
 			_run();
-		};						
+		};	/**/			
 
 		that.runInterval = function (gameLoopFunc) {
+			/*if(!Framework.Util.isUndefined(that._runInstance)) {
+				that.stopInterval();
+				that._runInstance = null;
+			}*/
 			// dynamic product runnable function
 			var drawTicks = 1000 / that._drawFPS;
-			var _run = function () {
-					gameLoopFunc();
-				};
-			that._runInstance = setInterval(_run, drawTicks);			
+			var _run = gameLoopFunc/*function () {
+					gameLoopFunc.call(this);
+				};*/
+
+			that._runInstance = setInterval(gameLoopFunc, drawTicks);
 		};
 
 		that.stopInterval = function() {
@@ -432,12 +456,18 @@ var Framework = (function (Framework) {
 		that.stopAnimationFrame = function() {
 			cancelAnimationFrame(that._runInstance);
 		};
-
-		that.stop = function () {
+/**/
+		that.pause = function () {
 			if (that._isRun) {
-				that.stopAnimationFrame();
+				that.stopInterval();
 				that._runInstance = null;
 				that._isRun = false;
+			}
+		};
+
+		that.resume = function() {
+			if(!that._isRun) {
+				that.run();
 			}
 		};
 
@@ -449,7 +479,7 @@ var Framework = (function (Framework) {
 				fps = 60;
 			}
 			that._updateFPS = fps;
-			that.stop();
+			that.pause();
 			that.run();
 		};
 
@@ -464,7 +494,7 @@ var Framework = (function (Framework) {
 				fps = 60;
 			}
 			that._drawFPS = fps;
-			that.stop();
+			that.pause();
 			that.run();
 		};
 
@@ -570,10 +600,11 @@ var Framework = (function (Framework) {
 			scaledHeight = Math.round(base * 9);
 			that._widthRatio = scaledWidth / that._canvas.width;
 			that._heightRatio = scaledHeight / that._canvas.height;		
-			that._canvasContainer.style.width = scaledWidth;
-			that._canvasContainer.style.height = scaledHeight;
+			//that._canvasContainer.style.width = scaledWidth;
+			//that._canvasContainer.style.height = scaledHeight;
 			that._canvas.style.width = scaledWidth;
-			that._canvas.style.height = scaledHeight;			
+			that._canvas.style.height = scaledHeight;		
+	
 		};
 
 		return that;
