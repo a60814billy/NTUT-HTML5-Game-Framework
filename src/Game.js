@@ -110,7 +110,6 @@ var Framework = (function (Framework) {
 		};
 
         that._teardown = function(){
-            Framework.KeyBoardManager.removeSubject(that._currentLevel);
           	//if(this._currentLevel.autoDelete){
                 this._currentLevel.autodelete();
            // }
@@ -303,7 +302,7 @@ var Framework = (function (Framework) {
 			Framework.MouseManager.setMouseMoveEvent(self._currentLevel.mousemove);
 			//Framework.MouseManager.setContextmenuEvent(self._currentLevel.contextmenu);
 
-			Framework.KeyBoardManager.addSubject(self._currentLevel);
+			Framework.KeyBoardManager.setSubject(self._currentLevel);
 			Framework.KeyBoardManager.setKeyupEvent(self._currentLevel.keyup);
 			Framework.KeyBoardManager.setKeydownEvent(self._currentLevel.keydown);
 			

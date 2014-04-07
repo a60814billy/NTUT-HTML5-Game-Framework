@@ -10,8 +10,7 @@ var Framework = (function (Framework) {
 			KeyBoardManagerInstance = {},
 			userKeydownEvent = function() {},
 			userKeyupEvent = function() {},
-			_subjectArr = [],
-			_subjectLenth = 0;
+			_subject;
 
 		var keydownEvent = function(e) {
 			e.preventDefault();
@@ -24,9 +23,8 @@ var Framework = (function (Framework) {
 			}
 
 			
-			for(i = 0; i < _subjectLenth; i++) {
-				userKeydownEvent.call(_subjectArr[i], _keydownList[keyCode], _keydownList, e);
-			}
+			userKeydownEvent.call(_subject, _keydownList[keyCode], _keydownList, e);
+			
 		};
 
 		var keyupEvent = function(e) {
@@ -42,9 +40,8 @@ var Framework = (function (Framework) {
 				_keydownList[temp][keyCode] = false;
 			}
 
-			for(var i = 0; i < _subjectLenth; i++) {
-				userKeyupEvent.call(_subjectArr[i], _keypressHistory[_keypressHistory.length - 1], _keypressHistory);
-			}
+			userKeyupEvent.call(_subject, _keypressHistory[_keypressHistory.length - 1], _keypressHistory);
+			
 		};
 
 		var setKeydownEvent = function(userFunction) {
@@ -76,19 +73,8 @@ var Framework = (function (Framework) {
 			_timeountID = setTimeout(clearHistory, _clearHistoryTime);
 		};
 
-		var addSubject = function(subject) {
-			_subjectArr.push(subject);
-			_subjectLenth++;
-		};
-
-		var removeSubject = function(subject) {
-			var i, len = _subjectArr.length;
-			for(i = 0; i < len; i++) {
-				if(_subjectArr[i] === subject)
-					break;
-			}
-			_subjectArr.splice(i, 1);
-			_subjectLenth--;
+		var setSubject = function(subject) {
+			_subject = subject;
 		};
 
 		/**
@@ -107,8 +93,7 @@ var Framework = (function (Framework) {
 
 
 		KeyBoardManagerClass.prototype = {
-			addSubject: addSubject,
-			removeSubject: removeSubject,
+			setSubject: setSubject,
 			setClearHistoryTime: setClearHistoryTime,
 			setKeydownEvent: setKeydownEvent,
 			setKeyupEvent: setKeyupEvent,
