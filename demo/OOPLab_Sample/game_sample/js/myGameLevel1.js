@@ -169,10 +169,8 @@ var MyGame = Framework.Class(Framework.Level , {
         //又要減少Duplicated code, 故在Touch事件被觸發時, 去Trigger Mouse事件
         this.click(e[0]);
     },
-        
-    click: function (e) {  
 
-        console.log(e.x, e.y);
+    click: function (e) {  
         if (!this.rectPosition) {
             return;
         }  
