@@ -74,55 +74,6 @@ var Framework = (function (Framework) {
             that._currentLevel.keypress(e);
 		};
 
-		that.eventHandler = function (e) {
-			var pos = {}, totalOffsetX = 0, totalOffsetY = 0, ele = that._canvas;
-			do {
-				totalOffsetX += ele.offsetLeft;
-				totalOffsetY += ele.offsetTop;
-				ele = ele.offsetParent;
-			} while(ele);
-			pos.x = e.x || e.clientX;
-			pos.y = e.y || e.clientY;
-			pos.x = Math.round((e.x - totalOffsetX) / that._widthRatio);
-			pos.y = Math.round((e.y - totalOffsetY) / that._heightRatio);
-			switch (e.type) {
-				case 'contextmenu':
-				case 'click':
-					that.click(pos);
-					return false;
-					break;
-				case 'mousedown':
-					that.mousedown(pos);
-					break;
-				case 'mouseup':
-					that.mouseup(pos);
-					break;
-				case 'mousemove':
-					that.mousemove(pos);
-					break;
-				case 'touchstart':
-					e.preventDefault();
-					that.touchstart(e);
-					break;
-				case 'touchend':
-					e.preventDefault();
-					that.touchend(e);
-					break;
-				case 'touchmove':
-					e.preventDefault();
-					that.touchmove(e);
-					break;
-				/*case 'keydown':
-					e.preventDefault();
-					this.keydown(e);
-					break;
-				case 'keypress':
-					e.preventDefault();
-					this.keypress(e);
-					break;*/
-			}
-		};
-
 		that._mainContainer = document.createElement('div');
 		that._mainContainer.style.backgroundColor = '#000';
 		that._mainContainer.style.width = '100%';
@@ -292,31 +243,6 @@ var Framework = (function (Framework) {
             if (!that._isInit) {
             	that.resizeEvent();
                 document.body.appendChild(that._mainContainer);
-                that._canvas.addEventListener('click', function (e) {
-                    self.eventHandler(e);
-                });
-                that._canvas.addEventListener('mousedown', function (e) {
-                    self.eventHandler(e);
-                });
-                that._canvas.addEventListener('mouseup', function (e) {
-                    self.eventHandler(e);
-                });
-                that._canvas.addEventListener('mousemove', function (e) {
-                    self.eventHandler(e);
-                });
-                that._canvas.addEventListener('touchstart', function (e) {
-                    self.eventHandler(e);
-                });
-                that._canvas.addEventListener('touchend', function (e) {
-                    self.eventHandler(e);
-                });
-                that._canvas.addEventListener('touchmove', function (e) {
-                    self.eventHandler(e);
-                });
-                that._canvas.addEventListener('contextmenu', function (e) {
-                    self.eventHandler(e);
-                });
-
                 window.addEventListener("resize", that.resizeEvent, false);
             }
 
@@ -363,6 +289,19 @@ var Framework = (function (Framework) {
 			//if(Framework.ResourceManager.getRequestCount() === 0) {
 			initFunction();
 			//}
+			//
+			
+			Framework.TouchManager.setSubject(self._currentLevel);
+			Framework.TouchManager.setTouchstartEvent(self._currentLevel.touchstart);
+			Framework.TouchManager.setTouchendEvent(self._currentLevel.touchend);
+			Framework.TouchManager.setTouchmoveEvent(self._currentLevel.touchmove);			
+
+			Framework.MouseManager.setSubject(self._currentLevel);
+			Framework.MouseManager.setClickEvent(self._currentLevel.click);
+			Framework.MouseManager.setMousedownEvent(self._currentLevel.mousedown);
+			Framework.MouseManager.setMouseUpEvent(self._currentLevel.mouseup);
+			Framework.MouseManager.setMouseMoveEvent(self._currentLevel.mousemove);
+			//Framework.MouseManager.setContextmenuEvent(self._currentLevel.contextmenu);
 
 			Framework.KeyBoardManager.addSubject(self._currentLevel);
 			Framework.KeyBoardManager.setKeyupEvent(self._currentLevel.keyup);

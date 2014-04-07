@@ -43,7 +43,7 @@ var Framework = (function (Framework) {
 			}
 
 			for(var i = 0; i < _subjectLenth; i++) {
-				userKeyupEvent.call(_subjectArr[i], e, _keypressHistory);
+				userKeyupEvent.call(_subjectArr[i], _keypressHistory[_keypressHistory.length - 1], _keypressHistory);
 			}
 		};
 

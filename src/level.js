@@ -72,7 +72,7 @@ var Framework = (function (Framework) {
         */
         loadingProgress: function (context, requestInfo) {
             context.font = '90px Arial';
-            context.fillText(Framework.ResourceManager.getFinishedRequestPercent() + '%' , context.canvas.width/2 - 50 , context.canvas.height/2);
+            context.fillText(Framework.ResourceManager.getFinishedRequestPercent() + '%' , context.canvas.width / 2 - 50 , context.canvas.height / 2);
         },
 
         /**

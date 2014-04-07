@@ -106,12 +106,12 @@ var MyMenu = Framework.exClass(Framework.GameMainMenu , {
         this.previousTouch = { x: e.x, y: e.y };
         if (this.previousTouch.x > this.rightArrow.upperLeft.x && this.previousTouch.x < this.rightArrow.upperRight.x && this.previousTouch.y > this.rightArrow.upperLeft.y && this.previousTouch.y < this.rightArrow.lowerLeft.y) {
             this.isTouchArrow = true;
-        }
+        } 
     },
 
     mousemove: function(e) {        
         if (this.isTouchArrow) {
-            this.currentTouch = { x: e.x, y: e.y };
+            this.currentTouch = e;
             if (this.currentTouch.x > this.previousTouch.x && this.currentTouch.y < this.rightArrow.lowerLeft.y && this.currentTouch.y > this.rightArrow.upperLeft.y) {
                 //當arrow被Touch到時, 會跟隨著觸控的位置移動
                 this.rightArrow.position.x = this.rightArrow.position.x + this.currentTouch.x - this.previousTouch.x 
@@ -120,7 +120,7 @@ var MyMenu = Framework.exClass(Framework.GameMainMenu , {
                     Framework.Game.goToNextLevel();
                 }
             }
-       }
+        }
         this.previousTouch = this.currentTouch;
     },
 
@@ -131,7 +131,7 @@ var MyMenu = Framework.exClass(Framework.GameMainMenu , {
     touchstart: function (e) {
         //為了要讓Mouse和Touch都有一樣的事件
         //又要減少Duplicated code, 故在Touch事件被觸發時, 去Trigger Mouse事件
-        this.mousedown({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+        this.mousedown(e[0]);
     },
 
     touchend: function (e) {
@@ -139,6 +139,6 @@ var MyMenu = Framework.exClass(Framework.GameMainMenu , {
     },
     
     touchmove: function (e) {
-        this.mousemove({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+        this.mousemove(e[0]);
     }
 });

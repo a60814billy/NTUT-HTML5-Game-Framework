@@ -167,9 +167,9 @@ var MyGame = Framework.Class(Framework.Level , {
     touchstart: function (e) {
         //為了要讓Mouse和Touch都有一樣的事件
         //又要減少Duplicated code, 故在Touch事件被觸發時, 去Trigger Mouse事件
-        this.click({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+        this.click(e[0]);
     },
-    
+        
     click: function (e) {  
 
         console.log(e.x, e.y);
