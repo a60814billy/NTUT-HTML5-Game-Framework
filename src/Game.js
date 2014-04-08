@@ -353,8 +353,16 @@ var Framework = (function (Framework) {
 				drawFunc();								
 			}
 
-			that.runInterval(gameLoopFunc);
+			that.runAnimationFrame(gameLoopFunc);
 			that._isRun = true;
+		};
+
+		that.stopInterval = function() {
+			clearInterval(that._runInstance);
+		};
+
+		that.stopAnimationFrame = function() {
+			cancelAnimationFrame(that._runInstance);
 		};
 		
 		that.runAnimationFrame = function (gameLoopFunc) {
@@ -371,6 +379,7 @@ var Framework = (function (Framework) {
 				gameLoopFunc();
 			};
 			_run();
+			that.stopLoop = that.stopAnimationFrame;
 		};	/**/			
 
 		that.runInterval = function (gameLoopFunc) {
@@ -385,19 +394,14 @@ var Framework = (function (Framework) {
 				};*/
 
 			that._runInstance = setInterval(gameLoopFunc, drawTicks);
+			that.stopLoop = that.stopInterval;
 		};
 
-		that.stopInterval = function() {
-			clearInterval(that._runInstance);
-		};
+		that.stopLoop = that.stopAnimationFrame;
 
-		that.stopAnimationFrame = function() {
-			cancelAnimationFrame(that._runInstance);
-		};
-/**/
 		that.pause = function () {
 			if (that._isRun) {
-				that.stopInterval();
+				that.stopLoop();
 				that._runInstance = null;
 				that._isRun = false;
 			}
