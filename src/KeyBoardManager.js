@@ -34,10 +34,10 @@ var Framework = (function (Framework) {
 			_keydownList[keyCode] = null;
 			delete _keydownList[keyCode];
 			for(temp in _keydownList) {
-				if(Framework.Util.isUndefined(_keydownList[temp][keyCode])) {
-					return;
+				if(!Framework.Util.isUndefined(_keydownList[temp][keyCode])) {
+					_keydownList[temp][keyCode] = false;
 				}
-				_keydownList[temp][keyCode] = false;
+				
 			}
 
 			userKeyupEvent.call(_subject, _keypressHistory[_keypressHistory.length - 1], _keypressHistory);
