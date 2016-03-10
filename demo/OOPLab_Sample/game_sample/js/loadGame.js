@@ -1,4 +1,5 @@
 //立即執行函式, 並封裝所有變數避免衝突
+var loadGameEnd;
 (function(){
     //動態依序載入JS
     //ref: http://blog.darkthread.net/blogs/darkthreadtw/archive/2009/01/15/4061.aspx
@@ -12,7 +13,10 @@
             jsConf.splice(0, 1);
             if(jsConf.length > 0) {
                 importJS(jsConf, lookFor);
-            }
+            }else
+			{
+				loadGameEnd = true;
+			}
         });
     }
 
@@ -38,9 +42,6 @@
     var listScript = 
     [
         { src: 'game_sample/js/define.js', lookFor: 'define' },
-        //{ src: 'game_sample/js/game.min.js', lookFor: 'Framework' },
-        { src: 'game_sample/js/plane.js', lookFor: 'plane' },
-        { src: 'game_sample/js/MyBox2D.js', lookFor: 'MyBox2D' },
         { src: 'game_sample/js/myMenu.js', lookFor: 'MyMenu' },
         { src: 'game_sample/js/character.js', lookFor: 'Character' },
         { src: 'game_sample/js/myGameLevel1.js', lookFor: 'MyGame' },

@@ -9,12 +9,25 @@ var Framework = (function (Framework) {
     */ 
 	Framework.Game = (function () {
         var that = {};
+		// gameloop fps
+		that.fps = 60;
+		that.canvasWidth = 1600;
+		that.canvasHeight = 900;
+		that.isBackwardCompatiable = true;
+
+		that._widthRatio = 1;
+		that._heightRatio = 1;
+
+		that._isRecording = false;
+		that._isRecordMode = _isRecordMode;
+		that._isTestMode = _isTestMode;
+		that._isTestReady = false;
+		that._isReplay = false;
+		
+		that.isContinue = false;
 		that._isInit = false;
 		// gameloop is running ?
 		that._isRun = false;
-		// gameloop fps
-		that._updateFPS = 60;
-		that._drawFPS = 60;
 		// show fps's div
 		that._fpsContext = undefined;
 		// FPS analysis object
@@ -24,30 +37,125 @@ var Framework = (function (Framework) {
 		that._runInstance = undefined;
         // game state
         that._levels = [];
+        that._testScripts = [];
         // current level
         that._currentLevel = undefined;
-
 		that._context = null;
+		that._currentTestScript = undefined;
+		that._currentReplay = undefined;
 
 		that._ideaWidth = 16;
 		that._ideaHeight = 9;
-		that._widthRatio = 1;
-		that._heightRatio = 1;
+		that.timelist = [];
+		that._record = new Framework.Record();
+
 
 		that._tempUpdate = function() {};
 		that._tempDraw = function(context) {};
+		
+		that.recordStart = function()
+		{
+			if(that._isRecordMode)
+			{
+				that._isRecording = true;
+				document.getElementById("start_btn").disabled = true;
+				document.getElementById("pause_btn").disabled = false;
+				document.getElementById("stop_btn").disabled = false;
+				document.getElementById("type_btn").disabled = false;
+				that._record.start();
+				that.resume();
 
+			}
+		};
+		that.recordPause = function()
+		{
+			if(that._isRecordMode)
+			{
+				that._isRecording = false;
+				document.getElementById("start_btn").disabled = false;
+				document.getElementById("pause_btn").disabled = true;
+				document.getElementById("stop_btn").disabled = false;
+				that._record.pause();
+				that.pause();
+			}
+		};
+		that.recordStop = function()
+		{
+			if(that._isRecordMode)
+			{
+				that._isRecording = false;
+				document.getElementById("start_btn").disabled = false;
+				document.getElementById("pause_btn").disabled = true;
+				document.getElementById("stop_btn").disabled = true;
+				document.getElementById("type_btn").disabled = true;
+				that._record.stop();
+			}
+		};
+		that.recordInput = function()
+		{
+			var command = prompt("Please enter command", "");
+    
+		    if (command != null) {
+				that._record.inputCommand("//"+command);
+		    }
 
+		};
+		that.recordReplay = function(){
+			that._isReplay = true;
+			that._teardown();
+			that._currentLevel = null;
+			that._isRecordMode = false;
+			that._isTestMode = true;
+			that._record.isRecording = false;
+			var replayScript = document.getElementById("record_div").innerText;
+			document.getElementById("record_div").innerText = "";
+			that._record.start();
+			that.getReplayScript(replayScript);
+			that.start();
+		};
+		that.getReplayScript = function(script){
+			script = script.replace(/\n/g, "");
+			var start = script.indexOf("{", 0)+1;
+			var end = script.indexOf("}", 0);
+			if(end === -1)
+				end = script.length;
+			var mainScript = script.substring(start, end);
+			mainScript = mainScript.split(";");
+			for(i=0; i<mainScript.length; i++){
+				mainScript[i] = mainScript[i].replace("\u00a0\u00a0\u00a0\u00a0", "");
+				// if(mainScript[i].indexOf("//", 0) === -1){
+				eval(mainScript[i]);
+				// }
+			}
+		};
+		that.recordContinue = function(){
+			that.isContinue = true;
+		};
+		that.showVariable = function(){
+			listMember(Framework.Game._currentLevel, "");
+		};
 		//Event Handler
 		// mouse event
 		that.click = function (e) {
             that._currentLevel.click(e);
+            if(that._isRecording)
+            {
+            	that._record.click(e);
+            }
 		};
 		that.mousedown = function (e) {
             that._currentLevel.mousedown(e);
+            if(that._isRecording)
+            {
+            	that._record.mousedown(e);
+            }
 		};
 		that.mouseup = function (e) {
             that._currentLevel.mouseup(e);
+            if(that._isRecording)
+            {
+            	that._record.mouseup(e);
+            }
 		};
 		that.mousemove = function (e) {
             that._currentLevel.mousemove(e);
@@ -66,21 +174,43 @@ var Framework = (function (Framework) {
 		//keyboard Event
 		that.keydown = function (e) {
             that._currentLevel.keydown(e);
+            if(that._isRecording)
+            {
+	            that._record.keydown(e);
+	            //console.log("record down");
+            }
 		};
 		that.keyup = function (e) {
             that._currentLevel.keyup(e);
+            if(that._isRecording)
+            {
+            	that._record.keyup(e);
+            }
 		};
 		that.keypress = function (e) {
             that._currentLevel.keypress(e);
+            if(that._isRecording)
+            {
+            	that._record.keypress(e);
+            }
 		};
 
 		that._mainContainer = document.createElement('div');
+		if(that._isTestMode || that._isRecordMode){
+			that._mainContainer.style.position = "relative";
+			that._mainContainer.style.float = "left";
+			that._mainContainer.style.width = '70%';
+			that._mainContainer.style.height = '100%';
+		}
+		else{
+			that._mainContainer.style.width = '100%';
+			that._mainContainer.style.height = '100%';
+			that._mainContainer.style.display = 'table';
+		}
+
+
 		that._mainContainer.style.backgroundColor = '#000';
-		that._mainContainer.style.width = '100%';
-		that._mainContainer.style.height = '100%';
-		that._mainContainer.style.display = 'table';
-		that._canvasContainer = document.createElement('div');				
-		//that._canvasContainer.style.margin = '0px auto';
+		that._canvasContainer = document.createElement('div');		
 		that._canvasContainer.style.display = 'table-cell';
 		that._canvasContainer.style.textAlign = 'center';
 		that._canvasContainer.style.verticalAlign = 'middle';
@@ -96,23 +226,53 @@ var Framework = (function (Framework) {
 		that.initializeProgressResource = function() {
             that._currentLevel._initializeProgressResource();
 		};
+		that.load = function() {
+			that._currentLevel._load();
+			if(that.isBackwardCompatiable)
+			{
+				that._currentLevel.initialize();
+			}
+		};
 		that.loadingProgress = function(context) {
             that._currentLevel._loadingProgress(context, { request: Framework.ResourceManager.getRequestCount(), response: Framework.ResourceManager.getResponseCount(), percent: Framework.ResourceManager.getFinishedRequestPercent()});
+            if(that.isBackwardCompatiable)
+            {
+            	that.initializeProgressResource();
+            }
 		};
 		that.initialize = function () {
             that._currentLevel._initialize();
+            that.initializeTestScript(that._currentLevel);
 		};
-		that.update = function () {
+		that.initializeTestScript = function(level){
+			//that._testScripts
+			var levelName = that._findLevelNameByLevel(level);
+			for(var i= 0,l=that._testScripts.length;i<l;i++){
+                if(that._testScripts[i].targetLevel === levelName ){
+                    Framework.Replay.ready(that._testScripts[i]);
+                    return;
+                }
+            }
+		}
+		that.update = function () {		
             that._currentLevel._update();
 		};
-		that.draw = function () {
+		that.draw = function () {					
             that._currentLevel._draw();
 		};
 
         that._teardown = function(){
           	//if(this._currentLevel.autoDelete){
-                this._currentLevel.autodelete();
+                that._currentLevel.autodelete();
+                that._isInit = false;
+            //    that._allGameElement.length = 0;
            // }
+        };
+
+        that.stop = function()
+        {
+        	that.pause();
+        	that._teardown();
         };
 
         that.getCanvasWidth = function() {
@@ -124,13 +284,34 @@ var Framework = (function (Framework) {
         };
 
         that._findLevel = function(name){
-            for(var i= 0,l=that._levels.length;i<l;i++){
-                if(that._levels[i].name === name ){
-                    return that._levels[i].level;
-                }
-            }
-            return null;
+            var result = Framework.Util.findValueByKey(that._levels,name);
+
+        	if(result === null){
+        		return null;
+        	}
+        	else{
+				return result.level;
+        	}
         };
+
+        that._findScript = function(name){
+        	var result = Framework.Util.findValueByKey(that._testScripts,name);
+
+        	if(result === null){
+        		return null;
+        	}
+        	else{
+				return result.script;
+        	}
+        };
+
+        that._findLevelNameByLevel = function(level){
+			for(var i= 0,l=that._levels.length;i<l;i++){
+	            if(that._levels[i].level === level ){
+	                return that._levels[i].name;
+	            }
+        	}
+        }
 
         /**
 		* 加入一個新的關卡	
@@ -154,6 +335,21 @@ var Framework = (function (Framework) {
             }
         };
 
+        that.addNewTestScript = function(levelName,scriptName,scriptInstance){
+
+        	var levelName = levelName;
+        	var scriptName = scriptName;
+        	var scriptInstance = scriptInstance;
+
+
+            	if(Framework.Util.isNull(that._findScript(scriptName))){
+                        that._testScripts.push({targetLevel: levelName,name : scriptName , script : scriptInstance});
+                    }else{
+                        Framework.DebugInfo.Log.error('Game : Script名稱不能重複');
+                        throw new Error('Game: already has same script name');
+                    }
+        }
+        
         /**
 		* 前往另一個關卡(前後皆可), 若沒有該關卡, 會throw exception	
 		* @method goToLevel
@@ -166,9 +362,14 @@ var Framework = (function (Framework) {
             that.pause();
             that._teardown();
             that._currentLevel = that._findLevel(levelName);
+            Framework.Replay.resetCycleCount();
             if(Framework.Util.isUndefined(that._currentLevel)){
                 Framework.DebugInfo.Log.error('Game : 找不到關卡');
                 throw new Error('Game : levelname not found.');
+            }
+            if(that._isRecordMode)
+            {
+            	that._record.inputCommand("// Change Level :" + levelname + ";");
             }
             that.start();
         };
@@ -184,9 +385,15 @@ var Framework = (function (Framework) {
             that.pause();
             that._teardown();
             var flag = false;
+            Framework.Replay.resetCycleCount();
             for(var i in that._levels){
                 if(flag){
                     that._currentLevel = that._levels[i].level;
+		            if(that._isRecordMode)
+		            {
+		            	var levelname = that._findLevelNameByLevel(that._currentLevel);
+		            	that._record.inputCommand("// Change Level :" + levelname + ";");
+		            }
                     that.start();
                     return;
                 }
@@ -210,10 +417,16 @@ var Framework = (function (Framework) {
             that._teardown();
             var flag = false;
             var prev = undefined;
+            Framework.Replay.resetCycleCount();
             for(var i in that._levels){
                 if(that._levels[i].level === that._currentLevel){
                     if(!Framework.Util.isUndefined(prev)){
                         that._currentLevel = prev;
+			            if(that._isRecordMode)
+			            {
+			            	var levelname = that._findLevelNameByLevel(that._currentLevel);
+			            	that._record.inputCommand("// Change Level To : " + levelname + ";");
+			            }
                         that.start();
                         return;
                     }
@@ -234,7 +447,13 @@ var Framework = (function (Framework) {
 		* 	Framework.Game.start();
 		*/
 		that.start = function () {
-            if (Framework.Util.isUndefined(that._currentLevel)){
+			if(!that._isReplay){
+				if(that._isTestMode && that._isTestReady === false)
+				{
+					return;
+				}
+			}
+            if (Framework.Util.isUndefined(that._currentLevel) || Framework.Util.isNull(that._currentLevel)){
                 that._currentLevel = that._levels[0].level;
             }
             var self = that;
@@ -253,9 +472,11 @@ var Framework = (function (Framework) {
 			var runFunction = function() {
 				self._isRun = true;
 				self.pause();
+				self.initialize();
 				//bind會產生一個同樣的function, 但this為指定的參數
 				self.draw = self._tempDraw.bind(self._currentLevel);
 				self.update = self._tempUpdate.bind(self._currentLevel);
+				Framework.Replay.setGameReady();
 				self.run();
 			};
 
@@ -268,7 +489,7 @@ var Framework = (function (Framework) {
 				self.update = function() {};
 				self.run();
 				self._isRun = false;
-				self.initialize();
+				self.load();
 				if (Framework.ResourceManager.getRequestCount() ===  Framework.ResourceManager.getResponseCount()) {
 					runFunction();
 				}
@@ -296,34 +517,34 @@ var Framework = (function (Framework) {
 			Framework.TouchManager.setTouchmoveEvent(self._currentLevel.touchmove);			
 
 			Framework.MouseManager.setSubject(self._currentLevel);
-			Framework.MouseManager.setClickEvent(self._currentLevel.click);
-			Framework.MouseManager.setMousedownEvent(self._currentLevel.mousedown);
-			Framework.MouseManager.setMouseUpEvent(self._currentLevel.mouseup);
+			Framework.MouseManager.setClickEvent(self.click);
+			Framework.MouseManager.setMousedownEvent(self.mousedown);
+			Framework.MouseManager.setMouseUpEvent(self.mouseup);
 			Framework.MouseManager.setMouseMoveEvent(self._currentLevel.mousemove);
 			//Framework.MouseManager.setContextmenuEvent(self._currentLevel.contextmenu);
 
 			Framework.KeyBoardManager.setSubject(self._currentLevel);
-			Framework.KeyBoardManager.setKeyupEvent(self._currentLevel.keyup);
-			Framework.KeyBoardManager.setKeydownEvent(self._currentLevel.keydown);
+			Framework.KeyBoardManager.setKeyupEvent(self.keyup);
+			Framework.KeyBoardManager.setKeydownEvent(self.keydown);
 			
 		};
 
 		that.run = function() {	
 			var self = that,	
 				nowFunc = function() { return (new Date()).getTime(); },		
-				updateTicks = 1000 / that._updateFPS,
-				drawTicks = 1000 / that._drawFPS,
+				updateTicks = 1000 / that.fps,
+				drawTicks = 1000 / that.fps,
 				previousUpdateTime = nowFunc(),
-				previousDrawTime = nowFunc(),
-				now = nowFunc();
+				previousDrawTime = previousUpdateTime,
+				now = previousDrawTime;
 
-			var nextGameTick = (new Date()).getTime(),
-				nextGameDrawTick = (new Date()).getTime();
-			var skipTicks = Math.round(1000 / that._updateFPS);
+			var nextGameTick = now,
+				nextGameDrawTick = now;
+			that.skipTicks = Math.round(1000 / that.fps);
 
 			var updateFunc = function() {	
 				now = nowFunc();						
-				while (now > nextGameTick) {
+				if (now > nextGameTick) {
 					//console.log('now: ' + now + ', nextGameTick: ' + nextGameTick + ', diff:' + (now-nextGameTick));	
 					that._fpsAnalysis.update();
 					// show FPS information
@@ -331,31 +552,59 @@ var Framework = (function (Framework) {
 						that.fpsContext.innerHTML = 'update FPS:' + that._fpsAnalysis.getUpdateFPS() + '<br />draw FPS:' + that._drawfpsAnalysis.getUpdateFPS();
 					}							
 					// run Game's update
-					that.update();
-					nextGameTick += skipTicks;
+					that.update();	
+					
+		            if(that._isRecording)
+		            {
+		            	that._record.update();
+		            	//console.log("record update")
+		            }
+					Framework.Replay.update();
+					nextGameTick += that.skipTicks;
 				}						
 			};
 
 			var drawFunc = function() {
-				if (now > nextGameDrawTick) {
-					that._context.clearRect(0, 0, that._canvas.width, that._canvas.height);	
+				if (now >= nextGameDrawTick) {					
 					that.draw(that._context);
 					that._drawfpsAnalysis.update();
 					if (that.fpsContext) {
 						that.fpsContext.innerHTML = 'update FPS:' + that._fpsAnalysis.getUpdateFPS() + '<br />draw FPS:' + that._drawfpsAnalysis.getUpdateFPS();
 					}
-					nextGameDrawTick += skipTicks;
+					nextGameDrawTick += that.skipTicks;
 				}
 			};
 
-			var gameLoopFunc = function() {				
+			var gameLoopFunc = function() {
+
+                var preDraw = Date.now();
 				updateFunc();
-				drawFunc();								
+				drawFunc();		
+
+                var drawTime = Date.now() - preDraw;
+                if(drawTime > 5)
+                {
+                	that.timelist.push(drawTime);
+            	}
+                if(that.timelist.length >= 30)
+                {
+                    var average = that.countAverage(that.timelist);
+                    that.timelist = [];
+                    //console.log("game loop time average " + average);
+                }						
 			}
 
-			that.runAnimationFrame(gameLoopFunc);
 			that._isRun = true;
+			that.runAnimationFrame(gameLoopFunc);
 		};
+
+        that.countAverage = function(list){
+                var sum = 0;
+                for(var i=0;i<list.length;i++){
+                    sum += list[i];
+                }
+                return sum / list.length;
+            };
 
 		that.stopInterval = function() {
 			clearInterval(that._runInstance);
@@ -375,8 +624,10 @@ var Framework = (function (Framework) {
                         window.webkitRequestAnimationFrame || 
                         window.msRequestAnimationFrame;
 			var _run = function () {
-				that._runInstance = requestAnimationFrame(_run);
 				gameLoopFunc();
+				if(that._isRun){
+					that._runInstance = requestAnimationFrame(_run);
+				}
 			};
 			_run();
 			that.stopLoop = that.stopAnimationFrame;
@@ -388,7 +639,7 @@ var Framework = (function (Framework) {
 				that._runInstance = null;
 			}*/
 			// dynamic product runnable function
-			var drawTicks = 1000 / that._drawFPS;
+			var drawTicks = 1000 / that.fps;
 			var _run = gameLoopFunc/*function () {
 					gameLoopFunc.call(this);
 				};*/
@@ -420,13 +671,14 @@ var Framework = (function (Framework) {
 				throw 'FPS must be smaller than 60.';
 				fps = 60;
 			}
-			that._updateFPS = fps;
+			that.skipTicks = Math.round(1000 / that.fps);
+			that.fps = fps;
 			that.pause();
 			that.run();
 		};
 
 		that.getUpdateFPS = function () {
-			return that._updateFPS;
+			return that.fps;
 		};
 
 		that.setDrawFPS = function (fps) {
@@ -435,13 +687,13 @@ var Framework = (function (Framework) {
 				throw 'FPS must be smaller than 60.';
 				fps = 60;
 			}
-			that._drawFPS = fps;
+			that.fps = fps;
 			that.pause();
 			that.run();
 		};
 
 		that.getDrawFPS = function () {
-			return that._drawFPS;
+			return that.fps;
 		};
 
 		that.setCanvas = function (canvas) {
@@ -528,18 +780,23 @@ var Framework = (function (Framework) {
 
 		that.resizeEvent = function() {
 			var base = 0,
-				baseWidth = window.innerWidth / 16,
-				baseHeight = window.innerHeight / 9,
+				baseWidth = window.innerWidth / that._ideaWidth,
+				baseHeight = window.innerHeight / that._ideaHeight,
 				scaledWidth = 0,
 				scaledHeight = 0;
+			if(that._isTestMode || that._isRecordMode)
+			{
+				baseWidth = window.innerWidth * 0.7 / that._ideaWidth;
+				baseHeight = window.innerHeight * 0.7 / that._ideaHeight;
+			}
 			if(baseWidth < baseHeight) {
 				base = baseWidth;
 			} else {
 				base = baseHeight;
 			}
 
-			scaledWidth = Math.round(base * 16);
-			scaledHeight = Math.round(base * 9);
+			scaledWidth = Math.round(base * that._ideaWidth);
+			scaledHeight = Math.round(base * that._ideaHeight);
 			that._widthRatio = scaledWidth / that._canvas.width;
 			that._heightRatio = scaledHeight / that._canvas.height;		
 			//that._canvasContainer.style.width = scaledWidth;
@@ -549,7 +806,33 @@ var Framework = (function (Framework) {
 	
 		};
 
+		that._pushGameObj = function(ele) {
+			that._currentLevel._allGameElement.push(ele);
+		};
+
+		that._showAllElement = function() {
+			that._currentLevel._showAllElement();
+		};
+
 		return that;
 	})();
+
 	return Framework;
 })(Framework || {});
+
+listMember = function(main, space) {
+	var objArray;
+	for(key in main){
+		//not function
+		try{
+			if(main[key].toString().indexOf("function", 0) === -1){
+				console.log(space + key + ": " + main[key] + "\n");
+				if(main[key].toString() === "[Sprite Object]" || main[key].toString() === "[object Object]"){
+					listMember(main[key], space + "   ");
+				}
+			}
+		}catch(e){
+		
+		}
+	}
+};

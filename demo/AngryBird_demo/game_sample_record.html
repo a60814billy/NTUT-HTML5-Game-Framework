@@ -1,0 +1,35 @@
+<script>
+//陣列和載入JS檔的順序相同, lookFor為在要載入的檔案中, 
+//有用到的全域變數, importJS這個function, 會在找到lookFor的變數後
+//才會繼續loading下一個檔案, 如果沒有需要lookFor, 則以空字串代表
+var listScript = 
+[
+    { src: '../../src/loadFramework.js',lookFor: 'loadFrameworkEnd'},
+    { src: 'game_sample/js/loadGame.js',lookFor: 'loadGameEnd'}
+]
+</script>
+
+<script type="text/javascript" src="../../src/recordLoad.js"></script>
+<!---->
+
+
+<div id="main" style="position: relative; float:left; width:30%;">
+<div id="record_control">
+	<input type="button" id = "start_btn" value="Start" style="width:20%;height:40px;font-size:20px;" onclick="Framework.Game.recordStart()">
+	<input type="button" id = "pause_btn"  value="Pause" style="width:20%;height:40px;font-size:20px;" onclick ="Framework.Game.recordPause()" disabled>
+	<input type="button" id = "stop_btn"  value="Stop" style="width:20%;height:40px;font-size:20px;" onclick ="Framework.Game.recordStop()" disabled>
+	<input type="button" id = "type_btn"  value="Add Comment" style="width:30%;height:40px;font-size:20px;" onclick ="Framework.Game.recordInput()" disabled>
+	<input type="button" id = "replay_btn"  value="Replay" style="width:30%;height:40px;font-size:20px;" onclick ="Framework.Game.recordReplay()">
+	<input type="button" id = "continue_btn"  value="Continue" style="width:30%;height:40px;font-size:20px;" onclick ="Framework.Game.recordContinue()">
+	<input type="button" id = "variable_btn"  value="Variable" style="width:30%;height:40px;font-size:20px;" onclick ="Framework.Game.showVariable()">
+</div>
+<div id="record_div"></div>
+</div>
+
+<style type="text/css">
+        /* DOM之間不要留空間 */
+        *{
+            padding:0;
+            margin:0;
+        }
+</style>

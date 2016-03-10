@@ -15,15 +15,18 @@ var Framework = (function (Framework) {
         * 
         */
         __construct: function(options){
+            this._tmpCanvas = document.createElement('canvas');
+            this._tmpContext = this._tmpCanvas.getContext('2d');
             this.id = undefined;
             this.type = undefined;
             this.texture = undefined;
             this.isDrawBoundry = false;
-            this.isDrawPace = false;
+            this.isDrawPace = false;            
             if(Framework.Util.isString(options)){
                 this.id = options;
                 Framework.ResourceManager.loadImage({id:options, url:options});
-                this.type = 'image';
+                this.type = 'image';   
+                this.pushSelfToLevel();
             }else if(Framework.Util.isCanvas(options)){
                 this.texture = options;
                 this.type = 'canvas';
@@ -31,58 +34,143 @@ var Framework = (function (Framework) {
                 Framework.DebugInfo.Log.error('Sprite 不支援的參數' + options);
             }
         },
-        draw: function(context){
-            var context = context || Framework.Game._context;
+        initTexture: function()
+        {
+            if(Framework.Util.isUndefined(this.texture)){
+                this.texture = Framework.ResourceManager.getResource(this.id);
+            }
+        },
+        draw: function(painter){
+            this.countAbsoluteProperty();
+            if(Framework.Util.isUndefined(this.texture)){
+                this.texture = Framework.ResourceManager.getResource(this.id);
+            }
+            if(Framework.Game.isBackwardCompatiable){
+                this.testDraw(painter);
+                return;
+            }
+            var painter = painter || Framework.Game._context;
+            //this.countAbsoluteProperty1();
+            var tmp, realWidth, realHeight, tmpContext;
+            if(this.type === 'image' || this.type === 'canvas') {
+                // 計算縮放後的大小
+                if(this.isObjectChanged) {                    
+                    if(!Framework.Util.isAbout(this.absoluteScale,1,0.00001) || !Framework.Util.isAbout(this.absoluteRotation,0,0.001)){
+                        realWidth = this.texture.width * this.scale;
+                        realHeight = this.texture.height * this.scale;
+                        // 將canvas 放大才不會被切到
+                        var diagonalLength = Math.ceil(Math.sqrt(Math.pow(realHeight, 2) + Math.pow(realWidth, 2)));
+                        this.canvas.width = diagonalLength;
+                        this.canvas.height = diagonalLength;
+
+                        var widthRatio = this.canvas.width / realWidth,
+                            heightRatio = this.canvas.height / realHeight,
+                            tranlateX = this.canvas.width / 2,
+                            tranlateY = this.canvas.height / 2;
+                        
+                        
+                        // 將Canvas 中心點移動到左上角(0,0)
+                        this.context.translate(tranlateX , tranlateY);
+                        // 旋轉Canvas
+                        this.context.rotate(this.absoluteRotation / 180 * Math.PI);
+                        // 移回來
+                        this.context.translate(-tranlateX , -tranlateY);
+                        // 縮放
+                        this.context.scale(this.absoluteScale, this.absoluteScale);
+                        // 畫圖                
+                        this.context.drawImage(this.texture, (this.canvas.width - realWidth) / 2 / this.absoluteScale, (this.canvas.height - realHeight) / 2 / this.absoluteScale);
+
+                    }
+                    
+                    // 再畫到主Canvas上                    
+                    if(this.isDrawBoundry) {
+                        this.context.rect((this.canvas.width - realWidth) / 2 / this.absoluteScale, (this.canvas.height - realHeight) / 2 / this.absoluteScale, this.texture.width, this.texture.height);   
+                        this.context.stroke();                 
+                    } 
+
+                    if(this.isDrawPace) {
+                        this.context.rect(this.absolutePosition.x, this.absolutePosition.y, 1, 1);
+                        this.context.stroke();
+                    } 
+                    
+                }
+
+                //console.log("sprite position, " + this.absolutePosition.x + " , " + this.absolutePosition.y);
+                if(painter instanceof Framework.GameObject) {
+                    painter = painter.context;  //表示傳進來的其實是GameObject或其 Concrete Class
+                }
+                if(!Framework.Util.isAbout(this.absoluteScale,1,0.00001) || !Framework.Util.isAbout(this.absoluteRotation,0,0.001)){
+                    painter.drawImage(this.canvas, this.absolutePosition.x - this.canvas.width / 2, this.absolutePosition.y - this.canvas.height / 2);
+                }
+                else{
+                    painter.drawImage(this.texture, this.absolutePosition.x, this.absolutePosition.y);
+                }
+            }
+
+        },    
+        testDraw:function(painter)
+        {
+            var painter = painter || Framework.Game._context;
             this.countAbsoluteProperty();
             var texture, tmp, realWidth, realHeight, tmpContext;
             if(Framework.Util.isUndefined(this.texture)){
                 this.texture = Framework.ResourceManager.getResource(this.id);
             }
-            if(this.type === 'image' || this.type === 'canvas'){
-                tmp = document.createElement('canvas');
+            if(this.type === 'image' || this.type === 'canvas') {
                 // 計算縮放後的大小
-                realWidth = this.texture.width * this.scale;
-                realHeight = this.texture.height * this.scale;
-                // 將canvas 放大才不會被切到
-                var diagonalLength = Math.ceil(Math.sqrt(Math.pow(realHeight, 2) + Math.pow(realWidth, 2)));
-                tmp.width = diagonalLength;
-                tmp.height = diagonalLength;
+                if(this.isObjectChanged) {                    
+                    if(!Framework.Util.isAbout(this.absoluteScale,1,0.00001) || !Framework.Util.isAbout(this.absoluteRotation,0,0.001)){
+                        realWidth = this.texture.width * this.scale;
+                        realHeight = this.texture.height * this.scale;
+                        // 將canvas 放大才不會被切到
+                        var diagonalLength = Math.floor(Math.sqrt(Math.pow(realHeight, 2) + Math.pow(realWidth, 2)));
+                        this.canvas.width = diagonalLength;
+                        this.canvas.height = diagonalLength;
 
-                var widthRatio = tmp.width / realWidth,
-                    heightRatio = tmp.height / realHeight,
-                    tranlateX = tmp.width / 2,
-                    tranlateY = tmp.height / 2;
-                
-                tmpContext = tmp.getContext('2d');
-                // 將Canvas 中心點移動到左上角(0,0)
-                tmpContext.translate(tranlateX , tranlateY);
-                // 旋轉Canvas
-                tmpContext.rotate(this.absoluteRotation / 180 * Math.PI);
-                // 移回來
-                tmpContext.translate(-tranlateX , -tranlateY);
-                // 縮放
-                tmpContext.scale(this.absoluteScale, this.absoluteScale);
-                // 畫圖                
-                tmpContext.drawImage(this.texture, (tmp.width - realWidth) / 2 / this.absoluteScale, (tmp.height - realHeight) / 2 / this.absoluteScale);
+                        var widthRatio = this.canvas.width / realWidth,
+                            heightRatio = this.canvas.height / realHeight,
+                            tranlateX = this.canvas.width / 2,
+                            tranlateY = this.canvas.height / 2;
+                        
+                        
+                        // 將Canvas 中心點移動到左上角(0,0)
+                        this.context.translate(tranlateX , tranlateY);
+                        // 旋轉Canvas
+                        this.context.rotate(this.absoluteRotation / 180 * Math.PI);
+                        // 移回來
+                        this.context.translate(-tranlateX , -tranlateY);
+                        // 縮放
+                        this.context.scale(this.absoluteScale, this.absoluteScale);
+                        // 畫圖                
+                        this.context.drawImage(this.texture, (this.canvas.width - realWidth) / 2 / this.absoluteScale, (this.canvas.height - realHeight) / 2 / this.absoluteScale);
 
-                // 再畫到主Canvas上
-                
-                if(this.isDrawBoundry) {
-                    tmpContext.rect((tmp.width - realWidth) / 2 / this.absoluteScale, (tmp.height - realHeight) / 2 / this.absoluteScale, this.texture.width, this.texture.height);                    
-                } 
+                    }
+                    
+                    // 再畫到主Canvas上                    
+                    if(this.isDrawBoundry) {
+                        this.context.rect((this.canvas.width - realWidth) / 2 / this.absoluteScale, (this.canvas.height - realHeight) / 2 / this.absoluteScale, this.texture.width, this.texture.height);   
+                        this.context.stroke();                 
+                    } 
 
-                if(this.isDrawPace) {
-                    context.rect(this.absolutePosition.x, this.absolutePosition.y, 1, 1);
-                } 
-
-                tmpContext.stroke();
-                
-                if(context instanceof Framework.GameObject) {
-                    context = context.context;  //表示傳進來的其實是GameObject或其 Concrete Class
+                    if(this.isDrawPace) {
+                        this.context.rect(this.absolutePosition.x, this.absolutePosition.y, 1, 1);
+                        this.context.stroke();
+                    } 
+                    
                 }
-                context.drawImage(tmpContext.canvas, this.absolutePosition.x - tmp.width / 2, this.absolutePosition.y - tmp.height / 2);
+
+                if(painter instanceof Framework.GameObject) {
+                    painter = painter.context;  //表示傳進來的其實是GameObject或其 Concrete Class
+                }
+                if(!Framework.Util.isAbout(this.absoluteScale,1,0.00001) || !Framework.Util.isAbout(this.absoluteRotation,0,0.001)){
+                    painter.drawImage(this.canvas, this.absolutePosition.x - this.canvas.width / 2, this.absolutePosition.y - this.canvas.height / 2);
+                }
+                else{
+
+                    painter.drawImage(this.texture, this.absolutePosition.x - this.texture.width / 2, this.absolutePosition.y - this.texture.height / 2);
+                }
             }
-        },    
+        },
         toString:function(){
             return '[Sprite Object]';
         },

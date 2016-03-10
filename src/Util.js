@@ -3,6 +3,23 @@ var Framework = (function (Framework) {
 
 	var utilClass = function() {};
 
+	var isAbout = function(realValue,aboutValue,delta){
+		if(realValue < aboutValue + delta && realValue > aboutValue - delta){
+			return true;
+		}
+		else{
+			return false;
+		}
+	};
+
+	var findValueByKey = function(targetList,key){
+		for(var i= 0,l=targetList.length;i<l;i++){
+            if(targetList[i].name === key ){
+                return targetList[i];
+            }
+        }
+        return null;
+	}
 
 	var isUndefined = function (obj) {
 		return (typeof obj === 'undefined');
@@ -74,7 +91,9 @@ var Framework = (function (Framework) {
 		isString: isString,
 		isCanvas: isCanvas,
 		namespace: namespace,
-		overrideProperty: overrideProperty
+		overrideProperty: overrideProperty,
+		isAbout: isAbout,
+		findValueByKey: findValueByKey
 	};
 
 

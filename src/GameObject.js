@@ -2,6 +2,7 @@
 var Framework;
 Framework = (function (Framework) {
     'use strict'
+
     Framework.GameObject = Framework.exClass({        
         /**
         * 所有Sprite和Scene的Base Class, 
@@ -9,12 +10,8 @@ Framework = (function (Framework) {
         * @class GameObject
         * @constructor
         */ 
-        __construct: function() {             
-            this.rotation = 0;
-            this.scale = 1;
-            this.position = { x: 0, y: 0 };
-
-            this.relativePosition = { x: 0, y: 0 };
+        __construct: function() {    
+            this.relativePosition = new Framework.Point();
             this.relativeRotation = 0;
             this.relativeScale = 1;
 
@@ -23,10 +20,40 @@ Framework = (function (Framework) {
             this.absoluteScale = 1;
             this.systemLayer = 1;  
             //this.spriteParent = {};
+        
+            this.previousAbsolutePosition = new Framework.Point();
+            this.previousWidth = 0;
+            this.previousHeight = 0;
+
+            this.rotation = 0;
+            this.scale = 1;
+            this.position = { x: 0, y: 0 };
+
+            this._isRotate = true;
+            this._isScale = true;
+            this._isMove = true;
+            this._changeFrame = true;
+            this._isCountAbsolute = false;
         },
 
-        countAbsoluteProperty: function() {
+        clearDirtyFlag: function() {
+            this._isRotate = false;
+            this._isScale = false;
+            this._isMove = false;
+            this._changeFrame = false;
+        },
+
+        pushSelfToLevel: function() {
+            Framework.Game._pushGameObj(this);
+        },
+
+        countAbsoluteProperty: function() {            
             var rad, parentRotation = 0, parentScale = 1, parentPositionX = 0, parentPositionY = 0;
+
+            this.previousAbsolutePosition.x = this.absolutePosition.x;
+            this.previousAbsolutePosition.y = this.absolutePosition.y;
+            this.previousWidth = this.width;
+            this.previousHeight = this.height;
 
             if (!Framework.Util.isUndefined(this.spriteParent)) {
                 parentRotation = this.spriteParent.absoluteRotation;
@@ -35,17 +62,89 @@ Framework = (function (Framework) {
                 parentPositionY = this.spriteParent.absolutePosition.y;
             }
 
-            this.absoluteRotation = this.rotation + parentRotation;
-            this.absoluteScale = this.scale * parentScale;
-
             rad = (parentRotation / 180) * Math.PI;
-            this.absolutePosition.x = Math.floor((this.relativePosition.x * Math.cos(rad) - this.relativePosition.y * Math.sin(rad))) * parentScale + parentPositionX;
-            this.absolutePosition.y = Math.floor((this.relativePosition.x * Math.sin(rad) + this.relativePosition.y * Math.cos(rad))) * parentScale + parentPositionY;
-        },        
+            var changedRotate = this.rotation + parentRotation, 
+                changedScale = this.scale * parentScale, 
+                changedPositionX = Math.floor((this.relativePosition.x * Math.cos(rad) - this.relativePosition.y * Math.sin(rad))) * parentScale + parentPositionX, 
+                changedPositionY = Math.floor((this.relativePosition.x * Math.sin(rad) + this.relativePosition.y * Math.cos(rad))) * parentScale + parentPositionY;
+                //changedPositionX = this.relativePosition.x + parentPositionX, 
+                //changedPositionY = this.relativePosition.y + parentPositionY;
+
+            if(this.absoluteRotation !== changedRotate) {
+                this._isRotate = true;
+            }
+
+            if(this.absoluteScale !== changedScale) {
+                this._isScale = true;
+            }
+
+            if(this.absolutePosition.x !== changedPositionX || this.absolutePosition.y !== changedPositionY) {
+                this._isMove = true;
+            }
+
+            this.absoluteRotation = changedRotate;
+            this.absoluteScale = changedScale;
+
+            this.absolutePosition.x = changedPositionX;
+            this.absolutePosition.y = changedPositionY;
+
+            if(Array.isArray(this.attachArray)) {
+                this.attachArray.forEach(function(ele) {
+                    if(!Framework.Util.isUndefined(ele.countAbsoluteProperty))
+                    {
+                        ele.countAbsoluteProperty();
+                    }
+
+                });
+            }
+        },
+        load: function() {},  
+        initialize: function() {},  
         update: function() {},
         draw: function(ctx) {},        
         teardown:function() {},
         toString:function() { return '[GameObject Object]'}
+    });
+
+    Object.defineProperty(Framework.GameObject.prototype, 'isObjectChanged', {
+        get: function() {
+            var isParentChanged = false;
+            /*if(!Framework.Util.isUndefined(this.spriteParent)) {
+                isParentChanged = this.spriteParent.isObjectChanged;
+            }*/
+            
+            if(!Framework.Util.isUndefined(this.attachArray)) {
+                this.attachArray.forEach(function(ele) {
+                    if(ele.isObjectChanged) {
+                       isParentChanged  = true;
+                   }
+                });
+            }
+
+            return this._isRotate || this._isScale || this._isMove || this._changeFrame || isParentChanged;
+        }
+    });
+
+    Object.defineProperty(Framework.GameObject.prototype, 'isOnChangedRect', {
+        get: function() {
+            var halfDiagonal = this.diagonal / 2,
+                thisRect = { x: this.absolutePosition.x - halfDiagonal, 
+                    y: this.absolutePosition.y - halfDiagonal,
+                    x2: this.absolutePosition.x + halfDiagonal, 
+                    y2: this.absolutePosition.y + halfDiagonal,
+                },
+                changedRect = Framework.Game._currentLevel._getChangedRect(1600, 900);
+
+            if((thisRect.x < changedRect.x2 && thisRect.y < changedRect.y2) || 
+                (thisRect.x2 > changedRect.x && thisRect.y2 > changedRect.y) ||
+                (thisRect.x2 > changedRect.x && thisRect.y2 < changedRect.y) ||
+                (thisRect.x2 < changedRect.x && thisRect.y2 > changedRect.y)) {
+                return true;
+            }
+
+            return false;
+
+        }
     });
 
     /**
@@ -55,14 +154,21 @@ Framework = (function (Framework) {
     * @default { x: 0, y: 0 }
     */
     Object.defineProperty(Framework.GameObject.prototype, 'position', {
-        get: function() {
-            this.relativePosition.x = Math.floor(this.relativePosition.x);
-            this.relativePosition.y = Math.floor(this.relativePosition.y);
+        get: function() {   
+            //this._isChanged = false;
             return this.relativePosition;
         },
 
         set: function(newValue) {
-            this.relativePosition = newValue;
+            if(!Framework.Util.isUndefined(newValue.x)) {               
+                this.relativePosition.x = Math.floor(newValue.x);
+                //this._isMove = true;
+            }   
+
+            if(!Framework.Util.isUndefined(newValue.y)) {
+                this.relativePosition.y = Math.floor(newValue.y);
+                //this._isMove = true;
+            }
         },
     });
 
@@ -79,6 +185,7 @@ Framework = (function (Framework) {
 
         set: function(newValue) {
             this.relativeRotation = newValue;
+            //this._isRotate = true;
         },
     });
 
@@ -95,6 +202,7 @@ Framework = (function (Framework) {
 
         set: function(newValue) {
             this.relativeScale = newValue;
+            //this._isScale = true;
         },
     }); 
 
@@ -110,9 +218,9 @@ Framework = (function (Framework) {
             if(this.texture) {
                 width = this.texture.width;
             }
-            if (this.col) {
+           /* if (this.col) {
                 width = this.texture.width / this.col;
-            }
+            }*/
             return Math.floor(width * this.absoluteScale);
         }
     });
@@ -129,10 +237,16 @@ Framework = (function (Framework) {
             if(this.texture) {
                 height = this.texture.height;
             }
-            if (this.row) {
+            /*if (this.row) {
                 height = this.texture.height / this.row;
-            }
+            }*/
             return Math.floor(height * this.absoluteScale);
+        }
+    });
+
+    Object.defineProperty(Framework.GameObject.prototype, 'diagonal', {
+        get: function() {
+            return Math.sqrt(this.width * this.width + this.height * this.height);
         }
     });
 

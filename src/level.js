@@ -29,28 +29,180 @@ var Framework = (function (Framework) {
             */
             this.rootScene = new Framework.Scene();
             this.autoDelete = true;
+            this._firstDraw = true;
+            this._allGameElement = [];
+            this.timelist = [];
+            this.updatetimelist = [];
+            this.cycleCount = 0;
         },
 
-        _initializeProgressResource: function() {
+        _traversalAllElement: function(func) {
+            this._allGameElement.forEach(func);
+        },
+
+        _initializeProgressResource: function() {            
             this.initializeProgressResource();
         },
-        _loadingProgress: function(ctx, requestInfo) {
-            this.loadingProgress(ctx, requestInfo);
-        },
-        _initialize: function() {
-            this.initialize();
-        },
-        _update: function() {
-            this.rootScene.update();
-            this.update();
-        },
-        _draw: function(ctx) {
-            this.rootScene.draw(ctx);
-            this.draw(ctx);
+
+        _load: function() {
+            this.load();
+            this._traversalAllElement(function(ele) {
+                ele.load();
+            });            
         },
 
-        _teardown: function(ctx) {
+        _loadingProgress: function(ctx, requestInfo) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);   
+            this.loadingProgress(ctx, requestInfo);
+        },
+
+        _initialize: function() { 
+            this.cycleCount = 0;          
+            this.initialize();
+            this._traversalAllElement(function(ele) {
+                ele.initialize();
+            }); 
+            //this.rootScene.initTexture();
+        },
+
+        _update: function() {
+            this.rootScene.clearDirtyFlag();
+            this._traversalAllElement(function(ele) {
+                ele.clearDirtyFlag();
+            }); 
+
+            var preDraw = Date.now();
+
+            this.rootScene.update();
+            this.cycleCount++;
+            this.update();
+
+            var drawTime = Date.now() - preDraw;
+            this.updatetimelist.push(drawTime);
+            if(this.updatetimelist.length >= 30)
+            {
+                var average = this.countAverage(this.updatetimelist);
+                this.updatetimelist = [];
+                //console.log("update time average " + average);
+            }
+
+            
+        },
+
+        _draw: function(ctx) { 
+            this.rootScene.countAbsoluteProperty();
+            /*this._traversalAllElement(function(ele) {
+                ele.countAbsoluteProperty();
+            });*/
+			
+            if(this.canvasChanged) {  
+                var rect = this._getChangedRect(ctx.canvas.width, ctx.canvas.height);
+       
+			
+                ctx.save();             
+                ctx.beginPath();
+
+                if(this._firstDraw) {
+                    rect.x = 0;
+                    rect.y = 0;
+                    rect.width = ctx.canvas.width;
+                    rect.height = ctx.canvas.height;
+                    this._firstDraw = false;
+                }
+
+                ctx.rect(rect.x, rect.y, rect.width, rect.height);               
+                ctx.clip(); 
+
+                ctx.clearRect(rect.x, rect.y, rect.width, rect.height); 
+
+                var preDraw = Date.now();  
+
+                this.rootScene.draw(ctx);
+                this.draw(ctx);
+
+                var drawTime = Date.now() - preDraw;
+                this.timelist.push(drawTime);
+                if(this.timelist.length >= 30)
+                {
+                    var average = this.countAverage(this.timelist);
+                    this.timelist = [];
+                    //console.log("draw time average " + average);
+                }
+
+                ctx.restore();                
+            } 
+
+        },
+
+        countAverage: function(list){
+                var sum = 0;
+                for(var i=0;i<list.length;i++){
+                    sum += list[i];
+                }
+                return sum / list.length;
+            },
+
+        _teardown: function() {
+            for(var i in this._allGameElement){
+                var deleteObj = this._allGameElement[i]
+                if(Framework.Util.isFunction(deleteObj.teardown)) {
+                    deleteObj.teardown();
+                }           
+                this._allGameElement[i] = null;
+                delete this._allGameElement[i];                     
+            }
+            this._allGameElement.length = 0;
             this.teardown();
+        },
+
+        _getChangedRect: function(maxWidth, maxHeight) {
+            var rect = { x: maxWidth, y: maxHeight, x2: 0, y2: 0 };       
+            
+            this._traversalAllElement(function(ele) {
+                if(ele.isObjectChanged) {
+                    var nowDiagonal = Math.ceil(Math.sqrt(ele.width * ele.width + ele.height * ele.height)),
+                        nowX = Math.ceil(ele.absolutePosition.x - nowDiagonal / 2), 
+                        nowY = Math.ceil(ele.absolutePosition.y - nowDiagonal / 2),  
+                        nowX2 = nowDiagonal + nowX,
+                        nowY2 = nowDiagonal + nowY,
+                        preDiagonal = Math.ceil(Math.sqrt(ele.previousWidth * ele.previousWidth + ele.previousHeight * ele.previousHeight)),
+                        preX = Math.ceil(ele.previousAbsolutePosition.x - preDiagonal / 2), 
+                        preY = Math.ceil(ele.previousAbsolutePosition.y - preDiagonal / 2),  
+                        preX2 = preDiagonal + preX,
+                        preY2 = preDiagonal + preY,
+                        x = (nowX < preX)? nowX:preX,
+                        y = (nowY < preY)? nowY:preY,
+                        x2 = (nowX2 > preX2)? nowX2:preX2,
+                        y2 = (nowY2 > preY2)? nowY2:preY2;
+
+                    if(x < rect.x) {
+                        rect.x = x;
+                    }
+
+                    if(y < rect.y) {
+                        rect.y = y;                     
+                    }
+
+                    if(x2 > rect.x2) {
+                        rect.x2 = x2;                       
+                    }
+
+                    if(y2 > rect.y2) {
+                        rect.y2 = y2;                       
+                    }
+                }
+            });
+
+            rect.width = rect.x2 - rect.x;
+            rect.height= rect.y2 - rect.y;
+
+            return rect;
+        },
+
+        _showAllElement: function() {
+            this._traversalAllElement(function(ele) {
+                console.log(ele, "ele.isMove", ele._isMove, "ele.isRotate", ele._isRotate, "ele.isScale", ele._isScale, "ele.changeFrame", ele._changeFrame, "ele.isObjectChanged", ele.isObjectChanged);
+            });
         },
         
         /**
@@ -59,6 +211,9 @@ var Framework = (function (Framework) {
         * @method initializeProgressResource   
         */
         initializeProgressResource: function () {
+        },
+
+        load: function() {            
         },
 
         /**
@@ -72,7 +227,7 @@ var Framework = (function (Framework) {
         */
         loadingProgress: function (context, requestInfo) {
             context.font = '90px Arial';
-            context.fillText(Framework.ResourceManager.getFinishedRequestPercent() + '%' , context.canvas.width / 2 - 50 , context.canvas.height / 2);
+            context.fillText(Math.floor(Framework.ResourceManager.getFinishedRequestPercent()) + '%' , context.canvas.width / 2 - 50 , context.canvas.height / 2);
         },
 
         /**
@@ -235,13 +390,28 @@ var Framework = (function (Framework) {
         teardown:function(){},
         autodelete : function(){
             for(var i in this.rootScene.attachArray){
-                this.rootScene.attachArray[i].teardown();
+                if(Framework.Util.isFunction(this.rootScene.attachArray[i].teardown)) {
+                    this.rootScene.attachArray[i].teardown();
+                }                
                 this.rootScene.attachArray[i] = null;
                 delete this.rootScene.attachArray[i];                
             }
             this.rootScene.attachArray.length = 0;
             this._teardown();
         }
+    });
+
+    Object.defineProperty(Framework.Level.prototype, 'canvasChanged', {
+        get: function() {
+            var isCanvasChanged = false;
+            this._traversalAllElement(function(ele) {
+                if(ele.isObjectChanged) {
+                    isCanvasChanged = true;
+                }                       
+            });
+            return isCanvasChanged;
+        } 
+
     });
 
     return Framework;

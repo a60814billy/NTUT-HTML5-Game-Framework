@@ -1,0 +1,30 @@
+<script type="text/javascript">
+//陣列和載入JS檔的順序相同, lookFor為在要載入的檔案中, 
+//有用到的全域變數, importJS這個function, 會在找到lookFor的變數後
+//才會繼續loading下一個檔案, 如果沒有需要lookFor, 則以空字串代表
+var listScript = 
+[
+    { src: '../../src/loadFramework.js', lookFor: 'loadFrameworkEnd'},
+    { src: 'game_sample/js/loadGame.js', lookFor: 'loadGameEnd'},
+    { src: 'test/test.js'},
+];
+</script>
+
+<script type="text/javascript" src="../../src/testLoad.js"></script>
+<!---->
+
+<div id="main" style="position: relative; float:left; width:30%;">
+	<link rel="stylesheet" href="./test/qunit-1.15.0.css">
+	<div id="qunit"></div>
+	<div id="qunit-fixture"></div>
+	<script src="./test/qunit-1.15.0.js"></script>
+	
+	<!--<script src="./test/test1.js"></script>-->
+	
+<style type="text/css">
+        /* DOM之間不要留空間 */
+        *{
+            padding:0;
+            margin:0;
+        }
+</style>

@@ -111,6 +111,7 @@ module.exports = function (grunt) {
                     'src/core.js',
                     'src/DebugInfo.js',
                     'src/FpsAnalysis.js',
+                    'src/Point.js',
                     'src/GameObject.js',
                     'src/Sprite.js',
                     'src/animationSprite.js',

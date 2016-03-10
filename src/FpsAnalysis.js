@@ -25,8 +25,8 @@ var Framework = (function (Framework) {
 				currentPoint = (++currentPoint) % fpsData.length;
 			},
 			getUpdateFPS: function () {
-				return Math.floor(1000 / (fps / fpsData.length));
-			},
+				return Math.floor((1000 / (fps / fpsData.length)) * 10) / 10;
+			}, 
 			toString:function(){
 				return "[FpsAnalysis Object]";
 			}

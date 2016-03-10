@@ -4,7 +4,7 @@
 var Character = function(file, options) {
     this.url = file;      
     //AnimationSprite當圖片是一整張圖片(連續圖), 而非Array時一定要給col, row三個(url是一定要的)   
-    this.sprite = new Framework.AnimationSprite({url:this.url, col:10 , row:7 , loop:true , speed:6}); 
+    this.sprite = new Framework.AnimationSprite({url:this.url, col:10 , row:7 , loop:true , speed:2}); 
     //以下這句話的意思是當options.position為undefined時this.sprite.position = x: 0, y: 0}
     //若options.position有值, 則this.sprite.position = options.position
     //原因是在JS中, undefined會被cast成false

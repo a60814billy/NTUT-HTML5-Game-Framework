@@ -131,6 +131,9 @@ var Framework = (function (Framework) {
 		};
 
 		var destroyResource = function(id) {
+			if(Framework.Util.isUndefined(_responsedResource[id])) {
+				return;
+			}
 			_responsedResource[id].response = null;
 			_responsedResource[id].url = null;
             _responsedResource[id] = null;
@@ -183,8 +186,7 @@ var Framework = (function (Framework) {
 		};
 
 		//Public
-		ResourceManager.prototype = {
-			
+		ResourceManager.prototype = {			
 			loadImage: loadImage,
 			loadJSON: minAjaxJSON,
 			destroyResource: destroyResource,

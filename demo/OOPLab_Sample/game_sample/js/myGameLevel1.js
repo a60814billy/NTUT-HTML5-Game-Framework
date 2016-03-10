@@ -1,6 +1,6 @@
-var MyGame = Framework.Class(Framework.Level , {                
-    initialize: function() {
-        var characterPosition;
+var MyGame = Framework.Class(Framework.Level , {
+	load: function(){
+		var characterPosition;
         
         this.isStop = false;
         this.isPlayed = false;
@@ -79,12 +79,22 @@ var MyGame = Framework.Class(Framework.Level , {
             x: Framework.Game.getCanvasWidth() / 2 - 130,
             y: Framework.Game.getCanvasHeight() / 2 - 90
         };
+		
+		this.position = {
+			x: 100,
+			y: 100
+		}
+		this.rotation = 0;
+	},
+
+    initialize: function() {
+        
                            
     },
 
-    update: function() {     
+    update: function() {
         var game = this;
-        //this.rootScene.update(); 
+        this.rootScene.update(); 
 
         //以下為當被攻擊時會停下來, 並且當被攻擊的動畫播放完時便繼續跑的Scenario
         if(this.firen.collide(this.freeze) && !this.isStop && !this.isPlayed) {
@@ -118,7 +128,7 @@ var MyGame = Framework.Class(Framework.Level , {
     },
 
     draw:function(parentCtx){
-        //this.rootScene.draw();
+        this.rootScene.draw();
         //可支援畫各種單純的圖形和字
         parentCtx.fillStyle = (this.secondHandRotationRate > 0)?'green':'red'; 
         parentCtx.fillRect(this.rectPosition.x , this.rectPosition.y, 260, 90);  
@@ -132,7 +142,6 @@ var MyGame = Framework.Class(Framework.Level , {
     },
 
     keydown:function(e, list){
-        
         Framework.DebugInfo.Log.warning(e.key);
         if(e.key === 'Numpad +' || e.key === '=') {
             this.secondHandRotationRate += 0.05;
@@ -167,10 +176,12 @@ var MyGame = Framework.Class(Framework.Level , {
     touchstart: function (e) {
         //為了要讓Mouse和Touch都有一樣的事件
         //又要減少Duplicated code, 故在Touch事件被觸發時, 去Trigger Mouse事件
-        this.click(e[0]);
+        this.click({ x: e.touches[0].clientX, y: e.touches[0].clientY });
     },
-
+    
     click: function (e) {  
+
+        console.log(e.x, e.y);
         if (!this.rectPosition) {
             return;
         }  

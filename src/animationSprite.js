@@ -34,11 +34,13 @@ var Framework = (function (Framework) {
             this.row = 1;
             this.from = 0;
             this.to = 0;
-            this.index = 0;
+            this._index = 0;
             this.speed = 10;
             this.loop = true;
-            this.maxIndex = 0;
+            this.maxIndex = 0;       
+            this.speedCounter = 0;     
             this.finishPlaying = function(){};
+
 
             // 建構子參數判斷
             if(!Framework.Util.isUndefined(options.url)){
@@ -63,7 +65,7 @@ var Framework = (function (Framework) {
                 Framework.DebugInfo.Log.error('AnimationSprite Error : 建構子參數錯誤');
                 throw new SyntaxError('AnimationSprite constructor arguments error');
             }
-            this.speed = options.speed || 24 ;
+            this.speed = options.speed || 24;
             this.loop = (Framework.Util.isUndefined(options.loop) ? true : options.loop);
 
 
@@ -75,6 +77,7 @@ var Framework = (function (Framework) {
                 //一堆圖片串成動畫
                 this._id = [];
                 this._type = 'more';
+                this._id = options.url;
                 options.url.forEach(function(src){
                     this._sprites.push(new Framework.Sprite(src));
                 } , this);
@@ -82,10 +85,13 @@ var Framework = (function (Framework) {
             }else if(!Framework.Util.isUndefined(options)){
                 Framework.DebugInfo.Log.error('AnimationSprite 不支援的參數 ' + options);
             }
+
+            this.pushSelfToLevel();
         },
         _nextFrame: function(){
             if(this._start){
-                this.index++;
+                this.index++;    
+                this._changeFrame = true;        
                 if(this.index > this.to) {
                     if(this.loop) {
                         this.index = this.from;
@@ -112,7 +118,7 @@ var Framework = (function (Framework) {
                 }*/
             }
         },
-
+        initTexture:function(){},
 
         /**
         * 
@@ -169,73 +175,106 @@ var Framework = (function (Framework) {
                 this._start = true;
             }            
         },
-        update: function(){  
-            var now = (new Date()).getTime();
-            if((now - this._previousTime) > (1000 / this.speed)){
-                for (var i = 1, l = Math.floor((now - this._previousTime)/(1000 / this.speed)); i <= l; i++) {
-                    if(this._start) {
-                        this._nextFrame();
-                    }
-                }
-                this._previousTime = now;
-            }
-            if (this._isLoadSprite) {                
-                if(this._type === 'more') {
-                    //為了要確保圖片大小是對的(如果是連續圖則必須使用原本的圖形, 非切割過後的)
-                    this.texture = this._sprites[this.index];
-                } 
-                
-                this._sprites[this.index].spriteParent = this.spriteParent;
-                this._sprites[this.index].position = this.position;
-                this._sprites[this.index].rotation = this.rotation;
-                this._sprites[this.index].scale = this.scale;
-                this._sprites[this.index].layer = this.layer;
-                this._sprites[this.index].isDrawBoundry = this.isDrawBoundry;
-                this._sprites[this.index].isDrawPace = this.isDrawPace;
-                
+
+        load: function() {
+            if(this._type === 'one') {
+                Framework.ResourceManager.loadImage({id:this._id, url:this._id});
             } else {
-                if(this._type === 'one'){
-                    // 故意用 closures 隔離變數的scope
-                    (function() {
-                        this.texture = Framework.ResourceManager.getResource(this._id);
-                        for (var i = 0; i < this.col * this.row; i++){
-
-                            var tmp = document.createElement('canvas');
-                            var realWidth = this.texture.width * this.scale;
-                            var realHeight = this.texture.height * this.scale;
-                            tmp.width = (this.texture.width ) / this.col;
-                            tmp.height = (this.texture.height ) /this.row;
-                            var tmpContext = tmp.getContext('2d');
-                            tmpContext.drawImage(this.texture,-(this.texture.width / this.col)*(i%this.col), -(this.texture.height/this.row) * (Math.floor(i/this.col)) );
-                            var sprite = new Framework.Sprite(tmp);
-                            sprite.position = this.position;
-                            sprite.rotation = this.rotation;
-                            sprite.scale = this.scale;
-                            sprite.spriteParent = this.spriteParent;
-                            this._sprites.push(sprite);
-                        }
-                        if (this.userInputFrom > this.userInputTo) {
-                            this._sprites.reverse();
-                            /*var indexFrom = this.maxIndex, indexTo = 0;
-                            while (indexFrom > indexTo) {
-                                this._sprites[indexFrom] = [this._sprites[indexTo], this._sprites[indexTo] = this._sprites[indexFrom]][0];
-                                
-                                indexFrom--;
-                                indexTo++;
-                            }*/
-                        }
-
-                    }).call(this);
-                    this._isLoadSprite = true;
-                }
+                this._id.forEach(function(src) {
+                    Framework.ResourceManager.loadImage({id:src, url:src});
+                }, this);
             }
         },
-        draw:function(context){
-            var context = context || Framework.Game._context;
-            this.countAbsoluteProperty();
-            if(this._isLoadSprite){
-                this._sprites[this.index].draw(context);
+
+        initialize: function() {
+            //if(this._type === 'one') {              
+                // 故意用 closures 隔離變數的scope
+                //(function() {
+                    var i = 0, tmpImg, tmpCanvas, tmpContext, sprite, realWidth, realHeight;
+                    if(this._type === 'one') {
+                        this.texture = Framework.ResourceManager.getResource(this._id);
+                        for (i = 0; i < this.col * this.row; i++){
+                            tmpCanvas = document.createElement('canvas');
+                            realWidth = this.texture.width * this.scale;
+                            realHeight = this.texture.height * this.scale;
+                            tmpCanvas.width = (this.texture.width ) / this.col;
+                            tmpCanvas.height = (this.texture.height ) /this.row;
+                            tmpContext = tmpCanvas.getContext('2d');
+                            tmpContext.drawImage(this.texture,-(this.texture.width / this.col)*(i%this.col), -(this.texture.height/this.row) * (Math.floor(i/this.col)) );
+                            this._sprites.push(new Framework.Sprite(tmpCanvas));
+                        }
+                        if (this.userInputFrom > this.userInputTo) {
+                            this._sprites.reverse();                        
+                        }
+                    } else {
+                        this._id.forEach(function(imgId){
+                            tmpCanvas = document.createElement('canvas');
+                            tmpImg = Framework.ResourceManager.getResource(imgId);
+                            realWidth = tmpImg.width * this.scale;
+                            realHeight = tmpImg.height * this.scale;
+                            tmpCanvas.width = realWidth;
+                            tmpCanvas.height = realHeight;
+                            tmpContext = tmpCanvas.getContext('2d');
+                            tmpContext.drawImage(tmpImg, 0, 0);
+                            this._sprites.push(new Framework.Sprite(tmpCanvas));
+                        }, this);
+                        this.texture = this._sprites[this.index];
+                        
+                    }
+
+                //}).call(this);
+                this._isLoadSprite = true;
+                
+           // }
+
+        },
+
+        update: function(){  
+            if(this._start) {
+                var addFrame = this.speed / 30;
+                this.speedCounter += addFrame;
+                while(this.speedCounter > 1){
+                    this._nextFrame();
+                    this.speedCounter -= 1;
+                }
             }
+
+        },
+
+        draw: function(painter){
+            var painter = painter || Framework.Game._context;
+            if(Framework.Util.isUndefined(this._sprites) || this._sprites.length == 0)
+            {
+                this.initialize();
+            }
+            //if(this.isObjectChanged) {
+                this.texture = this._sprites[this.index];
+                
+                 //if(this._isMove) {
+                    this.texture.position = this.position;
+                    this.texture.absolutePosition = this.absolutePosition;
+                //}
+
+                //if(this._isRotate) {
+                    this.texture.rotation = this.rotation;
+                    this.texture.absoluteRotation = this.absoluteRotation;
+                //}
+
+                //if(this._isScale) {
+                    this.texture.scale = this.scale;
+                    this.texture.absoluteScale = this.absoluteScale;
+                //}
+
+                this.texture.spriteParent = this.spriteParent;                
+                this.texture.layer = this.layer;
+                this.texture.isDrawBoundry = this.isDrawBoundry;
+                this.texture.isDrawPace = this.isDrawPace;
+                this.texture._changeFrame = this._changeFrame;
+            
+                this.texture.draw(painter); 
+            //} 
+                         
+            
         },
         toString:function(){
             return '[AnimationSprite Object]';
@@ -249,6 +288,17 @@ var Framework = (function (Framework) {
                 },this)
             }
         }
+    });
+    Object.defineProperty(Framework.AnimationSprite.prototype, 'index', {               
+        get: function() {     
+            //this._changeFrame = false;               
+            return this._index;
+        },
+        set: function(newValue) {            
+            this._index = newValue;
+            this._changeFrame = true;
+        }
+    
     });
     return Framework;
 })(Framework || {});

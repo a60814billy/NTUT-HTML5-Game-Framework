@@ -20,10 +20,10 @@ var Framework = (function (Framework) {
 				ele.lastTimeDiff = e.timeStamp - ele.firstTimeStamp;
 			} else {
 				_keydownList[keyCode] = { key:keyCode, firstTimeStamp: e.timeStamp, ctrlKey: e.ctrlKey,  shiftKey: e.shiftKey, altKey: e.altKey, lastTimeDiff: 0 };
+				userKeydownEvent.call(_subject, _keydownList[keyCode], _keydownList, e);
 			}
 
 			
-			userKeydownEvent.call(_subject, _keydownList[keyCode], _keydownList, e);
 			
 		};
 

@@ -18,28 +18,43 @@ var Framework = (function (Framework) {
             this.type = undefined;
             this.texture = undefined;
             this.attachArray=[];
+            this.pushSelfToLevel();
+        },
+
+        load: function () {
+            this.attachArray.forEach(function(ele){
+                ele.load();
+            }, this);
+        },
+
+        initTexture: function()
+        {
+            this.attachArray.forEach(function(ele){
+                if(!Framework.Util.isUndefined(ele.initTexture))
+                {
+                    ele.initTexture();
+                }
+            }, this);
         },
 
         update: function () {
-		    var i;
-		    for (i = 0; i < this.attachArray.length ; i++) {
-		        this.attachArray[i].update();
-		    }
+		    this.attachArray.forEach(function(ele){
+                ele.update();
+            }, this); 
 		},
 
-        draw: function(context){
-            var context = context || Framework.Game._context;            
-            this.countAbsoluteProperty();
-            var i, target;           
-            for (i = 0; i < this.attachArray.length ; i++) {
-                this.attachArray[i].draw(this.context);
-            }
+        draw: function(painter){
+            var painter = painter || Framework.Game._context;            
+            //this.countAbsoluteProperty1();
 
-            if(context instanceof Framework.GameObject) {
-                context = context.context;  //表示傳進來的其實是GameObject或其 Concrete Class
-            }
-            context.drawImage(this.context.canvas, 0, 0);
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            //if(this.isObjectChanged) {
+                //this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.attachArray.forEach(function(ele){
+                    ele.draw(painter);
+                }, this);  
+            //} 
+
+                       
         },
 
         /**
@@ -68,7 +83,7 @@ var Framework = (function (Framework) {
                 throw 'target is undefined.';
             }
 
-            if(Framework.Util.isUndefined(target.draw) && Framework.Util.isUndefined(target.update)) {
+            if(Framework.Util.isUndefined(target.draw) || Framework.Util.isUndefined(target.update)) {
                 throw 'target.draw or target.update is undefined.';
             }
 
@@ -107,5 +122,5 @@ var Framework = (function (Framework) {
             return '[Scene Object]';
         }
     });
-    return Framework;
+    return Framework; 
 })(Framework || {});
