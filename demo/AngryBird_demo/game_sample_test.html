@@ -2,12 +2,17 @@
 //陣列和載入JS檔的順序相同, lookFor為在要載入的檔案中, 
 //有用到的全域變數, importJS這個function, 會在找到lookFor的變數後
 //才會繼續loading下一個檔案, 如果沒有需要lookFor, 則以空字串代表
+var _id = 'Test';
+var _isConnectWebSocket = false;
 var listScript = 
 [
     { src: '../../src/loadFramework.js', lookFor: 'loadFrameworkEnd'},
     { src: 'game_sample/js/loadGame.js', lookFor: 'loadGameEnd'},
     { src: 'test/test.js'},
+	{ src: '../../src/FancyWebSocket.js'},
+	{ src: '../../src/SendWebSocket.js'},
 ];
+
 </script>
 
 <script type="text/javascript" src="../../src/testLoad.js"></script>
@@ -18,8 +23,6 @@ var listScript =
 	<div id="qunit"></div>
 	<div id="qunit-fixture"></div>
 	<script src="./test/qunit-1.15.0.js"></script>
-	
-	<!--<script src="./test/test1.js"></script>-->
 	
 <style type="text/css">
         /* DOM之間不要留空間 */

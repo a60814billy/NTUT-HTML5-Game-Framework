@@ -39,12 +39,12 @@ var Framework = (function (Framework) {
 			this.execute = function () {
 				try
 				{
-					console.log(this.infoString);
+					// console.log(this.infoString);
 					this.replayFunction();
 				}catch(err)
 				{
-					console.error('Action Fail:' + this.infoString + "\n" + err);
-					Framework.Game.pause();
+					// console.error('Action Fail:' + this.infoString + "\n" + err);
+					// Framework.Game.pause();
 				}
 				this.isDone = true;
 			}
@@ -97,10 +97,10 @@ var Framework = (function (Framework) {
 					assertMessage = "Passed!"
 					QUnit.assert.ok(isEqual, assertMessage );
 				} else {
-					assertMessage = 'Assert Fail! tagetValue: ' + evaluate(this.targetValue) + ', assertValue: ' + this.assertValue;
+					assertMessage = 'Assert Fail! targetValue: ' + evaluate(this.targetValue) + ', assertValue: ' + this.assertValue;
 					assertMessage += '\nFail at ' + this.infoString;
 					QUnit.assert.ok(isEqual, assertMessage );
-					Framework.Game.pause();
+					//Framework.Game.pause();
 				}
 			}
 		};
@@ -339,6 +339,25 @@ var Framework = (function (Framework) {
 			_replayList.push(item);
 		};
 
+		var mouseMove = function (x, y) {
+			var item = new replayItem();
+
+      		var callStack = new Error().stack;
+      		var splliString = callStack.split("at")[2].split("(")[1].replace(")","");
+			item.infoString = splliString;
+
+			item.replayFunction = function () {
+				var e = {
+					x : 0,
+					y : 0
+				};
+				e.x = x;
+				e.y = y;
+				Framework.Game.mousemove(e);
+			};
+			_replayList.push(item);
+		};
+		
 		var keyDown = function (key) {
 			var item = new replayItem();
 
@@ -510,6 +529,7 @@ var Framework = (function (Framework) {
 			mouseDown : mouseDown,
 			mouseClickObject : mouseClickObject,
 			mouseClickProperty : mouseClickProperty,
+			mouseMove : mouseMove,
 			keyDown : keyDown,
 			keyUp : keyUp,
 			keyPress : keyPress,

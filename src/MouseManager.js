@@ -73,6 +73,11 @@ var Framework = (function (Framework) {
 			e.preventDefault();
 			var e = countCanvasOffset(e);
 			userMouseMoveEvent.call(_subject, e);
+			
+			if(Framework.Game._isRecording && Framework.Game._config.isMouseMoveRecorded)
+            {
+            	Framework.Game._record.mousemove(e);
+            }
 		};
 
 		var contextmenuEvent = function(e) {

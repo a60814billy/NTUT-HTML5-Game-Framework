@@ -41,6 +41,7 @@ var loadFrameworkEnd;
     //才會繼續loading下一個檔案, 如果沒有需要lookFor, 則以空字串代表
     var frameworklistScript = 
     [
+		{ src: '../../src/config.js'},
         { src: '../../src/Record.js'},
         { src: '../../src/Replay.js'},
         { src: '../../src/EqualCondition.js'},

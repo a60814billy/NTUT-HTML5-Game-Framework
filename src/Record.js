@@ -62,6 +62,7 @@ var Framework = (function (Framework) {
             this.recordWait();
             this.record.push("Framework.Replay.mouseClick("+e.x+","+e.y+");");
             this.addDivString('&nbsp;&nbsp;&nbsp;&nbsp;'+this.record[this.record.length-1] + '<br>');
+			this.scrollToBottom();
         };
         this.mousedown = function (e) {
             this.recordWait();
@@ -69,17 +70,24 @@ var Framework = (function (Framework) {
         this.mouseup = function (e) {
             this.recordWait();
         };
-
+		this.mousemove = function (e) {
+            this.recordWait();
+            this.record.push("Framework.Replay.mouseMove("+e.x+","+e.y+");");
+            this.addDivString('&nbsp;&nbsp;&nbsp;&nbsp;'+this.record[this.record.length-1] + '<br>');
+			this.scrollToBottom();
+        };
         //keyboard Event
         this.keydown = function (e) {
             this.recordWait();
             this.record.push("Framework.Replay.keyDown('"+e.key+"');");
             this.addDivString('&nbsp;&nbsp;&nbsp;&nbsp;'+this.record[this.record.length-1] + '<br>');
+			this.scrollToBottom();
         };
         this.keyup = function (e) {
             this.recordWait();
             this.record.push("Framework.Replay.keyUp('"+e.key+"');");
             this.addDivString('&nbsp;&nbsp;&nbsp;&nbsp;'+this.record[this.record.length-1] + '<br>');
+			this.scrollToBottom();
         };
         this.keypress = function (e) {
             this.recordWait();
@@ -132,7 +140,9 @@ var Framework = (function (Framework) {
             this.record.push(command);
         }
 
-
+		this.scrollToBottom = function(){
+			document.getElementById("record_div").scrollTop = document.getElementById("record_div").scrollHeight
+		}
     };
 
     return Framework;

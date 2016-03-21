@@ -1,5 +1,6 @@
 // By Raccoon
 // include namespace
+
 var Framework = (function (Framework) {
 	'use strict'
 	/**
@@ -9,10 +10,11 @@ var Framework = (function (Framework) {
     */ 
 	Framework.Game = (function () {
         var that = {};
+		that._config = new Framework.Config();
 		// gameloop fps
-		that.fps = 60;
-		that.canvasWidth = 1600;
-		that.canvasHeight = 900;
+		that.fps = that._config.fps;
+		that.canvasWidth = that._config.canvasWidth;
+		that.canvasHeight = that._config.canvasHeight;
 		that.isBackwardCompatiable = true;
 
 		that._widthRatio = 1;
@@ -58,13 +60,26 @@ var Framework = (function (Framework) {
 			if(that._isRecordMode)
 			{
 				that._isRecording = true;
-				document.getElementById("start_btn").disabled = true;
-				document.getElementById("pause_btn").disabled = false;
-				document.getElementById("stop_btn").disabled = false;
-				document.getElementById("type_btn").disabled = false;
+				document.getElementById("start_btn").setAttribute("enable", "false");
+				document.getElementById("pause_btn").setAttribute("enable", "true");
+				document.getElementById("stop_btn").setAttribute("enable", "true");
+				document.getElementById("type_btn").setAttribute("enable", "true");
+				document.getElementById("replay_btn").setAttribute("enable", "true");
+				document.getElementById("variable_btn").setAttribute("enable", "false");
+				that.btnEnable();
 				that._record.start();
 				that.resume();
-
+			}
+			if(that._isReplay){
+				that.isContinue = true;
+				that._isRecordMode = true;
+				document.getElementById("start_btn").setAttribute("enable", "false");
+				document.getElementById("pause_btn").setAttribute("enable", "true");
+				document.getElementById("stop_btn").setAttribute("enable", "true");
+				document.getElementById("type_btn").setAttribute("enable", "true");
+				document.getElementById("replay_btn").setAttribute("enable", "true");
+				document.getElementById("variable_btn").setAttribute("enable", "false");
+				that.btnEnable();
 			}
 		};
 		that.recordPause = function()
@@ -72,9 +87,13 @@ var Framework = (function (Framework) {
 			if(that._isRecordMode)
 			{
 				that._isRecording = false;
-				document.getElementById("start_btn").disabled = false;
-				document.getElementById("pause_btn").disabled = true;
-				document.getElementById("stop_btn").disabled = false;
+				document.getElementById("start_btn").setAttribute("enable", "true");
+				document.getElementById("pause_btn").setAttribute("enable", "false");
+				document.getElementById("stop_btn").setAttribute("enable", "true");
+				document.getElementById("type_btn").setAttribute("enable", "true");
+				document.getElementById("replay_btn").setAttribute("enable", "false");
+				document.getElementById("variable_btn").setAttribute("enable", "true");
+				that.btnEnable();
 				that._record.pause();
 				that.pause();
 			}
@@ -84,16 +103,19 @@ var Framework = (function (Framework) {
 			if(that._isRecordMode)
 			{
 				that._isRecording = false;
-				document.getElementById("start_btn").disabled = false;
-				document.getElementById("pause_btn").disabled = true;
-				document.getElementById("stop_btn").disabled = true;
-				document.getElementById("type_btn").disabled = true;
+				document.getElementById("start_btn").setAttribute("enable", "false");
+				document.getElementById("pause_btn").setAttribute("enable", "false");
+				document.getElementById("stop_btn").setAttribute("enable", "false");
+				document.getElementById("type_btn").setAttribute("enable", "false");
+				document.getElementById("replay_btn").setAttribute("enable", "true");
+				document.getElementById("variable_btn").setAttribute("enable", "false");
+				that.btnEnable();
 				that._record.stop();
 			}
 		};
 		that.recordInput = function()
 		{
-			var command = prompt("Please enter command", "");
+			var command = prompt("Please enter comment", "");
     
 		    if (command != null) {
 				that._record.inputCommand("//"+command);
@@ -107,11 +129,25 @@ var Framework = (function (Framework) {
 			that._isRecordMode = false;
 			that._isTestMode = true;
 			that._record.isRecording = false;
+			that.isContinue = false;
 			var replayScript = document.getElementById("record_div").innerText;
 			document.getElementById("record_div").innerText = "";
-			that._record.start();
+			
 			that.getReplayScript(replayScript);
+			that._record.start();
 			that.start();
+			that._isRecording = true;
+			if(document.getElementById("variable_list") != null){
+				var div = document.getElementById("variable_list");
+				div.parentNode.removeChild(div);
+			}
+			document.getElementById("start_btn").setAttribute("enable", "true");
+			document.getElementById("pause_btn").setAttribute("enable", "false");
+			document.getElementById("stop_btn").setAttribute("enable", "false");
+			document.getElementById("type_btn").setAttribute("enable", "true");
+			document.getElementById("replay_btn").setAttribute("enable", "false");
+			document.getElementById("variable_btn").setAttribute("enable", "false");
+			that.btnEnable();
 		};
 		that.getReplayScript = function(script){
 			script = script.replace(/\n/g, "");
@@ -124,15 +160,100 @@ var Framework = (function (Framework) {
 			for(i=0; i<mainScript.length; i++){
 				mainScript[i] = mainScript[i].replace("\u00a0\u00a0\u00a0\u00a0", "");
 				// if(mainScript[i].indexOf("//", 0) === -1){
-				eval(mainScript[i]);
+				if(mainScript[i].indexOf("replay.assertEqual")!=0){
+					eval(mainScript[i]);
+				}
 				// }
 			}
 		};
-		that.recordContinue = function(){
-			that.isContinue = true;
-		};
+		// that.recordContinue = function(){
+			// that.isContinue = true;
+			// document.getElementById("start_btn").setAttribute("enable", "false");
+			// document.getElementById("pause_btn").setAttribute("enable", "true");
+			// document.getElementById("stop_btn").setAttribute("enable", "true");
+			// document.getElementById("type_btn").setAttribute("enable", "true");
+			// document.getElementById("replay_btn").setAttribute("enable", "true");
+			// document.getElementById("continue_btn").setAttribute("enable", "false");
+			// document.getElementById("variable_btn").setAttribute("enable", "false");
+			// that.btnEnable();
+		// };
 		that.showVariable = function(){
-			listMember(Framework.Game._currentLevel, "");
+			var maindiv = document.getElementById("main");
+			if(document.getElementById("variable_list") == null){
+				var variableDiv = document.createElement('div');
+				variableDiv.id = 'variable_list';
+				variableDiv.style.cssText = "width:100%;height:30%;background-color:#d3e0e6;overflow:auto;font-size:20;";
+				maindiv.appendChild(variableDiv);
+			}
+			else{
+				var div = document.getElementById("variable_list");
+				div.parentNode.removeChild(div);
+			}
+			listMember("Framework.Game._currentLevel", "&nbsp", "variable_list");
+		};
+		
+		that.btnMouseOver = function(button){
+			if(button.getAttribute('enable') === "true"){
+				if(button.id == "start_btn")
+					button.src = "game_sample/image/play_over.png";
+				if(button.id == "pause_btn")
+					button.src = "game_sample/image/pause_over.png";
+				if(button.id == "stop_btn")
+					button.src = "game_sample/image/stop_over.png";
+				if(button.id == "type_btn")
+					button.src = "game_sample/image/addComment_over.png";
+				if(button.id == "replay_btn")
+					button.src = "game_sample/image/replay_over.png";
+				if(button.id == "variable_btn")
+					button.src = "game_sample/image/variable_over.png";
+			}
+		};
+		that.btnMouseOut = function(button){
+			if(button.getAttribute('enable') === "true"){
+				if(button.id == "start_btn")
+					button.src = "game_sample/image/play.png";
+				if(button.id == "pause_btn")
+					button.src = "game_sample/image/pause.png";
+				if(button.id == "stop_btn")
+					button.src = "game_sample/image/stop.png";
+				if(button.id == "type_btn")
+					button.src = "game_sample/image/addComment.png";
+				if(button.id == "replay_btn")
+					button.src = "game_sample/image/replay.png";
+				if(button.id == "variable_btn")
+					button.src = "game_sample/image/variable.png";
+			}
+		};
+		that.btnEnable = function(){
+			if(document.getElementById("start_btn").getAttribute("enable") === "true")
+				document.getElementById("start_btn").src = "game_sample/image/play.png";
+			else
+				document.getElementById("start_btn").src = "game_sample/image/play_disable.png";
+			
+			if(document.getElementById("pause_btn").getAttribute("enable") === "true")
+				document.getElementById("pause_btn").src = "game_sample/image/pause.png";
+			else
+				document.getElementById("pause_btn").src = "game_sample/image/pause_disable.png";
+			
+			if(document.getElementById("stop_btn").getAttribute("enable") === "true")
+				document.getElementById("stop_btn").src = "game_sample/image/stop.png";
+			else
+				document.getElementById("stop_btn").src = "game_sample/image/stop_disable.png";
+			
+			if(document.getElementById("type_btn").getAttribute("enable") === "true")
+				document.getElementById("type_btn").src = "game_sample/image/addComment.png";
+			else
+				document.getElementById("type_btn").src = "game_sample/image/addComment_disable.png";
+			
+			if(document.getElementById("replay_btn").getAttribute("enable") === "true")
+				document.getElementById("replay_btn").src = "game_sample/image/replay.png";
+			else
+				document.getElementById("replay_btn").src = "game_sample/image/replay_disable.png";
+			
+			if(document.getElementById("variable_btn").getAttribute("enable") === "true")
+				document.getElementById("variable_btn").src = "game_sample/image/variable.png";
+			else
+				document.getElementById("variable_btn").src = "game_sample/image/variable_disable.png";
 		};
 		//Event Handler
 		// mouse event
@@ -159,6 +280,10 @@ var Framework = (function (Framework) {
 		};
 		that.mousemove = function (e) {
             that._currentLevel.mousemove(e);
+			if(that._isRecording)
+            {
+            	that._record.mousemove(e);
+            }
 		};
 		// touch event
 		that.touchstart = function (e) {
@@ -196,7 +321,14 @@ var Framework = (function (Framework) {
 		};
 
 		that._mainContainer = document.createElement('div');
-		if(that._isTestMode || that._isRecordMode){
+		if(that._isRecordMode){
+			that._mainContainer.style.position = "relative";
+			that._mainContainer.style.float = "left";
+			that._mainContainer.style.width = '70%';
+			that._mainContainer.style.height = '100%';
+			that._mainContainer.style.display = 'table';
+		}
+		else if(that._isTestMode){
 			that._mainContainer.style.position = "relative";
 			that._mainContainer.style.float = "left";
 			that._mainContainer.style.width = '70%';
@@ -217,8 +349,8 @@ var Framework = (function (Framework) {
 		that._canvas = document.createElement('canvas');	
 		that._canvas.style.backgroundColor = '#fff';		
 		that._canvas.setAttribute('id', '__game_canvas__');
-		that._canvas.width = 1600;
-		that._canvas.height = 900;
+		that._canvas.width = that._config.canvasWidth;
+		that._canvas.height = that._config.canvasHeight;
 		that._canvasContainer.appendChild(that._canvas);
 		that._mainContainer.appendChild(that._canvasContainer);
 		that._context = that._canvas.getContext('2d');
@@ -460,7 +592,7 @@ var Framework = (function (Framework) {
 
             if (!that._isInit) {
             	that.resizeEvent();
-                document.body.appendChild(that._mainContainer);
+				document.body.appendChild(that._mainContainer);
                 window.addEventListener("resize", that.resizeEvent, false);
             }
 
@@ -820,19 +952,63 @@ var Framework = (function (Framework) {
 	return Framework;
 })(Framework || {});
 
-listMember = function(main, space) {
-	var objArray;
-	for(key in main){
-		//not function
-		try{
-			if(main[key].toString().indexOf("function", 0) === -1){
-				console.log(space + key + ": " + main[key] + "\n");
-				if(main[key].toString() === "[Sprite Object]" || main[key].toString() === "[object Object]"){
-					listMember(main[key], space + "   ");
-				}
-			}
-		}catch(e){
-		
+listMember = function(main, space, divId) {
+	if(document.getElementById(divId+"_check")){
+		if(document.getElementById(divId+"_check").src.match("game_sample/image/arrow_over.png")){
+			document.getElementById(divId+"_check").src = "game_sample/image/arrow.png";
+		}else{
+			document.getElementById(divId+"_check").src = "game_sample/image/arrow_over.png";
 		}
 	}
+	var div = document.getElementById(divId);
+	var length = div.childNodes.length;
+	if(length > 4){
+		for(var i=4; i<length; i++){
+			div.removeChild(div.childNodes[4]);
+		}
+	}
+	else{
+		for(key in eval(main)){
+			//not function
+			try{
+				if(eval(main)[key].toString().indexOf("function", 0) === -1){
+					if(key != "rootScene" && key != "autoDelete" && key != "_firstDraw" && key != "_allGameElement"){
+						var varDiv = document.createElement("div");
+						varDiv.id = key;
+						varDiv.setAttribute("vertical-align","baseline");
+						var checkBox = document.createElement("img");
+						checkBox.setAttribute("src","game_sample/image/arrow.png");
+						checkBox.setAttribute("width","5%");
+						checkBox.setAttribute("id", key+"_check");
+						var func = 'listMember("'+main.toString()+'.'+ key.toString() +'", "'+space+"&nbsp&nbsp&nbsp"+'", "'+ key +'")';
+						checkBox.setAttribute("onclick", func);
+						varDiv.innerHTML += space;
+						varDiv.appendChild(checkBox);
+						varDiv.innerHTML += key +"&nbsp&nbsp&nbsp";
+						if(!isNaN(eval(main)[key])){
+							var btn = document.createElement("input");
+							btn.setAttribute("type","button");
+							btn.value = "Assert";
+							var func = 'addAssertion("'+main.toString()+'.'+ key.toString()+'","'+eval(main)[key]+'")'
+							btn.setAttribute("onclick", func);
+							varDiv.appendChild(btn);
+						}
+						varDiv.innerHTML += "<br>";
+						div.appendChild(varDiv);
+						// console.log(key + ": " + eval(main)[key] + "\n");
+					}
+				}
+			}catch(e){
+			
+			}
+		}
+		space += "&nbsp&nbsp&nbsp";
+	}
+};
+
+addAssertion = function(assertTarget, assertValue){
+	// var s = assertTarget.indexOf("Framework.Game._currentLevel.")
+	assertTarget = assertTarget.substring(29, assertTarget.length);
+	var recordDiv = document.getElementById("record_div");
+	document.getElementById("record_div").innerHTML += '<p>&nbsp;&nbsp;&nbsp;&nbsp;replay.assertEqual("'+assertTarget+'", '+assertValue+');</p>';
 };
