@@ -34,6 +34,9 @@ var Framework = (function (Framework) {
             this.timelist = [];
             this.updatetimelist = [];
             this.cycleCount = 0;
+
+            this.config = new Framework.Config();
+
         },
 
         _traversalAllElement: function(func) {
@@ -102,7 +105,7 @@ var Framework = (function (Framework) {
                 ctx.save();             
                 ctx.beginPath();
 
-                if(this._firstDraw) {
+                if(!this.config.isOptimize || this._firstDraw) {
                     rect.x = 0;
                     rect.y = 0;
                     rect.width = ctx.canvas.width;
