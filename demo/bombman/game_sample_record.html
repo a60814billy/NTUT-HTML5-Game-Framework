@@ -1,43 +1,49 @@
-<script>
-//陣列和載入JS檔的順序相同, lookFor為在要載入的檔案中, 
-//有用到的全域變數, importJS這個function, 會在找到lookFor的變數後
-//才會繼續loading下一個檔案, 如果沒有需要lookFor, 則以空字串代表
-var listScript = 
-[
-    { src: '../../src/loadFramework.js',lookFor: 'loadFrameworkEnd'},
-    { src: 'game_sample/js/loadGame.js',lookFor: 'loadGameEnd'}
-]
-</script>
-<script type="text/javascript" src="../../src/recordLoad.js"></script>
-<script type="text/javascript" src="../../src/jquery-2.1.4.min.js"></script>
-<!---->
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
 
-<div id="main" style="position: relative; float:left; width:30%; height:100%;">
-	<div style="background-color:#0d3247; width:100%; height:2.5%; font-family:Arial, sans-serif; color:white;">Record Control</div>
-	<div style="background-color:#c6e647; width:100%; height:0.5%;"></div>
-	<div id="record_control" style="background-color:#2b82ad;width:100%; height:10%;align="center">
-		<img id="start_btn" src='game_sample/image/play.png' style="position:relative; top:15%" width="15%"title="Record" onclick="Framework.Game.recordStart()" onmouseover="Framework.Game.btnMouseOver(this)" onmouseout="Framework.Game.btnMouseOut(this)" enable="true">
-		<img id="pause_btn" src='game_sample/image/pause_disable.png' style="position:relative; top:15%" width="15%"title="Pause" onclick ="Framework.Game.recordPause()" onmouseover="Framework.Game.btnMouseOver(this)" onmouseout="Framework.Game.btnMouseOut(this)" enable="false">
-		<img id="stop_btn"  src='game_sample/image/stop_disable.png' style="position:relative; top:15%" width="15%"title="Stop" onclick ="Framework.Game.recordStop()" onmouseover="Framework.Game.btnMouseOver(this)" onmouseout="Framework.Game.btnMouseOut(this)" enable="false">
-		<img id="type_btn"  src='game_sample/image/addComment_disable.png' style="position:relative; top:15%" width="15%" title="Add Comment" onclick ="Framework.Game.recordInput()" onmouseover="Framework.Game.btnMouseOver(this)" onmouseout="Framework.Game.btnMouseOut(this)" enable="false">
-		<img id="replay_btn" src='game_sample/image/replay_disable.png' style="position:relative; top:15%" width="15%" title="Replay" onclick ="Framework.Game.recordReplay()" onmouseover="Framework.Game.btnMouseOver(this)" onmouseout="Framework.Game.btnMouseOut(this)" enable="false">
-		<!--<img id="continue_btn"src='game_sample/image/continue_disable.png' style="position:relative; top:15%" width="13%" title="Continue Recording" onclick ="Framework.Game.recordContinue()" onmouseover="Framework.Game.btnMouseOver(this)" onmouseout="Framework.Game.btnMouseOut(this)" enable="false">-->
-		<img id="variable_btn"src='game_sample/image/variable_disable.png' style="position:relative; top:15%" width="15%" title="Assertion"onclick ="Framework.Game.showVariable()" onmouseover="Framework.Game.btnMouseOver(this)" onmouseout="Framework.Game.btnMouseOut(this)" enable="false">
-	</div>
-	<div style="background-color:#0d3247; width:100%; height:2.5%; font-family:Arial, sans-serif; color:white;">Record Script</div>
-	<div style="background-color:#c6e647; width:100%; height:0.5%;"></div>
-	<div id="record_div" style="background-color:#d3e0e6;width:100%;height:51%;overflow:auto;"></div>
-	<div style="background-color:#0d3247; width:100%; height:2.5%; font-family:Arial, sans-serif; color:white;">Game Variable</div>
-	<div style="background-color:#c6e647; width:100%; height:0.5%;"></div>
-</div>
-
-<style type="text/css">
-        /* DOM之間不要留空間 */
-        *{
-            padding:0;
-            margin:0;
+    <head>
+        <meta charset="utf-8" />
+        <title>OOPLab_Sample</title>
+        <script>
+        //陣列和載入JS檔的順序相同, lookFor為在要載入的檔案中, 
+        //有用到的全域變數, importJS這個function, 會在找到lookFor的變數後
+        //才會繼續loading下一個檔案, 如果沒有需要lookFor, 則以空字串代表
+        var listScript = [{
+            src: '../../src/loadFramework.js',
+            lookFor: 'loadFrameworkEnd'
+        }, {
+            src: 'game_sample/js/loadGame.js',
+            lookFor: 'loadGameEnd'
+        }, ]
+        </script>
+        <script type="text/javascript" src="../../src/recordLoad.js"></script>
+        <style type="text/css">
+        html,
+        body {
+            height: 100%;
         }
-		p{
-			color:#999999;
-		}
-</style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        </style>
+    </head>
+
+    <body>
+        <div id="main" style="position: relative; float:left; width:30%;">
+            <div id="record_control">
+                <input type="button" id="start_btn" value="Start" style="width:20%;height:40px;font-size:20px;" onclick="Framework.Game.recordStart()">
+                <input type="button" id="pause_btn" value="Pause" style="width:20%;height:40px;font-size:20px;" onclick="Framework.Game.recordPause()" disabled>
+                <input type="button" id="stop_btn" value="Stop" style="width:20%;height:40px;font-size:20px;" onclick="Framework.Game.recordStop()" disabled>
+                <input type="button" id="type_btn" value="Add Comment" style="width:30%;height:40px;font-size:20px;" onclick="Framework.Game.recordInput()" disabled>
+                <input type="button" id="replay_btn" value="Replay" style="width:30%;height:40px;font-size:20px;" onclick="Framework.Game.recordReplay()">
+                <input type="button" id="continue_btn" value="Continue" style="width:30%;height:40px;font-size:20px;" onclick="Framework.Game.recordContinue()">
+                <input type="button" id="variable_btn" value="Variable" style="width:30%;height:40px;font-size:20px;" onclick="Framework.Game.showVariable()">
+            </div>
+            <div id="record_div"></div>
+        </div>
+    </body>
+
+</html>

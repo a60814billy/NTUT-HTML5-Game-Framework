@@ -933,8 +933,8 @@ var Framework = (function (Framework) {
 			that._heightRatio = scaledHeight / that._canvas.height;		
 			//that._canvasContainer.style.width = scaledWidth;
 			//that._canvasContainer.style.height = scaledHeight;
-			that._canvas.style.width = scaledWidth;
-			that._canvas.style.height = scaledHeight;		
+			that._canvas.style.width = scaledWidth + 'px';
+			that._canvas.style.height = scaledHeight + 'px';		
 	
 		};
 
